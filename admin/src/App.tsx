@@ -4,6 +4,7 @@ import Sidebar from "./components/Sidebar";
 import BlogManagementPage from "./pages/BlogManagementPage";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import ComparisionManagementPage from "./pages/ComparisionManagementPage";
+import DealManagementPage from "./pages/DealsManagementPage";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -24,19 +25,21 @@ function AppContent() {
               path="/dashboard"
               element={<div>Dashboard (placeholder)</div>}
             />
-            <Route
-              path="/site-management"
-              element={<div>Site Management (placeholder)</div>}
-            />
-            <Route path="/reviews" element={<div>Reviews (placeholder)</div>} />
+
             <Route path="/blogs" element={<BlogManagementPage />} />
-            <Route path="/deals" element={<div>Deals (placeholder)</div>} />
-            <Route path="/stacks" element={<div>Stacks (placeholder)</div>} />
+            <Route path="/deals" element={<DealManagementPage />} />
             <Route
               path="/comparisons"
               element={<ComparisionManagementPage />}
             />
 
+            <Route
+              path="/site-management"
+              element={<div>Site Management (placeholder)</div>}
+            />
+
+            <Route path="/reviews" element={<div>Reviews (placeholder)</div>} />
+            <Route path="/stacks" element={<div>Stacks (placeholder)</div>} />
             <Route
               path="/analytics"
               element={<div>Analytics (placeholder)</div>}
