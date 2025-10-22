@@ -6,7 +6,7 @@ type Props = {
   onToggle?: (next: "live" | "maintenance") => void;
 };
 
-export default function BlogPageSettings({ status, onToggle }: Props) {
+export default function ComparisionPageSettings({ status, onToggle }: Props) {
   const [internal, setInternal] = useState<"live" | "maintenance">(
     status ?? "live"
   );
@@ -29,7 +29,7 @@ export default function BlogPageSettings({ status, onToggle }: Props) {
     <div className="w-full p-4 bg-zinc-800 rounded-2xl flex flex-col justify-start items-start gap-6">
       <div className="self-stretch pb-4 border-b border-zinc-700 inline-flex justify-between items-center">
         <div className="text-neutral-50 text-xl font-medium leading-loose">
-          Blog Page Settings
+          Comparision Page Settings
         </div>
 
         <button
@@ -52,10 +52,10 @@ export default function BlogPageSettings({ status, onToggle }: Props) {
         <div className="self-stretch inline-flex justify-start items-center gap-3">
           <div className="flex-1 inline-flex flex-col justify-start items-start gap-3">
             <div className="text-neutral-50 text-sm font-medium">
-              Blog Page Status
+              Comparision Page Status
             </div>
             <div className="text-zinc-400 text-base">
-              Set the blog page to live or maintenance mode.
+              Set the Comparision page to live or maintenance mode.
             </div>
           </div>
 

@@ -41,7 +41,7 @@ export default function BlogPageSettings({ status, onToggle }: Props) {
         >
           <ChevronDown
             className={`text-zinc-400 transition-transform duration-150 ${
-              open ? "rotate-0" : "rotate-180"
+              open ? "rotate-180" : "rotate-0"
             }`}
           />
         </button>

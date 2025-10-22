@@ -33,7 +33,7 @@ export default function HeroSectionManagement({
     topTagline ?? "For Expert Insights"
   );
   const [internalMain, setInternalMain] = useState(
-    mainHeadline ?? "Software Blogs"
+    mainHeadline ?? "Software Comparisions"
   );
   const [internalSub, setInternalSub] = useState(
     subHeadline ??

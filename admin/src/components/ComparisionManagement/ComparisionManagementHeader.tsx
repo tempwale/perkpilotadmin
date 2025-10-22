@@ -5,9 +5,9 @@ type Props = {
   onSave?: () => void;
 };
 
-export default function BlogManagementHeader({
-  title = "Blog Page Management",
-  subtitle = "Control overall setting for the blog page.",
+export default function ComparisionManagementHeader({
+  title = "Comparision Page Management",
+  subtitle = "Control overall setting for the Comparision page.",
   onPreview,
   onSave,
 }: Props) {
