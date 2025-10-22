@@ -1,142 +1,275 @@
-import React from "react";
-import { Link } from "react-router-dom";
-
-// Eye Icon SVG
-const EyeIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-  >
-    <path
-      fill-rule="evenodd"
-      clip-rule="evenodd"
-      d="M12 17.8C16.034 17.8 19.686 15.55 21.648 12C19.686 8.45 16.034 6.2 12 6.2C7.966 6.2 4.314 8.45 2.352 12C4.314 15.55 7.966 17.8 12 17.8ZM12 5C16.808 5 20.972 7.848 23 12C20.972 16.152 16.808 19 12 19C7.192 19 3.028 16.152 1 12C3.028 7.848 7.192 5 12 5ZM12 14.8C12.7426 14.8 13.4548 14.505 13.9799 13.9799C14.505 13.4548 14.8 12.7426 14.8 12C14.8 11.2574 14.505 10.5452 13.9799 10.0201C13.4548 9.495 12.7426 9.2 12 9.2C11.2574 9.2 10.5452 9.495 10.0201 10.0201C9.495 10.5452 9.2 11.2574 9.2 12C9.2 12.7426 9.495 13.4548 10.0201 13.9799C10.5452 14.505 11.2574 14.8 12 14.8ZM12 16C10.9391 16 9.92172 15.5786 9.17157 14.8284C8.42143 14.0783 8 13.0609 8 12C8 10.9391 8.42143 9.92172 9.17157 9.17157C9.92172 8.42143 10.9391 8 12 8C13.0609 8 14.0783 8.42143 14.8284 9.17157C15.5786 9.92172 16 10.9391 16 12C16 13.0609 15.5786 14.0783 14.8284 14.8284C14.0783 15.5786 13.0609 16 12 16Z"
-      fill="#FAFAFA"
-    />
-  </svg>
-);
-
-// Arrow Up Icon SVG (rotated)
-const ArrowUpIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-  >
-    <path
-      d="M12.9693 19.2807C12.8995 19.211 12.8442 19.1283 12.8065 19.0373C12.7687 18.9462 12.7493 18.8486 12.7493 18.7501C12.7493 18.6515 12.7687 18.5539 12.8065 18.4628C12.8442 18.3718 12.8995 18.2891 12.9693 18.2194L18.4396 12.7501H3.7499C3.55099 12.7501 3.36022 12.671 3.21957 12.5304C3.07891 12.3897 2.9999 12.199 2.9999 12.0001C2.9999 11.8011 3.07891 11.6104 3.21957 11.4697C3.36022 11.3291 3.55099 11.2501 3.7499 11.2501H18.4396L12.9693 5.78068C12.8285 5.63995 12.7495 5.44907 12.7495 5.25005C12.7495 5.05103 12.8285 4.86016 12.9693 4.71943C13.11 4.5787 13.3009 4.49963 13.4999 4.49963C13.6989 4.49963 13.8898 4.5787 14.0305 4.71943L20.7805 11.4694C20.8503 11.5391 20.9056 11.6218 20.9433 11.7128C20.9811 11.8039 21.0005 11.9015 21.0005 12.0001C21.0005 12.0986 20.9811 12.1962 20.9433 12.2873C20.9056 12.3783 20.8503 12.461 20.7805 12.5307L14.0305 19.2807C13.9609 19.3504 13.8782 19.4057 13.7871 19.4435C13.6961 19.4812 13.5985 19.5006 13.4999 19.5006C13.4013 19.5006 13.3037 19.4812 13.2127 19.4435C13.1216 19.4057 13.0389 19.3504 12.9693 19.2807Z"
-      fill="#FAFAFA"
-    />
-  </svg>
-);
-
-interface DealsCardProps {
-  id?: string;
-  imageUrl?: string;
-  featured?: boolean;
-  views?: number | string;
-  title?: string;
-  description?: string;
-  tags?: string[];
-  readTime?: string;
-  date?: string;
+// SVG Components
+function DefaultLogo() {
+  return (
+    <svg
+      width="61"
+      height="60"
+      viewBox="0 0 61 60"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect x="2.5" y="2" width="56" height="56" rx="28" fill="#F9FAFB" />
+      <rect
+        x="1.5"
+        y="1"
+        width="58"
+        height="58"
+        rx="29"
+        stroke="white"
+        strokeOpacity="0.08"
+        strokeWidth="2"
+      />
+      <g clipPath="url(#clip0_1_1899)">
+        <path
+          d="M20 14H41V24.6667H30.5L20 14ZM20 24.6667H30.5L41 35.3333H30.5V46L20 35.3333V24.6667Z"
+          fill="#0D0D11"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_1_1899">
+          <rect
+            width="21"
+            height="32"
+            fill="white"
+            transform="translate(20 14)"
+          />
+        </clipPath>
+      </defs>
+    </svg>
+  );
 }
 
-const DealsCard: React.FC<DealsCardProps> = ({
-  id = "Deal-1",
-  imageUrl = "",
-  featured = true,
-  views = 1234,
-  title = "The Ultimate Remote Work Stack For 2025",
-  description = "From just a startup idea to getting 1000s of customers every month and getting loved by globally users like our latest feature about SaaS financing for struggling startups",
-  tags = ["SaaS", "Founders", "Marketplace"],
-  readTime = "2 Minute Read",
-  date = "27/06/2004",
-}) => {
+function VerificationIcon() {
   return (
-    <Link
-      to={`/Deal/${id}`}
-      className="w-full w-[466px] p-6 bg-white/5 rounded-3xl shadow-[0px_1px_4px_0px_rgba(12,12,13,0.05)] outline outline-1 outline-offset-[-1px] outline-white/10 inline-flex flex-col justify-center items-start gap-6"
+    <svg
+      width="25"
+      height="24"
+      viewBox="0 0 25 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
     >
-      {/* Image Section */}
-      <div className="self-stretch h-[238px] bg-white/10 rounded-2xl flex flex-col justify-center items-start gap-3 overflow-hidden">
-        <div className="self-stretch flex-1 rounded-2xl">
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt={title}
-              className="w-full h-full object-cover rounded-2xl"
-            />
-          ) : null}
-        </div>
-      </div>
-      {/* Content Section */}
-      <div className="self-stretch flex flex-col justify-start items-start gap-6">
-        <div className="self-stretch flex flex-col justify-start items-start gap-4">
-          {/* Top Row: Featured + Views */}
-          <div className="self-stretch inline-flex justify-between items-center">
-            <div className="flex justify-center items-center gap-3">
-              {featured && (
-                <div className="px-2 py-1 bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[100px] flex justify-center items-center gap-2.5">
-                  <div className="justify-start text-neutral-50 text-xs font-medium font-['Poppins']">
-                    Featured Article
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="flex justify-start items-center gap-2">
-              <span className="w-6 h-6 relative flex items-center justify-center">
-                <EyeIcon />
-              </span>
-              <div className="justify-start text-neutral-50 text-sm font-medium font-['Poppins']">
-                {views}
-              </div>
-            </div>
-          </div>
-          {/* Title */}
-          <div className="self-stretch justify-start text-neutral-50 text-2xl font-medium font-['Plus_Jakarta_Sans'] leading-loose">
-            {title}
-          </div>
-          {/* Description */}
-          <div className="self-stretch h-[45px] justify-start text-zinc-200 text-sm font-normal font-['Poppins'] overflow-hidden text-ellipsis">
-            {description}
-          </div>
-          {/* Tags */}
-          <div className="inline-flex justify-center items-center gap-3">
-            {tags.map((tag, idx) => (
-              <div
-                key={idx}
-                className="px-2 py-1 bg-white/10 rounded-[100px] flex justify-center items-center gap-2.5"
-              >
-                <div className="justify-start text-zinc-200 text-xs font-medium font-['Poppins']">
-                  {tag}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        {/* Bottom Row: Read Time + Date */}
-        <div className="self-stretch inline-flex justify-between items-center">
-          <div className="py-2 rounded flex justify-center items-center gap-2">
-            <div className="text-center justify-start text-neutral-50 text-base font-medium font-['Inter'] leading-normal">
-              {readTime}
-            </div>
-            <span className="w-6 h-6 relative flex items-center justify-center">
-              <ArrowUpIcon />
-            </span>
-          </div>
-          <div className="justify-start text-zinc-300 text-sm font-medium font-['Poppins']">
-            {date}
-          </div>
-        </div>
-      </div>
-    </Link>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M15.9178 5.64301C15.7799 5.42265 15.5767 5.25077 15.3365 5.15129C15.0964 5.05181 14.8311 5.02969 14.5778 5.08801L12.7798 5.50101C12.5955 5.54336 12.4041 5.54336 12.2198 5.50101L10.4218 5.08801C10.1685 5.02969 9.90326 5.05181 9.66308 5.15129C9.42291 5.25077 9.21972 5.42265 9.08181 5.64301L8.10181 7.20701C8.00181 7.36701 7.86681 7.50201 7.70681 7.60301L6.14281 8.58301C5.92283 8.7208 5.7512 8.92366 5.65174 9.16342C5.55229 9.40319 5.52994 9.66797 5.58781 9.92101L6.00081 11.721C6.04301 11.905 6.04301 12.0961 6.00081 12.28L5.58781 14.079C5.52972 14.3322 5.55195 14.5972 5.65142 14.8372C5.75088 15.0771 5.92264 15.2802 6.14281 15.418L7.70681 16.398C7.86681 16.498 8.00181 16.633 8.10281 16.793L9.08281 18.357C9.36481 18.808 9.90281 19.031 10.4218 18.912L12.2198 18.499C12.4041 18.4567 12.5955 18.4567 12.7798 18.499L14.5788 18.912C14.832 18.9701 15.097 18.9479 15.337 18.8484C15.5769 18.7489 15.78 18.5772 15.9178 18.357L16.8978 16.793C16.9978 16.633 17.1328 16.498 17.2928 16.398L18.8578 15.418C19.078 15.28 19.2497 15.0767 19.349 14.8365C19.4483 14.5964 19.4702 14.3312 19.4118 14.078L18.9998 12.28C18.9575 12.0957 18.9575 11.9043 18.9998 11.72L19.4128 9.92101C19.471 9.66792 19.4489 9.403 19.3496 9.16304C19.2504 8.92308 19.0788 8.72 18.8588 8.58201L17.2938 7.60201C17.134 7.50183 16.999 7.36679 16.8988 7.20701L15.9178 5.64301ZM15.4148 9.77001C15.4767 9.65628 15.492 9.52298 15.4576 9.39818C15.4231 9.27338 15.3416 9.16679 15.2302 9.10085C15.1188 9.03491 14.9862 9.01476 14.8602 9.04463C14.7342 9.0745 14.6248 9.15206 14.5548 9.26101L11.9398 13.687L10.3608 12.175C10.314 12.1269 10.2579 12.0887 10.196 12.0628C10.1341 12.0368 10.0676 12.0236 10.0004 12.0239C9.93329 12.0242 9.8669 12.038 9.80522 12.0645C9.74353 12.091 9.68781 12.1296 9.64139 12.1781C9.59497 12.2267 9.55879 12.284 9.53501 12.3468C9.51124 12.4096 9.50035 12.4765 9.503 12.5436C9.50566 12.6107 9.52179 12.6766 9.55045 12.7373C9.57911 12.798 9.6197 12.8523 9.66981 12.897L11.7038 14.846C11.7582 14.8981 11.8237 14.9371 11.8954 14.9603C11.9671 14.9835 12.043 14.9902 12.1177 14.9799C12.1923 14.9697 12.2636 14.9426 12.3263 14.9009C12.389 14.8592 12.4415 14.8039 12.4798 14.739L15.4148 9.77001Z"
+        fill="white"
+      />
+    </svg>
   );
-};
+}
 
-export default DealsCard;
+interface DealCardProps {
+  title?: string;
+  category?: string;
+  description?: string;
+  logoComponent?: React.ReactNode;
+  verified?: boolean;
+  dealType?: string;
+  features?: string[];
+  discount?: string;
+  savings?: string;
+  onViewDetails?: () => void;
+  onGetDeal?: () => void;
+}
+
+function CheckCircle({ className }: { className?: string }) {
+  return (
+    <div className={className}>
+      <VerificationIcon />
+    </div>
+  );
+}
+
+export default function DealCard({
+  title = "Framer",
+  category = "No-Code Tool",
+  description = "Every communications experience, Integrated contact center, voice, video, chat, and APIs.",
+  logoComponent = <DefaultLogo />,
+  verified = true,
+  dealType = "Hot Deal",
+  features = [
+    "Unlimited Blocks",
+    "Team Collaboration",
+    "Advance Permissions",
+    "Version History",
+  ],
+  discount = "25% OFF",
+  savings = "Save Up To $1234",
+  onViewDetails,
+  onGetDeal,
+}: DealCardProps) {
+  return (
+    <div
+      className="backdrop-blur-md backdrop-filter bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.08)] border-solid box-border content-stretch flex flex-col gap-[16px] items-center pb-[16px] pt-0 px-[16px] relative rounded-[24px] size-full"
+      data-name="Card"
+      data-node-id="1:1652"
+    >
+      <div
+        className="border-[rgba(235,239,245,0.12)] border-b border-l-0 border-r-0 border-solid border-t-0 box-border content-stretch flex flex-col gap-[16px] items-start px-0 py-[16px] relative shrink-0 w-full"
+        data-node-id="1:1653"
+      >
+        <div
+          className="content-stretch flex items-center justify-between relative shrink-0 w-full"
+          data-node-id="1:1654"
+        >
+          <div
+            className="content-stretch flex flex-[1_0_0] gap-[12px] items-center min-h-px min-w-px relative shrink-0"
+            data-node-id="1:1655"
+          >
+            <div
+              className="bg-gray-50 border-2 border-[rgba(255,255,255,0.08)] border-solid box-border content-stretch flex gap-[10px] items-center justify-center p-[10px] relative rounded-[100px] shrink-0 size-[56px]"
+              data-node-id="1:1656"
+            >
+              <div
+                className="h-[32px] relative shrink-0 w-[21px]"
+                data-name="logo"
+                data-node-id="1:1657"
+              >
+                {logoComponent}
+              </div>
+            </div>
+            <div
+              className="content-stretch flex flex-col gap-[4px] items-start relative shrink-0"
+              data-node-id="1:1659"
+            >
+              <div
+                className="content-stretch flex gap-[8px] items-center relative shrink-0"
+                data-node-id="1:1660"
+              >
+                <p
+                  className="font-medium leading-[normal] relative shrink-0 text-[20px] text-white"
+                  data-node-id="1:1661"
+                >
+                  {title}
+                </p>
+                {verified && (
+                  <div
+                    className="relative shrink-0 size-[24px]"
+                    data-name="verification-icon"
+                    data-node-id="1:1662"
+                  >
+                    <VerificationIcon />
+                  </div>
+                )}
+              </div>
+              <p
+                className="leading-[normal] not-italic relative shrink-0 text-[#cbd2da] text-[12px]"
+                data-node-id="1:1664"
+              >
+                {category}
+              </p>
+            </div>
+          </div>
+          <div
+            className="bg-[rgba(255,255,255,0.08)] box-border content-stretch flex gap-[16px] items-start px-[12px] py-[4px] relative rounded-[100px] shrink-0"
+            data-name="Container"
+            data-node-id="1:1665"
+          >
+            <p
+              className="leading-[normal] not-italic relative shrink-0 text-[12px] text-center text-gray-50"
+              data-node-id="1:1666"
+            >
+              {dealType}
+            </p>
+          </div>
+        </div>
+        <div
+          className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full"
+          data-node-id="1:1667"
+        >
+          <p
+            className="leading-[normal] not-italic relative shrink-0 text-[#cbd2da] text-[12px] w-full whitespace-pre-wrap"
+            data-node-id="1:1668"
+          >
+            {description}
+          </p>
+          <div
+            className="content-stretch flex flex-col gap-[12px] items-start relative shrink-0 w-full"
+            data-node-id="1:1669"
+          >
+            <p
+              className="leading-[normal] not-italic relative shrink-0 text-[#ebeff5] text-[14px]"
+              data-node-id="1:1670"
+            >
+              What's Included
+            </p>
+            <div
+              className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0"
+              data-node-id="1:1671"
+            >
+              {features.map((feature, index) => (
+                <div
+                  key={index}
+                  className="content-stretch flex gap-[8px] items-center relative shrink-0"
+                  data-node-id="1:1672"
+                >
+                  <CheckCircle className="overflow-clip relative shrink-0 size-[20px]" />
+                  <p
+                    className="font-normal leading-[21px] relative shrink-0 text-[14px] text-white"
+                    data-node-id="1:1674"
+                  >
+                    {feature}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div
+          className="bg-[rgba(255,255,255,0.08)] box-border content-stretch flex items-center justify-between px-[16px] py-[8px] relative rounded-[100px] shrink-0 w-full"
+          data-node-id="1:1684"
+        >
+          <div
+            className="content-stretch flex gap-[10px] items-center justify-center relative shrink-0"
+            data-node-id="1:1685"
+          >
+            <p
+              className="leading-[normal] not-italic relative shrink-0 text-[14px] text-neutral-50"
+              data-node-id="1:1686"
+            >
+              {discount}
+            </p>
+          </div>
+          <p
+            className="leading-[normal] not-italic relative shrink-0 text-[14px] text-zinc-200"
+            data-node-id="1:1687"
+          >
+            {savings}
+          </p>
+        </div>
+      </div>
+      <div
+        className="content-stretch flex gap-[24px] items-center relative shrink-0 w-full"
+        data-name="Filter"
+        data-node-id="1:1688"
+      >
+        <button
+          onClick={onViewDetails}
+          className="bg-[rgba(255,255,255,0.08)] box-border content-stretch flex flex-[1_0_0] items-center justify-center min-h-px min-w-px px-[12px] py-[8px] relative rounded-[100px] shrink-0 hover:bg-[rgba(255,255,255,0.12)] transition-colors"
+          data-name="All Assets"
+          data-node-id="1:1689"
+        >
+          <p
+            className="leading-[24px] not-italic relative shrink-0 text-[16px] text-neutral-50"
+            data-node-id="1:1690"
+          >
+            View Details
+          </p>
+        </button>
+        <button
+          onClick={onGetDeal}
+          className="group bg-white hover:bg-gradient-to-b hover:from-[#501BD6] hover:to-[#7F57E2] box-border content-stretch flex flex-[1_0_0] items-center justify-center min-h-px min-w-px px-[12px] py-[8px] relative rounded-[100px] shrink-0 transition-all duration-200"
+          data-name="All Assets"
+          data-node-id="1:1691"
+        >
+          <p
+            className="leading-[24px] not-italic relative shrink-0 text-[16px] text-zinc-950 group-hover:text-white transition-colors duration-200"
+            data-node-id="1:1692"
+          >
+            Get This Deal
+          </p>
+        </button>
+      </div>
+    </div>
+  );
+}
