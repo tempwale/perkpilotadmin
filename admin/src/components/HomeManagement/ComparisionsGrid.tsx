@@ -6,7 +6,12 @@ import deviconSlack from "../../assets/app-icons/devicon_slack.svg";
 import logosAirtable from "../../assets/app-icons/logos_airtable.svg";
 import skillIconsWebflow from "../../assets/app-icons/skill-icons_webflow.svg";
 
-const ComparisionsGrid: React.FC = () => {
+type ComparisionsGridProps = {
+  data?: any[];
+  searchQuery?: string;
+};
+
+const ComparisionsGrid: React.FC<ComparisionsGridProps> = ({ data }) => {
   const comparisons = [
     {
       app1Name: "Framer",
@@ -45,10 +50,12 @@ const ComparisionsGrid: React.FC = () => {
     // Add your navigation logic here
   };
 
+  const source = data && data.length ? data : comparisons;
+
   return (
     <div className="w-full lg: py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center items-stretch">
-        {comparisons.map((comparison, index) => (
+        {source.map((comparison: any, index: number) => (
           <div key={index} className="w-full flex">
             <ComparisionsCard
               app1Name={comparison.app1Name}

@@ -6,6 +6,9 @@ import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import ComparisionManagementPage from "./pages/ComparisionManagementPage";
 import DealManagementPage from "./pages/DealsManagementPage";
 import HomeManagementPage from "./pages/HomePageManagement";
+import AddComparisionPage from "./pages/AddComparisionPage";
+import AddDealPage from "./pages/AddDealPage";
+import AddReviewPage from "./pages/AddReviewPage";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -29,10 +32,13 @@ function AppContent() {
 
             <Route path="/blogs" element={<BlogManagementPage />} />
             <Route path="/deals" element={<DealManagementPage />} />
+            <Route path="/adddeal" element={<AddDealPage />} />
+
             <Route
               path="/comparisons"
               element={<ComparisionManagementPage />}
             />
+            <Route path="/addcomparision" element={<AddComparisionPage />} />
             <Route path="/home" element={<HomeManagementPage />} />
 
             <Route
@@ -41,6 +47,7 @@ function AppContent() {
             />
 
             <Route path="/reviews" element={<div>Reviews (placeholder)</div>} />
+            <Route path="/addreview" element={<AddReviewPage />} />
             <Route path="/stacks" element={<div>Stacks (placeholder)</div>} />
             <Route
               path="/analytics"
