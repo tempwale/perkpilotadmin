@@ -5,6 +5,7 @@ import BlogManagementPage from "./pages/BlogManagementPage";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import ComparisionManagementPage from "./pages/ComparisionManagementPage";
 import DealManagementPage from "./pages/DealsManagementPage";
+import HomeManagementPage from "./pages/HomePageManagement";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ function AppContent() {
               path="/comparisons"
               element={<ComparisionManagementPage />}
             />
+            <Route path="/home" element={<HomeManagementPage />} />
 
             <Route
               path="/site-management"
