@@ -1,4 +1,4 @@
-import { GripIcon, GripVertical, Plus, PlusIcon } from "lucide-react";
+import { GripVertical, PlusIcon } from "lucide-react";
 import { useState } from "react";
 
 type ModulesCardProps = {
