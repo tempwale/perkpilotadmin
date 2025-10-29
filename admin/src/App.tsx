@@ -4,11 +4,13 @@ import Sidebar from "./components/Sidebar";
 import BlogManagementPage from "./pages/BlogManagementPage";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import ComparisionManagementPage from "./pages/ComparisionManagementPage";
-import DealManagementPage from "./pages/DealsManagementPage";
+import DealManagementPage from "./pages/Deal/DealsManagementPage";
 import HomeManagementPage from "./pages/HomePageManagement";
 import AddComparisionPage from "./pages/AddComparisionPage";
-import AddDealPage from "./pages/AddDealPage";
+import AddDealPage from "./pages/Deal/AddDealPage";
 import AddReviewPage from "./pages/AddReviewPage";
+import DealsPage from "./pages/Deal/DealsPage";
+import UpdateDealPage from "./pages/Deal/UpdateDealPage";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -24,15 +26,12 @@ function AppContent() {
         {/* You can add other content here */}
         <div className="m-4">
           <Routes>
-            <Route path="/" element={<div>Dashboard (placeholder)</div>} />
-            <Route
-              path="/dashboard"
-              element={<div>Dashboard (placeholder)</div>}
-            />
-
             <Route path="/blogs" element={<BlogManagementPage />} />
-            <Route path="/deals" element={<DealManagementPage />} />
+
+            <Route path="deals" element={<DealsPage />} />
+            <Route path="/dealsmanagement" element={<DealManagementPage />} />
             <Route path="/adddeal" element={<AddDealPage />} />
+            <Route path="/updatedeal/:id" element={<UpdateDealPage />} />
 
             <Route
               path="/comparisons"
@@ -41,28 +40,7 @@ function AppContent() {
             <Route path="/addcomparision" element={<AddComparisionPage />} />
             <Route path="/home" element={<HomeManagementPage />} />
 
-            <Route
-              path="/site-management"
-              element={<div>Site Management (placeholder)</div>}
-            />
-
-            <Route path="/reviews" element={<div>Reviews (placeholder)</div>} />
             <Route path="/addreview" element={<AddReviewPage />} />
-            <Route path="/stacks" element={<div>Stacks (placeholder)</div>} />
-            <Route
-              path="/analytics"
-              element={<div>Analytics (placeholder)</div>}
-            />
-            <Route path="/users" element={<div>Users (placeholder)</div>} />
-            <Route
-              path="/settings"
-              element={<div>Settings (placeholder)</div>}
-            />
-            <Route path="/support" element={<div>Support (placeholder)</div>} />
-            <Route
-              path="/admin-management"
-              element={<div>Admin Management (placeholder)</div>}
-            />
           </Routes>
         </div>
       </div>

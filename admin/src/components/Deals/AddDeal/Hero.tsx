@@ -1,7 +1,88 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import FooterActions from "./FooterActions";
+import { Plus } from "lucide-react";
+export default function Hero({
+  reviewId,
+  create,
+}: {
+  reviewId?: string;
+  create?: boolean;
+}) {
+  const [loadingDeal, setLoadingDeal] = useState(false);
 
-export default function ToolComparisonForm() {
+  useEffect(() => {
+    // If a reviewId (deal id) was provided, fetch the deal and prefill the form
+    if (!reviewId) {
+      if (create) console.log("Hero running in create mode");
+      return;
+    }
+
+    let mounted = true;
+
+    (async () => {
+      setLoadingDeal(true);
+      setErrorMessage(null);
+      try {
+        const res = await fetch(`http://localhost:5000/api/deals/${reviewId}`);
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body.message || `Server returned ${res.status}`);
+        }
+        const data = await res.json();
+        if (!mounted) return;
+
+        // Map backend deal model to our form fields
+        setFormData((prev) => ({
+          ...prev,
+          toolName: data.name ?? prev.toolName,
+          toolCategory: data.category ?? prev.toolCategory,
+          toolDescription: data.description ?? prev.toolDescription,
+          dealBadge: data.tag ?? prev.dealBadge,
+          features:
+            Array.isArray(data.features) && data.features.length > 0
+              ? data.features
+              : prev.features,
+          saveUptoAmount:
+            data.savingsAmount !== undefined && data.savingsAmount !== null
+              ? String(data.savingsAmount)
+              : prev.saveUptoAmount,
+          discountValue:
+            data.discountPercentage !== undefined &&
+            data.discountPercentage !== null
+              ? String(data.discountPercentage)
+              : prev.discountValue,
+          primaryCtaText:
+            data.primary_cta_text ?? data.primaryCtaText ?? prev.primaryCtaText,
+          secondaryCtaText:
+            data.secondary_cta_text ??
+            data.secondaryCtaText ??
+            prev.secondaryCtaText,
+          primaryCtaLink:
+            data.primary_cta_link ?? data.primaryCtaLink ?? prev.primaryCtaLink,
+          secondaryCtaLink:
+            data.secondary_cta_link ??
+            data.secondaryCtaLink ??
+            prev.secondaryCtaLink,
+        }));
+
+        // If server provided a logo URI, place it into logoFiles[0]
+        if (data.logoUri) {
+          setLogoFiles([data.logoUri, null, null]);
+          setSelectedLogo(0);
+        }
+      } catch (err: any) {
+        console.error("Failed to fetch deal:", err);
+        if (mounted)
+          setErrorMessage(err?.message || "Failed to load deal data");
+      } finally {
+        if (mounted) setLoadingDeal(false);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [reviewId, create]);
   type FormDataShape = {
     toolName: string;
     toolCategory: string;
@@ -62,6 +143,9 @@ export default function ToolComparisonForm() {
     null,
     null,
   ]);
+  const [submitting, setSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Handle input changes for all text fields
   const handleInputChange = (
@@ -125,10 +209,86 @@ export default function ToolComparisonForm() {
   // Handle form submission
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
-    console.log("Selected Logo Index:", selectedLogo);
-    console.log("Logo Files:", logoFiles);
-    // Add your API call or submission logic here
+    setSuccessMessage(null);
+    setErrorMessage(null);
+
+    // Basic client-side validation (use trimmed values to avoid whitespace-only input)
+    const name = (formData.toolName ?? "").toString().trim();
+    const category = (formData.toolCategory ?? "").toString().trim();
+    const description = (formData.toolDescription ?? "").toString().trim();
+
+    if (!name || !category || !description) {
+      setErrorMessage(
+        "Please fill in the required fields: Tool Name, Category and Description."
+      );
+      // helpful debug info for devs (view in browser console)
+      // eslint-disable-next-line no-console
+      console.debug("AddDeal validation failed", {
+        name,
+        category,
+        description,
+      });
+      return;
+    }
+
+    (async () => {
+      setSubmitting(true);
+      try {
+        // Build payload to match backend Deal model
+        const payload = {
+          name: formData.toolName,
+          category: formData.toolCategory,
+          description: formData.toolDescription,
+          features: formData.features.filter(
+            (f) => typeof f === "string" && f.trim() !== ""
+          ),
+          // numeric fields
+          discountPercentage: Number(formData.discountValue) || 0,
+          savingsAmount: Number(formData.saveUptoAmount) || 0,
+          tag: formData.dealBadge || null,
+          logoUri: null,
+          verified: false,
+          // CTA fields (backend expects snake_case)
+          primary_cta_text: formData.primaryCtaText || null,
+          secondary_cta_text: formData.secondaryCtaText || null,
+          primary_cta_link: formData.primaryCtaLink || null,
+          secondary_cta_link: formData.secondaryCtaLink || null,
+        } as any;
+
+        const res = await fetch("http://localhost:5000/api/deals/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const errBody = await res.json().catch(() => ({}));
+          throw new Error(errBody.message || `Server returned ${res.status}`);
+        }
+
+        const data = await res.json();
+        setSuccessMessage("Deal created successfully.");
+        console.log("Created deal:", data);
+        // Optionally reset form or navigate to deals list
+        // reset basic fields
+        setFormData((prev) => ({
+          ...prev,
+          toolName: "",
+          toolCategory: "",
+          toolDescription: "",
+          dealBadge: "",
+          features: ["", ""],
+        }));
+        setLogoFiles([null, null, null]);
+      } catch (err: any) {
+        console.error(err);
+        setErrorMessage(err.message || "Failed to create deal");
+      } finally {
+        setSubmitting(false);
+      }
+    })();
   };
 
   return (
@@ -396,17 +556,9 @@ export default function ToolComparisonForm() {
               data-layer="Add More Pros & Cons"
               className="AddMoreProsCons justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
             >
-              Add More Pros & Cons
+              Add More Features
             </div>
-            <div
-              data-layer="ic:round-plus"
-              className="IcRoundPlus w-6 h-6 relative overflow-hidden"
-            >
-              <div
-                data-layer="Vector"
-                className="Vector w-3.5 h-3.5 left-[5px] top-[5px] absolute bg-neutral-50"
-              />
-            </div>
+            <Plus size={16} className="text-neutral-50" />
           </button>
         </div>
 
@@ -620,7 +772,7 @@ export default function ToolComparisonForm() {
               data-layer="Primary CTA Button Link"
               className="PrimaryCtaButtonLink justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
             >
-              Primary CTA Button Link
+              Secondary CTA Button Link
             </div>
             <div
               data-layer="Input"
@@ -637,6 +789,28 @@ export default function ToolComparisonForm() {
             </div>
           </div>
         </div>
+
+        {/* Success / Error messages */}
+        {errorMessage && (
+          <div className="w-full text-left text-sm text-red-400 mt-2">
+            {errorMessage}
+          </div>
+        )}
+        {loadingDeal && (
+          <div className="w-full text-left text-sm text-zinc-400 mt-2">
+            Loading deal...
+          </div>
+        )}
+        {submitting && (
+          <div className="w-full text-left text-sm text-zinc-400 mt-2">
+            Submitting...
+          </div>
+        )}
+        {successMessage && (
+          <div className="w-full text-left text-sm text-emerald-400 mt-2">
+            {successMessage}
+          </div>
+        )}
 
         <FooterActions />
       </div>

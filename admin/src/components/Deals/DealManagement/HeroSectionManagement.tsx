@@ -1,6 +1,5 @@
 import { ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
-import UploadIconGrid from "../HomeManagement/UploadIconGrid";
 
 type Props = {
   topTagline?: string;
@@ -8,6 +7,7 @@ type Props = {
   subHeadline?: string;
   ctaText?: string;
   ctaLink?: string;
+  // image upload removed — keep props minimal
   tags?: string[];
   onChange?: (fields: {
     topTagline: string;
@@ -21,12 +21,13 @@ type Props = {
   onToggleOpen?: (next: boolean) => void;
 };
 
-export default function DiscountedIcons({
+export default function HeroSectionManagement({
   topTagline,
   mainHeadline,
   subHeadline,
   ctaText,
   ctaLink,
+
   tags,
   onChange,
   open: openProp,
@@ -50,6 +51,7 @@ export default function DiscountedIcons({
   );
   const [internalCtaText, setInternalCtaText] = useState<string>(ctaText ?? "");
   const [internalCtaLink, setInternalCtaLink] = useState<string>(ctaLink ?? "");
+  // NOTE: image preview/upload helpers removed for now — keep the component focused
 
   // sync prop -> internal when props change
   useEffect(() => {
@@ -106,7 +108,7 @@ export default function DiscountedIcons({
     <div className="w-full p-4 bg-zinc-800 rounded-2xl flex flex-col justify-start items-start gap-6">
       <div className="self-stretch pb-4 border-b border-zinc-700 inline-flex justify-between items-center">
         <div className="text-neutral-50 text-xl font-medium leading-loose">
-          Discounted Icons Section
+          Hero Section Management
         </div>
 
         <button
@@ -158,35 +160,6 @@ export default function DiscountedIcons({
               onChange={(e) => setInternalSub(e.target.value)}
             />
           </div>
-          <div className="flex flex-row w-full justify-between gap-6">
-            <div className="self-stretch w-full flex flex-col gap-3">
-              <label className="text-neutral-50 text-sm font-medium">
-                Primary CTA Button Text
-              </label>
-              <input
-                className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-zinc-200"
-                value={internalCtaText}
-                onChange={(e) => setInternalCtaText(e.target.value)}
-              />
-            </div>
-            <div className="self-stretch w-full flex flex-col justify-center items-start gap-3">
-              <label className="text-neutral-50 text-sm font-medium ">
-                Primary CTA Button Link
-              </label>
-              <input
-                className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-zinc-200"
-                value={internalCtaLink}
-                onChange={(e) => setInternalCtaLink(e.target.value)}
-              />
-            </div>
-          </div>
-          <div
-            data-layer="The main button for users to proceed with the tool"
-            className="TheMainButtonForUsersToProceedWithTheTool justify-start pl-2 text-neutral-50 text-[12px] font-medium "
-          >
-            The main button for users to proceed with the tool
-          </div>
-          <UploadIconGrid />
         </>
       )}
     </div>

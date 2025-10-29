@@ -1,8 +1,8 @@
-import DealManagementHeader from "../components/DealManagement/DealManagementHeader";
-import DealPageSettings from "../components/DealManagement/DealPageSettings";
-import HeroSectionManagement from "../components/DealManagement/HeroSectionManagement";
-import ArticleGrid from "../components/DealManagement/ArticleGrid";
-import FooterActions from "../components/DealManagement/FooterActions";
+import DealManagementHeader from "../../components/Deals/DealManagement/DealManagementHeader";
+import DealPageSettings from "../../components/Deals/DealManagement/DealPageSettings";
+import HeroSectionManagement from "../../components/Deals/DealManagement/HeroSectionManagement";
+import ArticleGrid from "../../components/Deals/DealManagement/ArticleGrid";
+import FooterActions from "../../components/Deals/DealManagement/FooterActions";
 
 export default function DealManagementPage() {
   return (
