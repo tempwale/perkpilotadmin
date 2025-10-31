@@ -4,7 +4,7 @@ import Pagination from "./Pagination";
 import fetchComparisions, { type Deal } from "../../../hooks/useDeals";
 
 // UI-facing Comparision shape that may include backend-specific fields.
-type UIComparision = Partial<Comparision> & {
+type UIComparision = Partial<Deal> & {
   _id?: string;
   id?: number;
   logoUri?: string;
