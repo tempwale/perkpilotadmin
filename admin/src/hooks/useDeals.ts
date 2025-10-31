@@ -8,8 +8,9 @@ export interface Deal {
   tags?: string[];
   publishedAt?: string; // ISO date string
 }
+import { DEALS_API } from "../config/backend";
 
-const DEFAULT_URL = "http://localhost:5000/api/deals";
+const DEFAULT_URL = DEALS_API;
 const DEFAULT_TIMEOUT = 10000; // 10s
 
 export async function fetchDeals(

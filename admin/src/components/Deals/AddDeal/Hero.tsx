@@ -1,6 +1,7 @@
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import FooterActions from "./FooterActions";
 import { Plus } from "lucide-react";
+import { DEALS_API } from "../../../config/backend";
 export default function Hero({
   reviewId,
   create,
@@ -23,7 +24,7 @@ export default function Hero({
       setLoadingDeal(true);
       setErrorMessage(null);
       try {
-        const res = await fetch(`http://localhost:5000/api/deals/${reviewId}`);
+        const res = await fetch(`${DEALS_API}/${reviewId}`);
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
           throw new Error(body.message || `Server returned ${res.status}`);
@@ -255,7 +256,7 @@ export default function Hero({
           secondary_cta_link: formData.secondaryCtaLink || null,
         } as any;
 
-        const res = await fetch("http://localhost:5000/api/deals/", {
+        const res = await fetch(`${DEALS_API}/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

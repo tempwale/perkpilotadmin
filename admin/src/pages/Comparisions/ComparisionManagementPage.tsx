@@ -1,8 +1,8 @@
-import ComparisionManagementHeader from "../components/ComparisionManagement/ComparisionManagementHeader";
-import ComparisionPageSettings from "../components/ComparisionManagement/ComparisionPageSettings";
-import HeroSectionManagement from "../components/ComparisionManagement/HeroSectionManagement";
-import ArticleGrid from "../components/ComparisionManagement/ArticleGrid";
-import FooterActions from "../components/ComparisionManagement/FooterActions";
+import ComparisionManagementHeader from "../../components/Comparisions/ComparisionManagement/ComparisionManagementHeader";
+import ComparisionPageSettings from "../../components/Comparisions/ComparisionManagement/ComparisionPageSettings";
+import HeroSectionManagement from "../../components/Comparisions/ComparisionManagement/HeroSectionManagement";
+import ArticleGrid from "../../components/Comparisions/ComparisionManagement/ArticleGrid";
+import FooterActions from "../../components/Comparisions/ComparisionManagement/FooterActions";
 
 export default function ComparisionManagementPage() {
   return (

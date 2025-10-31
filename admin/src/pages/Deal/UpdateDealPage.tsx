@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Header from "../../components/Deals/UpdateDeal/Header";
 import Hero from "../../components/Deals/UpdateDeal/Hero";
 import { useParams } from "react-router-dom";
+import { DEALS_API } from "../../config/backend";
 
 export default function UpdateDealPage() {
   const params = useParams();
@@ -18,7 +19,7 @@ export default function UpdateDealPage() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`http://localhost:5000/api/deals/${id}`);
+        const res = await fetch(`${DEALS_API}/${id}`);
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
           throw new Error(body.message || `Server returned ${res.status}`);

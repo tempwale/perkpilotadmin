@@ -3,14 +3,15 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import BlogManagementPage from "./pages/BlogManagementPage";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
-import ComparisionManagementPage from "./pages/ComparisionManagementPage";
+import ComparisionManagementPage from "./pages/Comparisions/ComparisionManagementPage";
 import DealManagementPage from "./pages/Deal/DealsManagementPage";
 import HomeManagementPage from "./pages/HomePageManagement";
-import AddComparisionPage from "./pages/AddComparisionPage";
+import AddComparisionPage from "./pages/Comparisions/AddComparisionPage";
 import AddDealPage from "./pages/Deal/AddDealPage";
 import AddReviewPage from "./pages/AddReviewPage";
 import DealsPage from "./pages/Deal/DealsPage";
 import UpdateDealPage from "./pages/Deal/UpdateDealPage";
+import ComparisionsPage from "./pages/Comparisions/ComparisionsPage";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -33,8 +34,9 @@ function AppContent() {
             <Route path="/adddeal" element={<AddDealPage />} />
             <Route path="/updatedeal/:id" element={<UpdateDealPage />} />
 
+            <Route path="/comparisons" element={<ComparisionsPage />} />
             <Route
-              path="/comparisons"
+              path="/Comparisionsmanagement"
               element={<ComparisionManagementPage />}
             />
             <Route path="/addcomparision" element={<AddComparisionPage />} />

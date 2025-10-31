@@ -1,6 +1,7 @@
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import FooterActions from "./FooterActions";
 import { Plus } from "lucide-react";
+import { DEALS_API } from "../../../config/backend";
 export default function ToolComparisonForm({
   reviewId,
   create,
@@ -72,7 +73,7 @@ export default function ToolComparisonForm({
       setLoadingDeal(true);
       setErrorMessage(null);
       try {
-        const res = await fetch(`http://localhost:5000/api/deals/${reviewId}`);
+        const res = await fetch(`${DEALS_API}/${reviewId}`);
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
           throw new Error(body.message || `Server returned ${res.status}`);
@@ -311,8 +312,8 @@ export default function ToolComparisonForm({
           null;
 
         const endpoint = editId
-          ? `http://localhost:5000/api/deals/${String(editId)}`
-          : "http://localhost:5000/api/deals/";
+          ? `${DEALS_API}/${String(editId)}`
+          : `${DEALS_API}/`;
 
         const method = editId ? "PUT" : "POST";
 

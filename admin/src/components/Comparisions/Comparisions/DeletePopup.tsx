@@ -1,30 +1,30 @@
 import { useState } from "react";
-import DealCard from "./DealsCard";
-import { DEALS_API } from "../../../config/backend";
+import ComparisionCard from "./ComparisionsCard";
+import { BACKEND_URL } from "../../../config/backend";
 
 export default function DeletePopup({
   onClose,
   onConfirm,
-  deal,
+  Comparision,
 }: {
   onClose?: () => void;
   onConfirm?: () => void;
-  deal?: any;
+  Comparision?: any;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleConfirm = async () => {
     setError(null);
-    const id = String(deal?.id ?? deal?._id ?? "");
+    const id = String(Comparision?.id ?? Comparision?._id ?? "");
     if (!id) {
-      setError("Missing deal id");
+      setError("Missing Comparision id");
       return;
     }
 
     try {
       setLoading(true);
-      const res = await fetch(`${DEALS_API}/${id}`, {
+      const res = await fetch(`${BACKEND_URL}/api/Comparisions/${id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });
@@ -39,7 +39,7 @@ export default function DeletePopup({
       onClose?.();
     } catch (err: any) {
       console.error("Delete failed", err);
-      setError(err?.message || "Failed to delete deal");
+      setError(err?.message || "Failed to delete Comparision");
     } finally {
       setLoading(false);
     }
@@ -68,10 +68,10 @@ export default function DeletePopup({
               className="Frame2147205563 flex-1 inline-flex flex-col justify-start items-start gap-3"
             >
               <div
-                data-layer="Want to delete this deal card?"
-                className="WantToDeleteThisDealCard self-stretch text-center justify-center text-neutral-50 text-lg font-semibold font-['Plus_Jakarta_Sans'] capitalize leading-6"
+                data-layer="Want to delete this Comparision card?"
+                className="WantToDeleteThisComparisionCard self-stretch text-center justify-center text-neutral-50 text-lg font-semibold font-['Plus_Jakarta_Sans'] capitalize leading-6"
               >
-                Want to delete this deal card?
+                Want to delete this Comparision card?
               </div>
               <div
                 data-layer="After deleting the stack it can be recover so be careful before deleting it!"
@@ -84,19 +84,19 @@ export default function DeletePopup({
           </div>
         </div>
         <div className="self-stretch flex justify-center">
-          {/* Render the DealCard inside popup as a compact preview */}
+          {/* Render the ComparisionCard inside popup as a compact preview */}
           <div className="w-[420px]">
-            <DealCard
-              id={String(deal?.id ?? deal?._id ?? "preview")}
-              title={deal?.title}
-              category={deal?.category ?? deal?.dealType}
-              description={deal?.description}
-              logoComponent={deal?.logoComponent}
-              verified={deal?.verified}
-              dealType={deal?.dealType}
-              features={deal?.features}
-              discount={deal?.discount}
-              savings={deal?.savings}
+            <ComparisionCard
+              id={String(Comparision?.id ?? Comparision?._id ?? "preview")}
+              title={Comparision?.title}
+              category={Comparision?.category ?? Comparision?.ComparisionType}
+              description={Comparision?.description}
+              logoComponent={Comparision?.logoComponent}
+              verified={Comparision?.verified}
+              ComparisionType={Comparision?.ComparisionType}
+              features={Comparision?.features}
+              discount={Comparision?.discount}
+              savings={Comparision?.savings}
             />
           </div>
         </div>
@@ -125,11 +125,11 @@ export default function DeletePopup({
                 />
               </svg>
               <div
-                data-layer="Note: Can’t be undone later! and you are free to edit this deal stack instead of deleting it full."
-                className="NoteCanTBeUndoneLaterAndYouAreFreeToEditThisDealStackInsteadOfDeletingItFull flex-1 justify-start text-neutral-50 text-xs font-normal font-['Poppins']"
+                data-layer="Note: Can’t be undone later! and you are free to edit this Comparision stack instead of deleting it full."
+                className="NoteCanTBeUndoneLaterAndYouAreFreeToEditThisComparisionStackInsteadOfDeletingItFull flex-1 justify-start text-neutral-50 text-xs font-normal font-['Poppins']"
               >
-                Note: Can’t be undone later! and you are free to edit this deal
-                stack instead of deleting it full.
+                Note: Can’t be undone later! and you are free to edit this
+                Comparision stack instead of deleting it full.
               </div>
             </div>
             {error && (

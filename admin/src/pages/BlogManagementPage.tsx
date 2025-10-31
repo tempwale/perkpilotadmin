@@ -1,8 +1,8 @@
-import BlogManagementHeader from "../components/BlogManagement/BlogManagementHeader";
-import BlogPageSettings from "../components/BlogManagement/BlogPageSettings";
-import HeroSectionManagement from "../components/BlogManagement/HeroSectionManagement";
-import ArticleGrid from "../components/BlogManagement/ArticleGrid";
-import FooterActions from "../components/BlogManagement/FooterActions";
+import BlogManagementHeader from "../components/Blogs/BlogManagement/BlogManagementHeader";
+import BlogPageSettings from "../components/Blogs/BlogManagement/BlogPageSettings";
+import HeroSectionManagement from "../components/Blogs/BlogManagement/HeroSectionManagement";
+import ArticleGrid from "../components/Blogs/BlogManagement/ArticleGrid";
+import FooterActions from "../components/Blogs/BlogManagement/FooterActions";
 
 export default function BlogManagementPage() {
   return (

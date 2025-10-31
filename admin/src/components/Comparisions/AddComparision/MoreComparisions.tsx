@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { ChangeEvent } from "react";
-import ComparisionsGrid from "../HomeManagement/ComparisionsGrid";
+import ComparisionsGrid from "../../HomeManagement/ComparisionsGrid";
 import { ChevronDown, Trash } from "lucide-react";
 
 type ComparisonItem = {
