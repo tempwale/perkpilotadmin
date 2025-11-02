@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Trash2 } from "lucide-react";
 
 interface ProConItem {
@@ -7,7 +7,11 @@ interface ProConItem {
   con: string;
 }
 
-export default function ProConCard() {
+type Props = {
+  onProsConsChange?: (prosConsData: any) => void;
+};
+
+export default function ProConCard({ onProsConsChange }: Props) {
   const [titlePros, setTitlePros] = useState<string>("");
   const [titleCons, setTitleCons] = useState<string>("");
   const [items, setItems] = useState<ProConItem[]>([
@@ -17,6 +21,16 @@ export default function ProConCard() {
     { id: 4, pro: "", con: "" },
     { id: 5, pro: "", con: "" },
   ]);
+
+  useEffect(() => {
+    onProsConsChange?.([
+      {
+        titlePros,
+        titleCons,
+        items,
+      },
+    ]);
+  }, [titlePros, titleCons, items, onProsConsChange]);
 
   const addItem = (): void => {
     const newItem: ProConItem = {

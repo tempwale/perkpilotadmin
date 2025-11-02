@@ -2,6 +2,7 @@ import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import FooterActions from "./FooterActions";
 import { Plus } from "lucide-react";
 import { DEALS_API } from "../../../config/backend";
+import { fetchLogoByDomain } from "../../../utils/LogoFetch";
 export default function Hero({
   reviewId,
   create,
@@ -144,6 +145,11 @@ export default function Hero({
     null,
     null,
   ]);
+  const [logoFetchUrl, setLogoFetchUrl] = useState<string>("");
+  const [logoFetching, setLogoFetching] = useState<boolean>(false);
+  const [logoFetchError, setLogoFetchError] = useState<string | null>(null);
+  const [showCustomCategory, setShowCustomCategory] = useState<boolean>(false);
+  const [customCategory, setCustomCategory] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -207,6 +213,39 @@ export default function Hero({
     }
   };
 
+  // Handle logo fetch from domain
+  const handleFetchLogo = async () => {
+    if (!logoFetchUrl.trim()) {
+      setLogoFetchError("Please enter a domain or company name");
+      return;
+    }
+
+    setLogoFetching(true);
+    setLogoFetchError(null);
+
+    try {
+      const logoUrl = await fetchLogoByDomain(logoFetchUrl.trim());
+      if (logoUrl) {
+        const newLogoFiles = [...logoFiles];
+        newLogoFiles[selectedLogo] = logoUrl;
+        setLogoFiles(newLogoFiles);
+        setLogoFetchUrl("");
+      } else {
+        setLogoFetchError(
+          "Logo not found. Please try another domain or upload manually."
+        );
+      }
+    } catch (error) {
+      setLogoFetchError(
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch logo. Please try again."
+      );
+    } finally {
+      setLogoFetching(false);
+    }
+  };
+
   // Handle form submission
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -247,7 +286,7 @@ export default function Hero({
           discountPercentage: Number(formData.discountValue) || 0,
           savingsAmount: Number(formData.saveUptoAmount) || 0,
           tag: formData.dealBadge || null,
-          logoUri: null,
+          logoUri: logoFiles[0] || null,
           verified: false,
           // CTA fields (backend expects snake_case)
           primary_cta_text: formData.primaryCtaText || null,
@@ -348,8 +387,19 @@ export default function Hero({
               >
                 <select
                   name="toolCategory"
-                  value={formData.toolCategory}
-                  onChange={handleInputChange}
+                  value={showCustomCategory ? "custom" : formData.toolCategory}
+                  onChange={(e) => {
+                    if (e.target.value === "custom") {
+                      setShowCustomCategory(true);
+                      setCustomCategory("");
+                    } else {
+                      setShowCustomCategory(false);
+                      setFormData((prev) => ({
+                        ...prev,
+                        toolCategory: e.target.value,
+                      }));
+                    }
+                  }}
                   className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Poppins'] leading-6"
                 >
                   <option value="">Select Category</option>
@@ -358,8 +408,30 @@ export default function Hero({
                   <option value="development">Development</option>
                   <option value="marketing">Marketing</option>
                   <option value="analytics">Analytics</option>
+                  <option value="custom">+ Add Custom Category</option>
                 </select>
               </div>
+              {showCustomCategory && (
+                <div
+                  data-layer="Input"
+                  className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                >
+                  <input
+                    type="text"
+                    value={customCategory}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setCustomCategory(value);
+                      setFormData((prev) => ({
+                        ...prev,
+                        toolCategory: value,
+                      }));
+                    }}
+                    placeholder="Enter custom category"
+                    className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6"
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -444,6 +516,40 @@ export default function Hero({
                   </label>
                 </div>
               ))}
+            </div>
+
+            {/* Logo Fetch Input */}
+            <div className="w-full mt-4 flex flex-col gap-2">
+              <div className="text-neutral-50 text-xs font-medium font-['Poppins']">
+                Or fetch from domain
+              </div>
+              <div className="flex gap-2">
+                <div
+                  data-layer="Input"
+                  className="Input flex-1 h-10 px-3 py-2 relative bg-zinc-800 rounded-lg outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                >
+                  <input
+                    type="text"
+                    value={logoFetchUrl}
+                    onChange={(e) => setLogoFetchUrl(e.target.value)}
+                    placeholder="e.g., google.com"
+                    className="w-full bg-transparent outline-none text-zinc-400 text-sm font-normal font-['Poppins']"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleFetchLogo}
+                  disabled={logoFetching}
+                  className="px-4 py-2 bg-[#501bd6] hover:bg-[#6030e8] disabled:opacity-50 text-neutral-50 text-sm font-medium rounded-lg transition-colors"
+                >
+                  {logoFetching ? "Fetching..." : "Fetch"}
+                </button>
+              </div>
+              {logoFetchError && (
+                <div className="text-red-400 text-xs font-medium">
+                  {logoFetchError}
+                </div>
+              )}
             </div>
           </div>
         </div>

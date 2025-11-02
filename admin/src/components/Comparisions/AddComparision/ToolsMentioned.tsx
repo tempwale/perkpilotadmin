@@ -1,7 +1,12 @@
 import { GripVertical, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-type Tool = { id: string; name: string };
+type Tool = {
+  id: string;
+  name: string;
+  logo?: string;
+  category?: string;
+};
 
 type Props = {
   headline?: string;
@@ -57,6 +62,14 @@ export default function ToolsMentioned({
 
   function removeTool(id: string) {
     setTools((s) => s.filter((t) => t.id !== id));
+  }
+
+  function updateToolLogo(id: string, logo: string) {
+    setTools((s) => s.map((t) => (t.id === id ? { ...t, logo } : t)));
+  }
+
+  function updateToolCategory(id: string, category: string) {
+    setTools((s) => s.map((t) => (t.id === id ? { ...t, category } : t)));
   }
 
   function onKey(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -283,10 +296,29 @@ export default function ToolsMentioned({
                         data-layer="Productive Tool"
                         className="ProductiveTool justify-start text-zinc-400 text-xs font-medium font-['Poppins']"
                       >
-                        Productive Tool
+                        {tool.category || "Tool category"}
                       </div>
                     </div>
                   </div>
+                </div>
+                {/* Logo and Category Inputs */}
+                <div className="flex-1 flex flex-col gap-2">
+                  <input
+                    type="text"
+                    value={tool.logo || ""}
+                    onChange={(e) => updateToolLogo(tool.id, e.target.value)}
+                    placeholder="Logo URL"
+                    className="h-8 px-2 py-1 bg-zinc-700 rounded text-xs text-zinc-400 placeholder:text-zinc-500 outline-none"
+                  />
+                  <input
+                    type="text"
+                    value={tool.category || ""}
+                    onChange={(e) =>
+                      updateToolCategory(tool.id, e.target.value)
+                    }
+                    placeholder="Category"
+                    className="h-8 px-2 py-1 bg-zinc-700 rounded text-xs text-zinc-400 placeholder:text-zinc-500 outline-none"
+                  />
                 </div>
               </div>
               <X

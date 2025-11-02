@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Trash2, ChevronDown } from "lucide-react";
 
 interface Tool {
@@ -12,7 +12,11 @@ interface Feature {
   availability: boolean[];
 }
 
-export default function FeatureComparison() {
+type Props = {
+  onFeaturesChange?: (featuresData: any) => void;
+};
+
+export default function FeatureComparison({ onFeaturesChange }: Props) {
   const [sectionTitle, setSectionTitle] = useState<string>("");
   const [featureHeadline, setFeatureHeadline] = useState<string>("");
   const [tools, setTools] = useState<Tool[]>([
@@ -26,6 +30,27 @@ export default function FeatureComparison() {
     { id: 3, name: "", availability: [true, true, true] },
     { id: 4, name: "", availability: [true, true, true] },
   ]);
+
+  useEffect(() => {
+    // Transform features to match backend schema with tool1Available, tool2Available, etc.
+    const transformedFeatures = features.map((f) => {
+      const featureObj: any = {
+        featureName: f.name || "Untitled Feature",
+      };
+      // Add tool availability as tool1Available, tool2Available, tool3Available, etc.
+      f.availability.forEach((available, index) => {
+        featureObj[`tool${index + 1}Available`] = available;
+      });
+      return featureObj;
+    });
+
+    onFeaturesChange?.({
+      sectionTitle: sectionTitle || "Features",
+      featuresHeadline: featureHeadline || "Feature Comparison",
+      tools: tools.map((t) => t.name || `Tool ${t.id}`),
+      features: transformedFeatures,
+    });
+  }, [sectionTitle, featureHeadline, tools, features, onFeaturesChange]);
 
   const addFeature = (): void => {
     const newFeature: Feature = {

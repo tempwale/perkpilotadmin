@@ -1,5 +1,9 @@
 import ProConCard from "./ProConCard";
 
-export default function ProConGrid() {
-  return <ProConCard />;
+type Props = {
+  onProsConsChange?: (prosConsData: any[]) => void;
+};
+
+export default function ProConGrid({ onProsConsChange }: Props) {
+  return <ProConCard onProsConsChange={onProsConsChange} />;
 }

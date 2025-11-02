@@ -126,7 +126,7 @@ export default function DealCard({
                 data-node-id="1:1656"
               >
                 <div
-                  className="h-[32px] relative shrink-0 w-[21px]"
+                  className="h-[45px] relative shrink-0 w-[21px]"
                   data-name="logo"
                   data-node-id="1:1657"
                 >

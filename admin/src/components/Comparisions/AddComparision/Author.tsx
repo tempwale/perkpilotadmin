@@ -1,7 +1,17 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
-export default function Author() {
+type Props = {
+  onAuthorChange?: (author: string) => void;
+  onCategoryChange?: (category: string) => void;
+  onReadingTimeChange?: (time: string) => void;
+};
+
+export default function Author({
+  onAuthorChange,
+  onCategoryChange,
+  onReadingTimeChange,
+}: Props) {
   const [selectedAuthor, setSelectedAuthor] = useState("Select Author");
   const [selectedCategory, setSelectedCategory] = useState("Select Category");
   const [readingTime, setReadingTime] = useState("5 Minute");
@@ -11,6 +21,23 @@ export default function Author() {
 
   const authors = ["John Doe", "Jane Smith", "Alex Turner", "Emily Clark"];
   const categories = ["Tech", "Design", "Marketing", "Finance"];
+
+  const handleAuthorSelect = (author: string) => {
+    setSelectedAuthor(author);
+    setShowAuthors(false);
+    onAuthorChange?.(author);
+  };
+
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
+    setShowCategories(false);
+    onCategoryChange?.(category);
+  };
+
+  const handleReadingTimeChange = (time: string) => {
+    setReadingTime(time);
+    onReadingTimeChange?.(time);
+  };
 
   return (
     <div
@@ -39,10 +66,7 @@ export default function Author() {
                 <div
                   key={a}
                   className="px-4 py-2 hover:bg-zinc-700 cursor-pointer text-neutral-50 text-sm font-['Poppins']"
-                  onClick={() => {
-                    setSelectedAuthor(a);
-                    setShowAuthors(false);
-                  }}
+                  onClick={() => handleAuthorSelect(a)}
                 >
                   {a}
                 </div>
@@ -74,10 +98,7 @@ export default function Author() {
                 <div
                   key={c}
                   className="px-4 py-2 hover:bg-zinc-700 cursor-pointer text-neutral-50 text-sm font-['Poppins']"
-                  onClick={() => {
-                    setSelectedCategory(c);
-                    setShowCategories(false);
-                  }}
+                  onClick={() => handleCategorySelect(c)}
                 >
                   {c}
                 </div>
@@ -98,7 +119,7 @@ export default function Author() {
         <input
           type="text"
           value={readingTime}
-          onChange={(e) => setReadingTime(e.target.value)}
+          onChange={(e) => handleReadingTimeChange(e.target.value)}
           className="self-stretch h-14 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] focus:outline-none"
         />
       </div>

@@ -5,6 +5,7 @@ type Props = {
   body?: string;
   onHeadingChange?: (value: string) => void;
   onBodyChange?: (value: string) => void;
+  onImageChange?: (value: string) => void;
   showInputs?: boolean;
   className?: string;
 };
@@ -14,6 +15,7 @@ export default function Hero({
   body = "Hero Body",
   onHeadingChange,
   onBodyChange,
+  onImageChange,
   className = "",
 }: Props) {
   const [localHeading, setLocalHeading] = useState<string>(heading);
@@ -40,7 +42,9 @@ export default function Hero({
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        setImage(event.target?.result as string);
+        const imageData = event.target?.result as string;
+        setImage(imageData);
+        onImageChange?.(imageData);
       };
       reader.readAsDataURL(file);
     }

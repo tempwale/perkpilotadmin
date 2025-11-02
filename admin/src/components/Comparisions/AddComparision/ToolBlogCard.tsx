@@ -1,10 +1,18 @@
 import { Plus, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function ToolBlogCard() {
+type Props = {
+  onCardsChange?: (cards: any[]) => void;
+};
+
+export default function ToolBlogCard({ onCardsChange }: Props) {
   const [cards, setCards] = useState([
     { id: 1, title: "", body: "", note: "" },
   ]);
+
+  useEffect(() => {
+    onCardsChange?.(cards);
+  }, [cards, onCardsChange]);
 
   const handleAddCard = () => {
     const newCard = { id: Date.now(), title: "", body: "", note: "" };

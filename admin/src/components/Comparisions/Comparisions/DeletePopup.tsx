@@ -24,7 +24,7 @@ export default function DeletePopup({
 
     try {
       setLoading(true);
-      const res = await fetch(`${BACKEND_URL}/api/Comparisions/${id}`, {
+      const res = await fetch(`${BACKEND_URL}/api/comparisons/${id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });

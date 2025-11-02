@@ -8,7 +8,7 @@ import DealManagementPage from "./pages/Deal/DealsManagementPage";
 import HomeManagementPage from "./pages/HomePageManagement";
 import AddComparisionPage from "./pages/Comparisions/AddComparisionPage";
 import AddDealPage from "./pages/Deal/AddDealPage";
-import AddReviewPage from "./pages/AddReviewPage";
+import AddReviewPage from "./pages/Reviews/AddReviewPage";
 import DealsPage from "./pages/Deal/DealsPage";
 import UpdateDealPage from "./pages/Deal/UpdateDealPage";
 import ComparisionsPage from "./pages/Comparisions/ComparisionsPage";

@@ -1,7 +1,7 @@
 import { useState, useEffect, type ReactNode } from "react";
 import ComparisionCard from "./ComparisionsCard";
 import Pagination from "./Pagination";
-import fetchComparisions, { type Deal } from "../../../hooks/useDeals";
+import fetchComparisions, { type Deal } from "../../../hooks/useComparisions";
 
 // UI-facing Comparision shape that may include backend-specific fields.
 type UIComparision = Partial<Deal> & {
@@ -29,7 +29,6 @@ interface ComparisionGridProps {
 export default function ComparisionGrid({
   Comparisions,
   onViewDetails,
-  onGetComparision,
   itemsPerPage = 6,
   showPagination = true,
 }: ComparisionGridProps) {
@@ -135,51 +134,15 @@ export default function ComparisionGrid({
     }
   };
 
-  const handleGetComparision = (ComparisionId: string | number) => {
-    if (onGetComparision) {
-      onGetComparision(ComparisionId);
-    } else {
-      console.log(`Get Comparision ${ComparisionId}`);
-    }
-  };
-
-  // Delete handler: only works when using internal apiComparisions state (not when `Comparisions` prop is provided)
-  const handleDelete = (
-    ComparisionId: string | number,
-    sourceIndex: number
-  ) => {
-    if (Comparisions && Comparisions.length) {
-      console.warn("Cannot delete Comparisions passed in via props");
-      return;
-    }
-
-    setApiComparisions((prev) => {
-      // prefer removing by index when available
-      if (
-        sourceIndex != null &&
-        sourceIndex >= 0 &&
-        sourceIndex < prev.length
-      ) {
-        const copy = [...prev];
-        copy.splice(sourceIndex, 1);
-        return copy;
-      }
-
-      // fallback: remove by matching id fields
-      return prev.filter((d) => {
-        const dId = d._id ?? d.id;
-        return !(String(dId) === String(ComparisionId));
-      });
-    });
-
-    // adjust current page if needed
-    setCurrentPage((p) => {
-      const newTotal = Math.max(
-        1,
-        Math.ceil((filteredComparisions.length - 1) / effectiveItemsPerPage)
-      );
-      return Math.min(p, newTotal);
-    });
+  const handleDeleteComparision = (ComparisionId: string | number) => {
+    // Remove from API comparisions state
+    setApiComparisions((prev) =>
+      prev.filter((c) => {
+        const cId =
+          c.id ?? c._id ?? `Comparision-${sourceComparisions.indexOf(c)}`;
+        return cId !== ComparisionId;
+      })
+    );
   };
 
   return (
@@ -253,36 +216,77 @@ export default function ComparisionGrid({
             Comparision.id ??
             Comparision._id ??
             `Comparision-${sourceIndex >= 0 ? sourceIndex : idx}`;
-          const category =
-            Comparision.category ?? Comparision.ComparisionType ?? "";
-          const ComparisionType =
-            Comparision.ComparisionType ?? Comparision.tag ?? "";
-          const logoComponent =
-            Comparision.logoComponent ??
-            (Comparision.logoUri ? (
+          // logoUri/logoComponent may exist on the API object; we only map the
+          // parts we need into the card props below.
+
+          // Map API shape to the UI card props expected by the new ComparisionsCard
+          const apiToComparisionCardProps = (item: UIComparision) => {
+            const anyItem = item as any;
+            const tools = Array.isArray(anyItem.toolsMentioned)
+              ? anyItem.toolsMentioned
+              : [];
+            const t1 = tools[0] ?? {};
+            const t2 = tools[1] ?? {};
+
+            const app1Logo = t1.toolLogo ? (
               <img
-                src={Comparision.logoUri}
-                alt={Comparision.title ?? "logo"}
-                className="w-12 h-12 object-contain"
+                src={t1.toolLogo}
+                alt={t1.toolName ?? item.title ?? "logo"}
+                className="w-8 h-8 object-contain"
               />
-            ) : null);
+            ) : (
+              item.logoComponent ??
+              (item.logoUri ? (
+                <img
+                  src={item.logoUri}
+                  alt={item.title ?? "logo"}
+                  className="w-8 h-8 object-contain"
+                />
+              ) : null)
+            );
+
+            const app2Logo = t2.toolLogo ? (
+              <img
+                src={t2.toolLogo}
+                alt={t2.toolName ?? "logo"}
+                className="w-8 h-8 object-contain"
+              />
+            ) : null;
+
+            const title = (anyItem.heroHeading ??
+              item.title ??
+              anyItem.slug ??
+              "") as string;
+            const description = (anyItem.heroBody ??
+              item.description ??
+              "") as string;
+
+            const tags = [
+              item.category,
+              item.ComparisionType,
+              (anyItem.tag as string) ?? undefined,
+              (t1.toolCategory as string) ?? undefined,
+              (t2.toolCategory as string) ?? undefined,
+            ].filter(Boolean) as string[];
+
+            return {
+              app1Logo,
+              app2Logo,
+              title,
+              description,
+              tags,
+            };
+          };
+
+          const cardProps = apiToComparisionCardProps(Comparision);
 
           return (
             <div key={String(idKey)}>
               <ComparisionCard
-                id={String(idKey)}
-                title={Comparision.title}
-                category={category}
-                description={Comparision.description}
-                logoComponent={logoComponent}
-                verified={Comparision.verified ?? false}
-                ComparisionType={ComparisionType}
-                features={Comparision.features ?? []}
-                discount={Comparision.discount ?? ""}
-                savings={Comparision.savings ?? ""}
-                onViewDetails={() => handleViewDetails(idKey)}
-                onGetComparision={() => handleGetComparision(idKey)}
-                onDelete={() => handleDelete(idKey, sourceIndex)}
+                id={idKey}
+                {...cardProps}
+                onReadComparison={() => handleViewDetails(idKey)}
+                onDelete={() => handleDeleteComparision(idKey)}
               />
             </div>
           );
