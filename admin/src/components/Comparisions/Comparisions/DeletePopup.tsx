@@ -89,14 +89,10 @@ export default function DeletePopup({
             <ComparisionCard
               id={String(Comparision?.id ?? Comparision?._id ?? "preview")}
               title={Comparision?.title}
-              category={Comparision?.category ?? Comparision?.ComparisionType}
               description={Comparision?.description}
-              logoComponent={Comparision?.logoComponent}
-              verified={Comparision?.verified}
-              ComparisionType={Comparision?.ComparisionType}
-              features={Comparision?.features}
-              discount={Comparision?.discount}
-              savings={Comparision?.savings}
+              tags={Comparision?.tags || [Comparision?.category, Comparision?.ComparisionType].filter(Boolean)}
+              app1Logo={Comparision?.app1Logo}
+              app2Logo={Comparision?.app2Logo}
             />
           </div>
         </div>
