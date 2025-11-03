@@ -90,7 +90,12 @@ export default function DeletePopup({
               id={String(Comparision?.id ?? Comparision?._id ?? "preview")}
               title={Comparision?.title}
               description={Comparision?.description}
-              tags={Comparision?.tags || [Comparision?.category, Comparision?.ComparisionType].filter(Boolean)}
+              tags={
+                Comparision?.tags ||
+                [Comparision?.category, Comparision?.ComparisionType].filter(
+                  Boolean
+                )
+              }
               app1Logo={Comparision?.app1Logo}
               app2Logo={Comparision?.app2Logo}
             />

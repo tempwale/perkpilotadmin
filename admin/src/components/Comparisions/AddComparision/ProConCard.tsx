@@ -8,10 +8,11 @@ interface ProConItem {
 }
 
 type Props = {
+  cardNumber?: number;
   onProsConsChange?: (prosConsData: any) => void;
 };
 
-export default function ProConCard({ onProsConsChange }: Props) {
+export default function ProConCard({ cardNumber = 1, onProsConsChange }: Props) {
   const [titlePros, setTitlePros] = useState<string>("");
   const [titleCons, setTitleCons] = useState<string>("");
   const [items, setItems] = useState<ProConItem[]>([
@@ -23,14 +24,18 @@ export default function ProConCard({ onProsConsChange }: Props) {
   ]);
 
   useEffect(() => {
+    // Transform items to prosConsPairs format (remove id property)
+    const prosConsPairs = items.map(({ pro, con }) => ({ pro, con }));
+    
     onProsConsChange?.([
       {
+        cardNumber,
         titlePros,
         titleCons,
-        items,
+        prosConsPairs,
       },
     ]);
-  }, [titlePros, titleCons, items, onProsConsChange]);
+  }, [titlePros, titleCons, items, cardNumber, onProsConsChange]);
 
   const addItem = (): void => {
     const newItem: ProConItem = {
@@ -63,7 +68,7 @@ export default function ProConCard({ onProsConsChange }: Props) {
     <div className="w-full min-h-screen bg-zinc-900 p-8">
       <div className="max-w-7xl mx-auto flex flex-col gap-4">
         <div className="text-neutral-50 text-xl font-medium font-['Poppins'] leading-8">
-          Pros & Cons Card 01
+          Pros & Cons Card
         </div>
 
         <div className="flex flex-col gap-6">
