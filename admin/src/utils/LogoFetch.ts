@@ -1,52 +1,44 @@
-const BRANDFETCH_CLIENT_ID = import.meta.env.VITE_BRANDFETCH_CLIENT_ID;
+const LOGO_DEV_TOKEN = import.meta.env.VITE_LOGO_DEV_TOKEN;
 
 /**
- * Fetch brand logo URL using Brandfetch CDN
- * @param identifier - The company identifier (domain or company name)
+ * Fetch brand logo URL using logo.dev
+ * @param domain - The company domain (e.g., "google.com")
  * @returns Logo URL that can be used directly in img src
  */
 export async function fetchLogoByDomain(
   domain: string
 ): Promise<string | null> {
-  if (!BRANDFETCH_CLIENT_ID) {
-    throw new Error(
-      "VITE_BRANDFETCH_CLIENT_ID environment variable is not set"
+  if (!LOGO_DEV_TOKEN) {
+    console.error(
+      "VITE_LOGO_DEV_TOKEN environment variable is not set. Please add it to your .env file."
     );
+    return null;
   }
 
   try {
     // Clean the domain (remove protocol, www, trailing slashes)
     const cleanDomain = domain
-      .replace(/^(https?:\/\/)?(www\.)?/, '')
-      .replace(/\/$/, '')
+      .replace(/^(https?:\/\/)?(www\.)?/, "")
+      .replace(/\/$/, "")
       .trim();
 
     if (!cleanDomain) {
-      throw new Error('Invalid domain');
-    }
-
-    // Brandfetch CDN URL - returns image directly
-    // Format: https://cdn.brandfetch.io/{domain}/icon?c={client-id}
-    const logoUrl = `https://cdn.brandfetch.io/${encodeURIComponent(
-      cleanDomain
-    )}/icon?c=${BRANDFETCH_CLIENT_ID}`;
-
-    console.log("Generated logo URL:", logoUrl);
-
-    // Verify the logo exists by checking response status
-    const response = await fetch(logoUrl, { method: 'HEAD' });
-
-    if (!response.ok) {
-      console.warn(
-        `Logo not found for ${cleanDomain}: ${response.status} ${response.statusText}`
-      );
+      console.error("Invalid domain provided");
       return null;
     }
 
-    // Return the URL directly - it's an image, not JSON
+    // logo.dev URL - returns image directly
+    // Format: https://img.logo.dev/{domain}?token={token}
+    const logoUrl = `https://img.logo.dev/${encodeURIComponent(
+      cleanDomain
+    )}?token=${LOGO_DEV_TOKEN}`;
+
+    console.log("Generated logo URL:", logoUrl);
+
+    // Return the URL directly - logo.dev handles the image serving
     return logoUrl;
   } catch (error) {
-    console.error(`Failed to fetch logo for domain ${domain}:`, error);
+    console.error(`Failed to generate logo URL for domain ${domain}:`, error);
     return null;
   }
 }

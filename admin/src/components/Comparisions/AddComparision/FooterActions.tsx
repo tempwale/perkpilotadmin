@@ -24,6 +24,13 @@ export default function FooterActions({
     setError(null);
     setLoading(true);
 
+    console.log("=== SENDING TO BACKEND ===");
+    console.log(
+      "Full comparison data:",
+      JSON.stringify(comparisonData, null, 2)
+    );
+    console.log("Pros/Cons Cards:", comparisonData.prosConsCards);
+
     try {
       const response = await fetch(COMPARISIONS_API, {
         method: "POST",

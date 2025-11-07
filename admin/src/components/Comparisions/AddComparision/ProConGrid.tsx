@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Plus } from "lucide-react";
 import ProConCard from "./ProConCard";
 
@@ -8,11 +8,7 @@ type Props = {
 
 export default function ProConGrid({ onProsConsChange }: Props) {
   const [cards, setCards] = useState<number[]>([1]); // Start with 1 card
-
-  useEffect(() => {
-    // Initialize with empty data for the first card
-    onProsConsChange?.([]);
-  }, []);
+  const [allCardsData, setAllCardsData] = useState<any[]>([]);
 
   const addCard = () => {
     if (cards.length < 3) {
@@ -23,17 +19,18 @@ export default function ProConGrid({ onProsConsChange }: Props) {
   const removeCard = (index: number) => {
     const newCards = cards.filter((_, i) => i !== index);
     setCards(newCards);
+    // Also remove the data for that card
+    const newData = allCardsData.filter((_, i) => i !== index);
+    setAllCardsData(newData);
+    onProsConsChange?.(newData);
   };
 
   const handleCardChange = (index: number, data: any) => {
-    // Collect all card data and pass it up
-    const allCardsData: any[] = [];
-    cards.forEach((_, i) => {
-      if (i === index) {
-        allCardsData[i] = data[0]; // ProConCard returns array with single item
-      }
-    });
-    onProsConsChange?.(allCardsData.filter(Boolean));
+    // Update the specific card's data
+    const newData = [...allCardsData];
+    newData[index] = data[0]; // ProConCard returns array with single item
+    setAllCardsData(newData);
+    onProsConsChange?.(newData.filter(Boolean));
   };
 
   return (

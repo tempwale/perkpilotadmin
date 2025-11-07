@@ -145,27 +145,18 @@ export default function AddComparisionPage() {
   };
 
   const handleProsConsChange = (prosConsData: any[]) => {
-    // Ensure at least 2 cards with default values for missing data
-    const minCards = Math.max(2, prosConsData.length);
-    const prosConsCards = Array.from({ length: minCards }, (_, index) => {
-      const item = prosConsData[index] || {
-        titlePros: `Card ${index + 1} - Pros`,
-        titleCons: `Card ${index + 1} - Cons`,
-        items: [{ pro: "Default Pro", con: "Default Con" }],
-      };
-      return {
-        cardNumber: index + 1,
-        titlePros: item.titlePros || `Card ${index + 1} - Pros`,
-        titleCons: item.titleCons || `Card ${index + 1} - Cons`,
-        prosConsPairs:
-          item.items && item.items.length > 0
-            ? item.items.map((pair: any) => ({
-                pro: pair.pro || "Untitled Pro",
-                con: pair.con || "Untitled Con",
-              }))
-            : [{ pro: "Default Pro", con: "Default Con" }],
-      };
-    });
+    console.log("Received pros/cons data:", prosConsData);
+
+    // Use the data exactly as it comes from ProConCard
+    const prosConsCards = prosConsData.map((item) => ({
+      cardNumber: item.cardNumber,
+      titlePros: item.titlePros,
+      titleCons: item.titleCons,
+      prosConsPairs: item.prosConsPairs, // Already in correct format from ProConCard
+    }));
+
+    console.log("Transformed pros/cons cards:", prosConsCards);
+
     setComparisonData((prev) => ({
       ...prev,
       prosConsCards,
