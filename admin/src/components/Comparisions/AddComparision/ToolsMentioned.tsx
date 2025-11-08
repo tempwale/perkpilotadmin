@@ -239,7 +239,7 @@ export default function ToolsMentioned({
               </div>
               <div
                 data-layer="Frame 1321320236"
-                className="Frame1321320236 flex-1 py-4 inline-flex flex-col justify-start items-start gap-3"
+                className="Frame1321320236 flex-1 py-4 inline-flex flex-row justify-start items-start gap-3"
               >
                 <div
                   data-layer="Frame 1321320234"

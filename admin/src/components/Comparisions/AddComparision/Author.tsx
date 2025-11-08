@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ChevronDown, Plus } from "lucide-react";
+import { AUTHORS_API } from "../../../config/backend";
 
 type Props = {
   onAuthorChange?: (author: string) => void;
   onCategoryChange?: (category: string) => void;
   onReadingTimeChange?: (time: string) => void;
 };
-
 
 export default function Author({
   onAuthorChange,
@@ -20,13 +20,49 @@ export default function Author({
   const [showAuthors, setShowAuthors] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
 
-  const authors = ["John Doe", "Jane Smith", "Alex Turner", "Emily Clark"];
+  const [authors, setAuthors] = useState<Array<{ id: string; name: string }>>(
+    []
+  );
+  const [loadingAuthors, setLoadingAuthors] = useState(false);
   const categories = ["Tech", "Design", "Marketing", "Finance"];
 
-  const handleAuthorSelect = (author: string) => {
-    setSelectedAuthor(author);
+  // Fetch authors from backend
+  useEffect(() => {
+    const fetchAuthors = async () => {
+      setLoadingAuthors(true);
+      try {
+        const response = await fetch(`${AUTHORS_API}?limit=100`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch authors");
+        }
+        const result = await response.json();
+        // Extract author id and name from the response
+        const authorsList = result.data.map((author: any) => ({
+          id: author._id,
+          name: author.authorName,
+        }));
+        setAuthors(authorsList);
+      } catch (error) {
+        console.error("Error fetching authors:", error);
+        // Fallback to default authors if fetch fails
+        setAuthors([
+          { id: "1", name: "John Doe" },
+          { id: "2", name: "Jane Smith" },
+          { id: "3", name: "Alex Turner" },
+          { id: "4", name: "Emily Clark" },
+        ]);
+      } finally {
+        setLoadingAuthors(false);
+      }
+    };
+
+    fetchAuthors();
+  }, []);
+
+  const handleAuthorSelect = (author: { id: string; name: string }) => {
+    setSelectedAuthor(author.name);
     setShowAuthors(false);
-    onAuthorChange?.(author);
+    onAuthorChange?.(author.id); // Send author ID to backend
   };
 
   const handleCategorySelect = (category: string) => {
@@ -62,16 +98,36 @@ export default function Author({
           </span>
           <ChevronDown className="text-zinc-200 w-5 h-5" />
           {showAuthors && (
-            <div className="absolute top-16 left-0 w-full bg-zinc-800 rounded-xl shadow-lg border border-zinc-700 z-10">
-              {authors.map((a) => (
-                <div
-                  key={a}
-                  className="px-4 py-2 hover:bg-zinc-700 cursor-pointer text-neutral-50 text-sm font-['Poppins']"
-                  onClick={() => handleAuthorSelect(a)}
-                >
-                  {a}
+            <div className="absolute top-16 left-0 w-full bg-zinc-800 rounded-xl shadow-lg border border-zinc-700 z-10 max-h-60 overflow-y-auto">
+              {loadingAuthors ? (
+                <div className="px-4 py-3 text-neutral-50 text-sm font-['Poppins'] text-center">
+                  Loading authors...
                 </div>
-              ))}
+              ) : authors.length === 0 ? (
+                <div className="px-4 py-3 text-zinc-400 text-sm font-['Poppins'] text-center">
+                  No authors found
+                </div>
+              ) : (
+                authors.map((a) => (
+                  <div
+                    key={a.id}
+                    className="px-4 py-2 hover:bg-zinc-700 cursor-pointer text-neutral-50 text-sm font-['Poppins']"
+                    onClick={() => handleAuthorSelect(a)}
+                  >
+                    {a.name}
+                  </div>
+                ))
+              )}
+              <div
+                className="px-4 py-3 border-t border-zinc-700 hover:bg-zinc-700 cursor-pointer flex items-center gap-2 text-[#7f57e2] text-sm font-medium font-['Poppins']"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.location.href = "/addauthor";
+                }}
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add New Author</span>
+              </div>
             </div>
           )}
         </div>

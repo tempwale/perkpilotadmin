@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { uploadToCloudinary } from "../../../config/cloudinary";
 
 type Props = {
   heading?: string;
@@ -21,6 +22,8 @@ export default function Hero({
   const [localHeading, setLocalHeading] = useState<string>(heading);
   const [localBody, setLocalBody] = useState<string>(body);
   const [image, setImage] = useState<string | null>(null);
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   useEffect(() => setLocalHeading(heading), [heading]);
   useEffect(() => setLocalBody(body), [body]);
@@ -37,16 +40,32 @@ export default function Hero({
     onBodyChange?.(v);
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (!file) return;
+
+    setUploading(true);
+    setUploadError(null);
+
+    try {
+      // Upload to Cloudinary and get the URL
+      const cloudinaryUrl = await uploadToCloudinary(file);
+
+      // Create a local preview
       const reader = new FileReader();
       reader.onload = (event) => {
         const imageData = event.target?.result as string;
-        setImage(imageData);
-        onImageChange?.(imageData);
+        setImage(imageData); // For local preview
       };
       reader.readAsDataURL(file);
+
+      // Send Cloudinary URL to parent component
+      onImageChange?.(cloudinaryUrl);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      setUploadError("Failed to upload image. Please try again.");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -128,15 +147,24 @@ export default function Hero({
             />
           </svg>
           <span className="text-neutral-50 text-xs font-medium font-['Poppins']">
-            {image ? "Change Image" : "Upload Image"}
+            {uploading
+              ? "Uploading..."
+              : image
+              ? "Change Image"
+              : "Upload Image"}
           </span>
           <input
             type="file"
             accept="image/*"
             className="hidden"
             onChange={handleImageUpload}
+            disabled={uploading}
           />
         </label>
+
+        {uploadError && (
+          <div className="text-red-400 text-xs mt-1">{uploadError}</div>
+        )}
 
         {image && (
           <div className="mt-3 w-full flex justify-center">

@@ -12,6 +12,7 @@ import AddReviewPage from "./pages/Reviews/AddReviewPage";
 import DealsPage from "./pages/Deal/DealsPage";
 import UpdateDealPage from "./pages/Deal/UpdateDealPage";
 import ComparisionsPage from "./pages/Comparisions/ComparisionsPage";
+import AddAuthor from "./pages/AddAuthor";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ function AppContent() {
         {/* You can add other content here */}
         <div className="m-4">
           <Routes>
+            <Route path="/addauthor" element={<AddAuthor />} />
             <Route path="/blogs" element={<BlogManagementPage />} />
 
             <Route path="deals" element={<DealsPage />} />
