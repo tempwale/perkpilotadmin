@@ -22,7 +22,7 @@ export default function AddComparisionPage() {
     sectionHeadline: "",
     tipBulbText: "",
     toolsMentioned: [],
-    author: "",
+    authorId: "", // Changed from 'author' to 'authorId'
     blogCategory: "",
     readingTime: "",
     toolBlogCards: [],
@@ -89,10 +89,10 @@ export default function AddComparisionPage() {
     }));
   };
 
-  const handleAuthorChange = (author: string) => {
+  const handleAuthorChange = (authorId: string) => {
     setComparisonData((prev) => ({
       ...prev,
-      author,
+      authorId, // Changed from 'author' to 'authorId'
     }));
   };
 

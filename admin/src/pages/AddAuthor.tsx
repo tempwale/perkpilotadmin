@@ -12,7 +12,7 @@ export default function AddAuthor() {
     authorIndustry: "",
     authorViewProfileURL: "",
     authorDescription: "",
-    authorImageUpload: "",
+    authorImageURL: "", // Changed from authorImageUpload to match backend
     authorXAccount: "",
     authorIGAccount: "",
     authorLinkedinAccount: "",
@@ -41,12 +41,14 @@ export default function AddAuthor() {
 
     try {
       const imageUrl = await uploadToCloudinary(file);
+      console.log("✅ Cloudinary upload successful:", imageUrl);
       setFormData((prev) => ({
         ...prev,
-        authorImageUpload: imageUrl,
+        authorImageURL: imageUrl, // Changed to authorImageURL to match backend
       }));
+      console.log("✅ Author image URL saved to form data");
     } catch (error) {
-      console.error("Error uploading image:", error);
+      console.error("❌ Error uploading image:", error);
       setUploadError("Failed to upload image. Please try again.");
     } finally {
       setUploading(false);
@@ -76,13 +78,28 @@ export default function AddAuthor() {
       return;
     }
 
+    console.log("=== SAVING AUTHOR ===");
+    console.log("Author Image URL:", formData.authorImageURL);
+    console.log("Full Form Data:", JSON.stringify(formData, null, 2));
+
+    // Backend expects authorImageURL (all caps URL)
+    const authorData: any = { ...formData };
+    
+    if (formData.authorImageURL && formData.authorImageURL.trim() !== '') {
+      console.log("✅ Image URL is present and will be sent:", formData.authorImageURL);
+    } else {
+      console.warn("⚠️ No image URL found in form data!");
+    }
+
+    console.log("Sending author data:", JSON.stringify(authorData, null, 2));
+
     try {
       const response = await fetch(AUTHORS_API, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(authorData),
       });
 
       if (!response.ok) {
@@ -204,9 +221,9 @@ export default function AddAuthor() {
               htmlFor="author-image"
               className="h-32 px-6 py-3 bg-zinc-800 rounded-xl border border-zinc-700 flex flex-col justify-center items-center gap-2 cursor-pointer hover:border-[#7f57e2] transition-colors"
             >
-              {formData.authorImageUpload ? (
+              {formData.authorImageURL ? (
                 <img
-                  src={formData.authorImageUpload}
+                  src={formData.authorImageURL}
                   alt="Author"
                   className="h-full w-auto object-contain rounded-lg"
                 />
