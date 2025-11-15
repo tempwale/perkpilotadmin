@@ -44,9 +44,9 @@ export default function ToolReviewForm({
   };
 
   const [formData, setFormData] = useState<FormDataShape>({
-    toolName: "",
-    toolCategory: "",
-    toolDescription: "",
+    toolName: reviewData?.productName || "",
+    toolCategory: reviewData?.productType || "",
+    toolDescription: reviewData?.description || "",
     dealBadge: "",
     whatsIncludedTitle: "",
     features: ["", ""],

@@ -2,7 +2,6 @@ import Alternatives from "./Tabs/Alternatives";
 import Features from "./Tabs/Features";
 import Overview from "./Tabs/Overview";
 import Pricing from "./Tabs/Pricing";
-import Reviews from "./Tabs/Reviews";
 
 type Props = {
   reviewData?: any;
