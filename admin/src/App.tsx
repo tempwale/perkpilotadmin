@@ -13,6 +13,7 @@ import DealsPage from "./pages/Deal/DealsPage";
 import UpdateDealPage from "./pages/Deal/UpdateDealPage";
 import ComparisionsPage from "./pages/Comparisions/ComparisionsPage";
 import AddAuthor from "./pages/AddAuthor";
+import ReviewsPage from "./pages/Reviews/ReviewsPage";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -45,6 +46,8 @@ function AppContent() {
             <Route path="/home" element={<HomeManagementPage />} />
 
             <Route path="/addreview" element={<AddReviewPage />} />
+
+            <Route path="/reviews" element={<ReviewsPage />} />
           </Routes>
         </div>
       </div>
