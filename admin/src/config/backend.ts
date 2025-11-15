@@ -25,5 +25,7 @@ export const COMPARISIONS_API = `${BACKEND_URL}/api/comparisons`;
 export const REVIEWS_API = `${BACKEND_URL}/api/reviews`;
 // Authors API endpoint
 export const AUTHORS_API = `${BACKEND_URL}/api/authors`;
+// Reviews API endpoint
+export const REVIEWS_API = `${BACKEND_URL}/api/reviews`;
 
 export default BACKEND_URL;

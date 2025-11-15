@@ -1,10 +1,21 @@
-import {useState,
+import {
+  useState,
+  useEffect,
   type ChangeEvent,
   type FormEvent,
   type KeyboardEvent,
-  type ReactElement} from "react";
+} from "react";
+import { fetchLogoByDomain } from "../../../utils/LogoFetch";
 
-export default function ToolComparisonForm(): ReactElement{
+type Props = {
+  reviewData?: any;
+  updateReviewData?: (updates: any) => void;
+};
+
+export default function ToolReviewForm({
+  reviewData,
+  updateReviewData,
+}: Props = {}) {
   type FormDataShape = {
     toolName: string;
     toolCategory: string;
@@ -33,9 +44,9 @@ export default function ToolComparisonForm(): ReactElement{
   };
 
   const [formData, setFormData] = useState<FormDataShape>({
-    toolName: "",
-    toolCategory: "",
-    toolDescription: "",
+    toolName: reviewData?.productName || "",
+    toolCategory: reviewData?.productType || "",
+    toolDescription: reviewData?.description || "",
     dealBadge: "",
     whatsIncludedTitle: "",
     features: ["", ""],
@@ -66,6 +77,55 @@ export default function ToolComparisonForm(): ReactElement{
     null,
   ]);
   const [hoverRating, setHoverRating] = useState<number>(0);
+  const [logoFetchUrl, setLogoFetchUrl] = useState<string>("");
+  const [logoFetching, setLogoFetching] = useState<boolean>(false);
+  const [logoFetchError, setLogoFetchError] = useState<string | null>(null);
+
+  // Sync all form data to parent's reviewData
+  useEffect(() => {
+    if (updateReviewData) {
+      const updates: any = {};
+
+      // Basic product info
+      if (formData.toolName) updates.productName = formData.toolName;
+      if (formData.toolCategory) updates.productType = formData.toolCategory;
+      if (formData.toolDescription)
+        updates.description = formData.toolDescription;
+
+      // Logo (use first non-null logo as avatarUrl)
+      const firstLogo = logoFiles.find((logo) => logo !== null);
+      if (firstLogo) updates.avatarUrl = firstLogo;
+
+      // Stats
+      if (formData.totalUsers) updates.userCount = formData.totalUsers;
+      if (formData.founded) {
+        const year = parseInt(formData.founded);
+        if (!isNaN(year)) updates.foundedYear = year;
+      }
+      if (formData.employees) updates.employeeRange = formData.employees;
+      if (formData.headquarters) updates.headquarters = formData.headquarters;
+
+      // Rating
+      if (formData.averageRating > 0)
+        updates.aggregateRating = formData.averageRating;
+
+      // Only update if there are changes
+      if (Object.keys(updates).length > 0) {
+        updateReviewData(updates);
+      }
+    }
+  }, [
+    formData.toolName,
+    formData.toolCategory,
+    formData.toolDescription,
+    formData.totalUsers,
+    formData.founded,
+    formData.employees,
+    formData.headquarters,
+    formData.averageRating,
+    logoFiles,
+    updateReviewData,
+  ]);
 
   // Handle input changes for all text fields
   const handleInputChange = (
@@ -165,6 +225,39 @@ export default function ToolComparisonForm(): ReactElement{
       newLogoFiles[index] = URL.createObjectURL(file);
       setLogoFiles(newLogoFiles);
       setSelectedLogo(index);
+    }
+  };
+
+  // Handle logo fetch from domain
+  const handleFetchLogo = async () => {
+    if (!logoFetchUrl.trim()) {
+      setLogoFetchError("Please enter a domain or company name");
+      return;
+    }
+
+    setLogoFetching(true);
+    setLogoFetchError(null);
+
+    try {
+      const logoUrl = await fetchLogoByDomain(logoFetchUrl.trim());
+      if (logoUrl) {
+        const newLogoFiles = [...logoFiles];
+        newLogoFiles[selectedLogo] = logoUrl;
+        setLogoFiles(newLogoFiles);
+        setLogoFetchUrl("");
+      } else {
+        setLogoFetchError(
+          "Logo not found. Please try another domain or upload manually."
+        );
+      }
+    } catch (error) {
+      setLogoFetchError(
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch logo. Please try again."
+      );
+    } finally {
+      setLogoFetching(false);
     }
   };
 
@@ -329,6 +422,40 @@ export default function ToolComparisonForm(): ReactElement{
                   </label>
                 </div>
               ))}
+            </div>
+
+            {/* Logo Fetch Input */}
+            <div className="w-full mt-4 flex flex-col gap-2">
+              <div className="text-neutral-50 text-xs font-medium font-['Poppins']">
+                Or fetch from domain
+              </div>
+              <div className="flex gap-2">
+                <div
+                  data-layer="Input"
+                  className="Input flex-1 h-10 px-3 py-2 relative bg-zinc-800 rounded-lg outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                >
+                  <input
+                    type="text"
+                    value={logoFetchUrl}
+                    onChange={(e) => setLogoFetchUrl(e.target.value)}
+                    placeholder="e.g., google.com"
+                    className="w-full bg-transparent outline-none text-zinc-400 text-sm font-normal font-['Poppins']"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleFetchLogo}
+                  disabled={logoFetching}
+                  className="px-4 py-2 bg-[#501bd6] hover:bg-[#6030e8] disabled:opacity-50 text-neutral-50 text-sm font-medium rounded-lg transition-colors"
+                >
+                  {logoFetching ? "Fetching..." : "Fetch"}
+                </button>
+              </div>
+              {logoFetchError && (
+                <div className="text-red-400 text-xs font-medium">
+                  {logoFetchError}
+                </div>
+              )}
             </div>
           </div>
         </div>

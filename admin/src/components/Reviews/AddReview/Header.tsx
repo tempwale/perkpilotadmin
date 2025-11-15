@@ -7,7 +7,7 @@ type Props = {
 };
 
 export default function Header({
-  title = "Tool Comparison Blog",
+  title = "Tool Review Blog",
   onBack,
   showBack = true,
   className = "",
@@ -50,8 +50,8 @@ export default function Header({
           className="Frame2147205571 self-stretch flex flex-col justify-start items-start gap-1"
         >
           <div
-            data-layer="Tool Comparison Blog"
-            className="ToolComparisonBlog self-stretch justify-start text-neutral-50 text-xl font-medium font-['Poppins'] leading-8"
+            data-layer="Tool Review Blog"
+            className="ToolReviewBlog self-stretch justify-start text-neutral-50 text-xl font-medium font-['Poppins'] leading-8"
           >
             {title}
           </div>

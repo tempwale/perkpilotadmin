@@ -23,11 +23,16 @@ import {
   Tag,
 } from "lucide-react";
 
-export default function Overview(): ReactElement{
+type Props = {
+  initialOverview?: string;
+  onOverviewChange?: (overview: string) => void;
+};
+
+export default function Overview({ initialOverview, onOverviewChange }: Props = {}) {
   const [isEnabled, setIsEnabled] = useState(true);
   const [fontSize, setFontSize] = useState(16);
   const [content, setContent] = useState(
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam..."
+    initialOverview || "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam..."
   );
   const [heading, setHeading] = useState("Heading 1");
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -57,7 +62,9 @@ export default function Overview(): ReactElement{
 
   const handleContentChange = (e: FormEvent<HTMLDivElement>): void => {
     const el = e.currentTarget as HTMLDivElement;
-    setContent(el.innerText);
+    const newContent = el.innerText;
+    setContent(newContent);
+    onOverviewChange?.(newContent);
   };
 
   const handleHeadingChange = (e: FormEvent<HTMLDivElement>): void => {

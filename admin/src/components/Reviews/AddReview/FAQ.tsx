@@ -9,32 +9,51 @@ type FaqItem = {
   answer: string;
 };
 
-export default function FAQ(): ReactElement{
-  const [faqs, setFaqs] = useState<FaqItem[]>([
-    { id: 1, question: "", answer: "" },
-    { id: 2, question: "", answer: "" },
-    { id: 3, question: "", answer: "" },
-  ]);
+type Props = {
+  initialFaqs?: Array<{ question: string; answer: string }>;
+  onFaqsChange?: (faqs: Array<{ question: string; answer: string }>) => void;
+};
 
-  const handleQuestionChange = (id: number, value: string): void => {
-    setFaqs(
+export default function FAQ({ initialFaqs, onFaqsChange }: Props = {}) {
+  const [faqs, setFaqs] = useState<FaqItem[]>(
+    initialFaqs?.map((faq, idx) => ({
+      id: idx + 1,
+      question: faq.question,
+      answer: faq.answer
+    })) || [
+      { id: 1, question: "", answer: "" },
+      { id: 2, question: "", answer: "" },
+      { id: 3, question: "", answer: "" },
+    ]
+  );
+
+  const updateFaqs = (newFaqs: FaqItem[]) => {
+    setFaqs(newFaqs);
+    onFaqsChange?.(newFaqs.map(f => ({
+      question: f.question,
+      answer: f.answer
+    })));
+  };
+
+  const handleQuestionChange = (id: number, value: string) => {
+    updateFaqs(
       faqs.map((faq) => (faq.id === id ? { ...faq, question: value } : faq))
     );
   };
 
-  const handleAnswerChange = (id: number, value: string): void => {
-    setFaqs(
+  const handleAnswerChange = (id: number, value: string) => {
+    updateFaqs(
       faqs.map((faq) => (faq.id === id ? { ...faq, answer: value } : faq))
     );
   };
 
-  const deleteFaq = (id: number): void => {
-    setFaqs(faqs.filter((faq): boolean => faq.id !== id));
+  const deleteFaq = (id: number) => {
+    updateFaqs(faqs.filter((faq) => faq.id !== id));
   };
 
   const addFaq = (): void => {
     const newId = Math.max(...faqs.map((f) => f.id), 0) + 1;
-    setFaqs([...faqs, { id: newId, question: "", answer: "" }]);
+    updateFaqs([...faqs, { id: newId, question: "", answer: "" }]);
   };
 
   return (
