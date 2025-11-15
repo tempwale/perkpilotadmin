@@ -3,33 +3,56 @@
 import { useState } from "react";
 import { GripVertical, Trash2, Plus, Star } from "lucide-react";
 
-export default function RatingBreakdown() {
+type Feature = {
+  id: number;
+  name: string;
+  rating: number;
+  minScore: string;
+  maxScore: string;
+};
+
+type Props = {
+  initialCategories?: Array<{ category: string; value: number; outOf: number }>;
+  onCategoriesChange?: (categories: Array<{ category: string; value: number; outOf: number }>) => void;
+};
+
+export default function RatingBreakdown({ initialCategories, onCategoriesChange }: Props = {}) {
   const [isEnabled, setIsEnabled] = useState(true);
   const [title, setTitle] = useState("Rating Breakdown");
-  type Feature = {
-    id: number;
-    name: string;
-    rating: number;
-    minScore: string;
-    maxScore: string;
+
+  const [features, setFeatures] = useState<Feature[]>(
+    initialCategories?.map((cat, idx) => ({
+      id: idx + 1,
+      name: cat.category,
+      rating: cat.value,
+      minScore: "0",
+      maxScore: cat.outOf.toString()
+    })) || [
+      { id: 1, name: "Ease of Use", rating: 0, minScore: "4.5", maxScore: "5.0" },
+      { id: 2, name: "Features", rating: 0, minScore: "4.5", maxScore: "5.0" },
+      { id: 3, name: "Value", rating: 0, minScore: "4.5", maxScore: "5.0" },
+      {
+        id: 4,
+        name: "Customer Support",
+        rating: 0,
+        minScore: "4.5",
+        maxScore: "5.0",
+      },
+      { id: 5, name: "Reliability", rating: 0, minScore: "4.5", maxScore: "5.0" },
+    ]
+  );
+
+  const updateFeatures = (newFeatures: Feature[]) => {
+    setFeatures(newFeatures);
+    onCategoriesChange?.(newFeatures.map(f => ({
+      category: f.name,
+      value: f.rating,
+      outOf: parseFloat(f.maxScore) || 5
+    })));
   };
 
-  const [features, setFeatures] = useState<Feature[]>([
-    { id: 1, name: "Ease of Use", rating: 0, minScore: "4.5", maxScore: "5.0" },
-    { id: 2, name: "Features", rating: 0, minScore: "4.5", maxScore: "5.0" },
-    { id: 3, name: "Value", rating: 0, minScore: "4.5", maxScore: "5.0" },
-    {
-      id: 4,
-      name: "Customer Support",
-      rating: 0,
-      minScore: "4.5",
-      maxScore: "5.0",
-    },
-    { id: 5, name: "Reliability", rating: 0, minScore: "4.5", maxScore: "5.0" },
-  ]);
-
   const handleFeatureNameChange = (id: number, value: string) => {
-    setFeatures(
+    updateFeatures(
       features.map((feature) =>
         feature.id === id ? { ...feature, name: value } : feature
       )
@@ -37,7 +60,7 @@ export default function RatingBreakdown() {
   };
 
   const handleRatingChange = (id: number, rating: number) => {
-    setFeatures(
+    updateFeatures(
       features.map((feature) =>
         feature.id === id ? { ...feature, rating } : feature
       )
@@ -45,7 +68,7 @@ export default function RatingBreakdown() {
   };
 
   const handleMinScoreChange = (id: number, value: string) => {
-    setFeatures(
+    updateFeatures(
       features.map((feature) =>
         feature.id === id ? { ...feature, minScore: value } : feature
       )
@@ -53,7 +76,7 @@ export default function RatingBreakdown() {
   };
 
   const handleMaxScoreChange = (id: number, value: string) => {
-    setFeatures(
+    updateFeatures(
       features.map((feature) =>
         feature.id === id ? { ...feature, maxScore: value } : feature
       )
@@ -61,12 +84,12 @@ export default function RatingBreakdown() {
   };
 
   const deleteFeature = (id: number) => {
-    setFeatures(features.filter((feature) => feature.id !== id));
+    updateFeatures(features.filter((feature) => feature.id !== id));
   };
 
   const addFeature = () => {
     const newId = Math.max(...features.map((f) => f.id), 0) + 1;
-    setFeatures([
+    updateFeatures([
       ...features,
       { id: newId, name: "", rating: 0, minScore: "4.5", maxScore: "5.0" },
     ]);

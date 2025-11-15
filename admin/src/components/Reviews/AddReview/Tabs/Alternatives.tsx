@@ -22,13 +22,14 @@ interface AlternativesProps {
 
 export default function Alternatives({
   initialAlternatives,
+  onAlternativesChange,
 }: AlternativesProps) {
   const [isEnabled, setIsEnabled] = useState<boolean>(true);
   const [sectionTitle, setSectionTitle] = useState<string>(
     "Product Alternatives Section"
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [alternatives] = useState<Alternative[]>(
+  const [alternatives, setAlternatives] = useState<Alternative[]>(
     initialAlternatives || [
       {
         id: 1,
@@ -98,6 +99,11 @@ export default function Alternatives({
       },
     ]
   );
+
+  const updateAlternatives = (newAlternatives: Alternative[]): void => {
+    setAlternatives(newAlternatives);
+    onAlternativesChange?.(newAlternatives);
+  };
 
   const handleToggle = (): void => {
     setIsEnabled(!isEnabled);

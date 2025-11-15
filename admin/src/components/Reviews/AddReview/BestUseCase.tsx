@@ -5,12 +5,25 @@ type UseCase = {
   id: number;
   title: string;
   description: string;
+  rating?: number;
 };
 
-export default function BestUseCase() {
-  const [useCases, setUseCases] = useState<UseCase[]>([
-    { id: 1, title: "", description: "" },
-  ]);
+type Props = {
+  initialUseCases?: UseCase[];
+  onUseCasesChange?: (useCases: UseCase[]) => void;
+};
+
+export default function BestUseCase({ initialUseCases, onUseCasesChange }: Props = {}) {
+  const [useCases, setUseCases] = useState<UseCase[]>(
+    initialUseCases || [
+      { id: 1, title: "", description: "" },
+    ]
+  );
+
+  const updateUseCasesState = (newUseCases: UseCase[]) => {
+    setUseCases(newUseCases);
+    onUseCasesChange?.(newUseCases);
+  };
 
   const addUseCase = () => {
     const newUseCase = {
@@ -18,11 +31,11 @@ export default function BestUseCase() {
       title: "",
       description: "",
     };
-    setUseCases([...useCases, newUseCase]);
+    updateUseCasesState([...useCases, newUseCase]);
   };
 
   const deleteUseCase = (id: number) => {
-    setUseCases(useCases.filter((useCase) => useCase.id !== id));
+    updateUseCasesState(useCases.filter((useCase) => useCase.id !== id));
   };
 
   const updateUseCase = (
@@ -30,7 +43,7 @@ export default function BestUseCase() {
     field: keyof Omit<UseCase, "id">,
     value: string
   ) => {
-    setUseCases(
+    updateUseCasesState(
       useCases.map((useCase) =>
         useCase.id === id ? { ...useCase, [field]: value } : useCase
       )

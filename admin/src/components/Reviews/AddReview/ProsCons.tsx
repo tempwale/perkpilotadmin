@@ -3,52 +3,52 @@
 import { useState } from "react";
 import { GripVertical, Trash2, Plus } from "lucide-react";
 
-type ProsConsItem = {
-  id: number;
-  title: string;
-  pros: string;
-  cons: string;
-  enabled: boolean;
+type Props = {
+  initialPros?: string[];
+  initialCons?: string[];
+  onProsChange?: (pros: string[]) => void;
+  onConsChange?: (cons: string[]) => void;
 };
 
-export default function ProsCons() {
-  const [items, setItems] = useState<ProsConsItem[]>([
-    { id: 1, title: "", pros: "", cons: "", enabled: true },
-  ]);
+export default function ProsCons({ initialPros, initialCons, onProsChange, onConsChange }: Props = {}) {
+  const [isEnabled, setIsEnabled] = useState(true);
+  const [pros, setPros] = useState<string[]>(initialPros || [""]);
+  const [cons, setCons] = useState<string[]>(initialCons || [""]);
 
-  const addItem = () => {
-    setItems([
-      ...items,
-      {
-        id: Date.now(),
-        title: "",
-        pros: "",
-        cons: "",
-        enabled: true,
-      },
-    ]);
+  const addPro = () => {
+    const newPros = [...pros, ""];
+    setPros(newPros);
+    onProsChange?.(newPros);
   };
 
-  const deleteItem = (id: number) => {
-    setItems(items.filter((item) => item.id !== id));
+  const addCon = () => {
+    const newCons = [...cons, ""];
+    setCons(newCons);
+    onConsChange?.(newCons);
   };
 
-  const toggleItem = (id: number) => {
-    setItems(
-      items.map((item) =>
-        item.id === id ? { ...item, enabled: !item.enabled } : item
-      )
-    );
+  const deletePro = (index: number) => {
+    const newPros = pros.filter((_, i) => i !== index);
+    setPros(newPros);
+    onProsChange?.(newPros);
   };
 
-  const updateField = (
-    id: number,
-    field: keyof Pick<ProsConsItem, "title" | "pros" | "cons">,
-    value: string
-  ) => {
-    setItems(
-      items.map((item) => (item.id === id ? { ...item, [field]: value } : item))
-    );
+  const deleteCon = (index: number) => {
+    const newCons = cons.filter((_, i) => i !== index);
+    setCons(newCons);
+    onConsChange?.(newCons);
+  };
+
+  const updatePro = (index: number, value: string) => {
+    const newPros = pros.map((pro, i) => (i === index ? value : pro));
+    setPros(newPros);
+    onProsChange?.(newPros);
+  };
+
+  const updateCon = (index: number, value: string) => {
+    const newCons = cons.map((con, i) => (i === index ? value : con));
+    setCons(newCons);
+    onConsChange?.(newCons);
   };
 
   return (
@@ -63,152 +63,145 @@ export default function ProsCons() {
         Pros vs Cons
       </div>
 
-      {items.map((item) => (
+      <div
+        data-layer="Row"
+        className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-700 flex flex-col justify-center items-start gap-4 overflow-hidden"
+      >
+        {/* Header */}
         <div
-          key={item.id}
           data-layer="Row"
-          className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-700 flex flex-col justify-center items-start gap-4 overflow-hidden"
+          className="Row self-stretch h-14 inline-flex justify-start items-center"
         >
           <div
-            data-layer="Row"
-            className="Row self-stretch h-14 inline-flex justify-start items-center"
+            data-layer="Column"
+            className="Column flex-1 self-stretch px-6 py-3 border-b border-zinc-700 flex justify-start items-center gap-3"
           >
             <div
-              data-layer="Column"
-              className="Column flex-1 self-stretch px-6 py-3 border-b border-zinc-700 flex justify-start items-center gap-3"
+              data-layer="Frame 2147205991"
+              className="Frame2147205991 flex justify-start items-center cursor-grab"
             >
-              <div
-                data-layer="Frame 2147205991"
-                className="Frame2147205991 flex justify-start items-center cursor-grab"
-              >
-                <GripVertical className="w-6 h-6 text-neutral-50" />
-              </div>
-              <div
-                data-layer="Text"
-                className="Text justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
-              >
-                Pros & Cons
-              </div>
+              <GripVertical className="w-6 h-6 text-neutral-50" />
             </div>
             <div
-              data-layer="Column"
-              className="Column self-stretch px-6 py-3 border-b border-zinc-700 flex justify-start items-center gap-4"
+              data-layer="Text"
+              className="Text justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
             >
-              <button
-                onClick={() => toggleItem(item.id)}
-                data-layer="Button"
-                className="Button w-[53.33px] h-7 relative bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline outline-1 outline-offset-[-1px] outline-[#501bd6] overflow-hidden"
-              >
-                <div
-                  data-layer="Button"
-                  className={`Button w-[23.33px] h-[22.67px] absolute bg-white rounded-[66.67px] transition-all duration-200 ${
-                    item.enabled ? "left-[26.67px]" : "left-[3px]"
-                  } top-[2.67px]`}
-                />
-              </button>
-              <button
-                onClick={() => deleteItem(item.id)}
-                data-layer="fluent:delete-16-regular"
-                className="FluentDelete16Regular w-6 h-6 relative overflow-hidden cursor-pointer hover:opacity-70 transition-opacity"
-              >
-                <Trash2 className="w-6 h-6 text-neutral-50" />
-              </button>
+              Pros & Cons
             </div>
           </div>
           <div
-            data-layer="Frame 2147206019"
-            className="Frame2147206019 self-stretch inline-flex justify-end items-center gap-6"
+            data-layer="Column"
+            className="Column self-stretch px-6 py-3 border-b border-zinc-700 flex justify-start items-center gap-4"
           >
-            <div
-              data-layer="Frame 2147205992"
-              className="Frame2147205992 flex-1 px-6 rounded-3xl inline-flex flex-col justify-center items-end gap-2"
+            <button
+              onClick={() => setIsEnabled(!isEnabled)}
+              data-layer="Button"
+              className="Button w-[53.33px] h-7 relative bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline outline-1 outline-offset-[-1px] outline-[#501bd6] overflow-hidden"
             >
               <div
-                data-layer="Frame 2147205559"
-                className="Frame2147205559 self-stretch flex flex-col justify-center items-start gap-2"
+                data-layer="Button"
+                className={`Button w-[23.33px] h-[22.67px] absolute bg-white rounded-[66.67px] transition-all duration-200 ${
+                  isEnabled ? "left-[26.67px]" : "left-[3px]"
+                } top-[2.67px]`}
+              />
+            </button>
+          </div>
+        </div>
+
+        {/* Pros and Cons Content */}
+        <div
+          data-layer="Frame 2147206019"
+          className="Frame2147206019 self-stretch px-6 inline-flex justify-start items-start gap-6"
+        >
+          {/* Pros Column */}
+          <div
+            data-layer="Frame 2147205560"
+            className="Frame2147205560 flex-1 inline-flex flex-col justify-start items-start gap-3"
+          >
+            <div className="flex justify-between items-center w-full">
+              <div
+                data-layer="Pros"
+                className="Pros justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
               >
-                <div
-                  data-layer="Title"
-                  className="Title justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
-                >
-                  Title
-                </div>
+                Pros
+              </div>
+              <button
+                onClick={addPro}
+                className="inline-flex items-center gap-1 hover:opacity-70 transition-opacity"
+              >
+                <span className="text-neutral-50 text-xs font-medium">Add Pro</span>
+                <Plus className="w-4 h-4 text-neutral-50" />
+              </button>
+            </div>
+            
+            {pros.map((pro, index) => (
+              <div key={index} className="w-full flex items-center gap-2">
                 <input
                   type="text"
-                  value={item.title}
-                  onChange={(e) =>
-                    updateField(item.id, "title", e.target.value)
-                  }
-                  placeholder="Title"
+                  value={pro}
+                  onChange={(e) => updatePro(index, e.target.value)}
+                  placeholder={`Pro ${index + 1}`}
                   data-layer="Input"
-                  className="Input self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-2 focus:outline-[#501bd6]"
+                  className="Input flex-1 h-12 pl-6 pr-4 py-3 bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-2 focus:outline-[#501bd6]"
                 />
+                {pros.length > 1 && (
+                  <button
+                    onClick={() => deletePro(index)}
+                    className="hover:opacity-70 transition-opacity"
+                    aria-label="Delete pro"
+                  >
+                    <Trash2 className="w-5 h-5 text-neutral-50" />
+                  </button>
+                )}
               </div>
+            ))}
+          </div>
+
+          {/* Cons Column */}
+          <div
+            data-layer="Frame 2147205561"
+            className="Frame2147205561 flex-1 inline-flex flex-col justify-start items-start gap-3"
+          >
+            <div className="flex justify-between items-center w-full">
               <div
-                data-layer="Frame 2147206057"
-                className="Frame2147206057 self-stretch inline-flex justify-start items-start gap-6"
+                data-layer="Cons"
+                className="Cons justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
               >
-                <div
-                  data-layer="Frame 2147205560"
-                  className="Frame2147205560 flex-1 inline-flex flex-col justify-center items-start gap-2"
-                >
-                  <div
-                    data-layer="Pros"
-                    className="Pros justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
-                  >
-                    Pros
-                  </div>
-                  <input
-                    type="text"
-                    value={item.pros}
-                    onChange={(e) =>
-                      updateField(item.id, "pros", e.target.value)
-                    }
-                    placeholder="Pros"
-                    data-layer="Input"
-                    className="Input self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-2 focus:outline-[#501bd6]"
-                  />
-                </div>
-                <div
-                  data-layer="Frame 2147205561"
-                  className="Frame2147205561 flex-1 inline-flex flex-col justify-center items-start gap-2"
-                >
-                  <div
-                    data-layer="Cons"
-                    className="Cons justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
-                  >
-                    Cons
-                  </div>
-                  <input
-                    type="text"
-                    value={item.cons}
-                    onChange={(e) =>
-                      updateField(item.id, "cons", e.target.value)
-                    }
-                    placeholder="Cons"
-                    data-layer="Input"
-                    className="Input self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-2 focus:outline-[#501bd6]"
-                  />
-                </div>
+                Cons
               </div>
+              <button
+                onClick={addCon}
+                className="inline-flex items-center gap-1 hover:opacity-70 transition-opacity"
+              >
+                <span className="text-neutral-50 text-xs font-medium">Add Con</span>
+                <Plus className="w-4 h-4 text-neutral-50" />
+              </button>
             </div>
+            
+            {cons.map((con, index) => (
+              <div key={index} className="w-full flex items-center gap-2">
+                <input
+                  type="text"
+                  value={con}
+                  onChange={(e) => updateCon(index, e.target.value)}
+                  placeholder={`Con ${index + 1}`}
+                  data-layer="Input"
+                  className="Input flex-1 h-12 pl-6 pr-4 py-3 bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-2 focus:outline-[#501bd6]"
+                />
+                {cons.length > 1 && (
+                  <button
+                    onClick={() => deleteCon(index)}
+                    className="hover:opacity-70 transition-opacity"
+                    aria-label="Delete con"
+                  >
+                    <Trash2 className="w-5 h-5 text-neutral-50" />
+                  </button>
+                )}
+              </div>
+            ))}
           </div>
         </div>
-      ))}
-
-      <button
-        onClick={addItem}
-        data-layer="Frame 2147205993"
-        className="Frame2147205993 inline-flex justify-start items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
-      >
-        <div
-          data-layer="Add More Pros & Cons"
-          className="AddMoreProsCons justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
-        >
-          Add More Pros & Cons
-        </div>
-        <Plus className="w-6 h-6 text-neutral-50" />
-      </button>
+      </div>
     </div>
   );
 }
