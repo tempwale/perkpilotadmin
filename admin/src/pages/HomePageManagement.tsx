@@ -1,3 +1,4 @@
+import { type ReactElement } from "react";
 import HeroSectionManagement from "../components/Deals/DealManagement/HeroSectionManagement";
 import FooterActions from "../components/Deals/DealManagement/FooterActions";
 import HomeManagementHeader from "../components/HomeManagement/HomeManagementHeader";
@@ -8,10 +9,10 @@ import TopPicks from "../components/HomeManagement/TopsPicks";
 import SoftwareCompanies from "../components/HomeManagement/SoftwareComparisions";
 import TopReviews from "../components/HomeManagement/TopReviews";
 
-export default function HomeManagementPage() {
+export default function HomeManagementPage(): ReactElement {
   return (
     <div className="flex justify-center">
-      <div className="p-4 bg-zinc-900 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-800 inline-flex flex-col justify-center items-center gap-6 w-full max-w-[1116px]">
+      <div className="p-4 bg-zinc-900 rounded-3xl outline-1 -outline-offset-1 outline-zinc-800 inline-flex flex-col justify-center items-center gap-6 w-full max-w-[1116px]">
         <div className="w-full flex flex-col gap-6">
           <HomeManagementHeader />
           <HomePageSettings />

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { uploadToCloudinary } from "../../../config/cloudinary";
 
 type Props = {
@@ -18,29 +18,29 @@ export default function Hero({
   onBodyChange,
   onImageChange,
   className = "",
-}: Props) {
+}: Props): ReactElement {
   const [localHeading, setLocalHeading] = useState<string>(heading);
   const [localBody, setLocalBody] = useState<string>(body);
   const [image, setImage] = useState<string | null>(null);
   const [uploading, setUploading] = useState<boolean>(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
-  useEffect(() => setLocalHeading(heading), [heading]);
-  useEffect(() => setLocalBody(body), [body]);
+  useEffect((): void => setLocalHeading(heading), [heading]);
+  useEffect((): void => setLocalBody(body), [body]);
 
-  const handleHeadingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleHeadingChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const v = e.target.value;
     setLocalHeading(v);
     onHeadingChange?.(v);
   };
 
-  const handleBodyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBodyChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const v = e.target.value;
     setLocalBody(v);
     onBodyChange?.(v);
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -53,7 +53,7 @@ export default function Hero({
 
       // Create a local preview
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = (event): void => {
         const imageData = event.target?.result as string;
         setImage(imageData); // For local preview
       };
@@ -105,7 +105,7 @@ export default function Hero({
                 aria-label="Hero heading"
                 value={localHeading}
                 onChange={handleHeadingChange}
-                className="w-full h-14 px-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-zinc-700 text-zinc-400 text-base font-['Poppins'] leading-6 outline-none"
+                className="w-full h-14 px-4 py-3 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-zinc-400 text-base font-['Poppins'] leading-6 outline-none"
                 placeholder="Enter heading"
               />
             </div>
@@ -119,7 +119,7 @@ export default function Hero({
                 aria-label="Hero body"
                 value={localBody}
                 onChange={handleBodyChange}
-                className="w-full h-14 px-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-zinc-700 text-zinc-400 text-base font-['Poppins'] leading-6 outline-none"
+                className="w-full h-14 px-4 py-3 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-zinc-400 text-base font-['Poppins'] leading-6 outline-none"
                 placeholder="Enter body text"
               />
             </div>
@@ -133,7 +133,7 @@ export default function Hero({
           Hero Image
         </div>
 
-        <label className="flex flex-row gap-2 items-center justify-center h-14 px-4 py-2 bg-zinc-800 rounded-xl outline outline-1 outline-zinc-700 cursor-pointer hover:bg-zinc-700 transition">
+        <label className="flex flex-row gap-2 items-center justify-center h-14 px-4 py-2 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 cursor-pointer hover:bg-zinc-700 transition">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"

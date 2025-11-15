@@ -1,5 +1,6 @@
 // SVG Components
-function DefaultLogo() {
+import { type ReactElement } from "react";
+function DefaultLogo(): ReactElement{
   return (
     <svg
       width="61"
@@ -39,7 +40,7 @@ function DefaultLogo() {
   );
 }
 
-function VerificationIcon() {
+function VerificationIcon(): ReactElement{
   return (
     <svg
       width="25"
@@ -72,7 +73,7 @@ interface DealCardProps {
   onGetDeal?: () => void;
 }
 
-function CheckCircle({ className }: { className?: string }) {
+function CheckCircle({ className }: { className?: string }): ReactElement{
   return (
     <div className={className}>
       <VerificationIcon />
@@ -97,7 +98,7 @@ export default function DealCard({
   savings = "Save Up To $1234",
   onViewDetails,
   onGetDeal,
-}: DealCardProps) {
+}: DealCardProps): ReactElement{
   return (
     <div
       className="backdrop-blur-md backdrop-filter bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.08)] border-solid box-border content-stretch flex flex-col gap-[16px] items-center pb-[16px] pt-0 px-[16px] relative rounded-[24px] size-full"
@@ -244,7 +245,7 @@ export default function DealCard({
         data-node-id="1:1688"
       >
         <button
-          onClick={onViewDetails}
+          onClick={(): void => onViewDetails?.()}
           className="bg-[rgba(255,255,255,0.08)] box-border content-stretch flex flex-[1_0_0] items-center justify-center min-h-px min-w-px px-[12px] py-[8px] relative rounded-[100px] shrink-0 hover:bg-[rgba(255,255,255,0.12)] transition-colors"
           data-name="All Assets"
           data-node-id="1:1689"
@@ -257,7 +258,7 @@ export default function DealCard({
           </p>
         </button>
         <button
-          onClick={onGetDeal}
+          onClick={(): void => onGetDeal?.()}
           className="group bg-white hover:bg-gradient-to-b hover:from-[#501BD6] hover:to-[#7F57E2] box-border content-stretch flex flex-[1_0_0] items-center justify-center min-h-px min-w-px px-[12px] py-[8px] relative rounded-[100px] shrink-0 transition-all duration-200"
           data-name="All Assets"
           data-node-id="1:1691"

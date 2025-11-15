@@ -1,10 +1,11 @@
+import { type ReactElement } from "react";
 import Alternatives from "./Tabs/Alternatives";
 import Features from "./Tabs/Features";
 import Overview from "./Tabs/Overview";
 import Pricing from "./Tabs/Pricing";
 import Reviews from "./Tabs/Reviews";
 
-export default function Tabs() {
+export default function Tabs(): ReactElement{
   return (
     <div>
       <div

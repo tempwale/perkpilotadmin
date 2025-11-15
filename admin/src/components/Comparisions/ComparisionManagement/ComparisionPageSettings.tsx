@@ -1,12 +1,12 @@
 import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useState, type ReactElement} from "react";
 
 type Props = {
   status?: "live" | "maintenance";
   onToggle?: (next: "live" | "maintenance") => void;
 };
 
-export default function ComparisionPageSettings({ status, onToggle }: Props) {
+export default function ComparisionPageSettings({ status, onToggle }: Props): ReactElement{
   const [internal, setInternal] = useState<"live" | "maintenance">(
     status ?? "live"
   );
@@ -15,7 +15,7 @@ export default function ComparisionPageSettings({ status, onToggle }: Props) {
   // (keep simple; if more advanced sync is needed we can use useEffect)
   const current = status ?? internal;
 
-  function handleToggle() {
+  function handleToggle(): void {
     const next = current === "live" ? "maintenance" : "live";
     if (!status) setInternal(next);
     if (onToggle) onToggle(next);
@@ -35,7 +35,7 @@ export default function ComparisionPageSettings({ status, onToggle }: Props) {
         <button
           type="button"
           aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
+          onClick={(): void => setOpen((v) => !v)}
           className="w-6 h-6 flex items-center justify-center rounded hover:bg-zinc-700/20 focus:outline-none focus:ring-2 focus:ring-[#7f57e2]"
           aria-label={open ? "Collapse settings" : "Expand settings"}
         >

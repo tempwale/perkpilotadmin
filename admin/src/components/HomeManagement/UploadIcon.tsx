@@ -1,18 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import {useEffect, useRef, useState, type ReactElement} from "react";
 
 type Props = {
   onImageChange?: (file: File | null) => void;
 };
 
-export default function UploadIcon({ onImageChange }: Props) {
+export default function UploadIcon({ onImageChange }: Props): ReactElement{
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [progress, setProgress] = useState<number | null>(null);
   const timerRef = useRef<number | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
 
-  useEffect(() => {
-    return () => {
+  useEffect((): void => {
+    return (): void => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -25,7 +25,7 @@ export default function UploadIcon({ onImageChange }: Props) {
     };
   }, [previewUrl]);
 
-  function handleFileInput(f: File | null) {
+  function handleFileInput(f: File | null): void {
     if (!f) {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
       setPreviewUrl(null);
@@ -54,7 +54,7 @@ export default function UploadIcon({ onImageChange }: Props) {
 
     const image = new Image();
     imgRef.current = image;
-    image.onload = () => {
+    image.onload = (): void => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -64,7 +64,7 @@ export default function UploadIcon({ onImageChange }: Props) {
       if (onImageChange) onImageChange(f);
       imgRef.current = null;
     };
-    image.onerror = () => {
+    image.onerror = (): void => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -78,7 +78,7 @@ export default function UploadIcon({ onImageChange }: Props) {
   return (
     <div
       data-layer="Row"
-      className="Row self-stretch w-full py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-zinc-700 inline-flex justify-start items-center overflow-hidden"
+      className="Row self-stretch w-full py-4 bg-zinc-800 rounded-3xl outline-1 outline-zinc-700 inline-flex justify-start items-center overflow-hidden"
     >
       <div
         data-layer="Column"
@@ -177,7 +177,7 @@ export default function UploadIcon({ onImageChange }: Props) {
               <div
                 role="button"
                 tabIndex={0}
-                onClick={() =>
+                onClick={(): void =>
                   document.getElementById("upload-icon-input")?.click()
                 }
                 onKeyDown={(e) => {
@@ -186,7 +186,7 @@ export default function UploadIcon({ onImageChange }: Props) {
                     document.getElementById("upload-icon-input")?.click();
                   }
                 }}
-                className="Frame1321315108 self-stretch flex-1 px-4 py-2.5 rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-700 inline-flex justify-center items-center gap-3 cursor-pointer"
+                className="Frame1321315108 self-stretch flex-1 px-4 py-2.5 rounded-xl outline-1 -outline-offset-1 outline-zinc-700 inline-flex justify-center items-center gap-3 cursor-pointer"
               >
                 {previewUrl ? (
                   <img
@@ -338,7 +338,7 @@ export default function UploadIcon({ onImageChange }: Props) {
             </div>
             <div
               data-layer="Input"
-              className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
+              className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
             >
               <div
                 data-layer="Frame 13"
@@ -375,7 +375,7 @@ export default function UploadIcon({ onImageChange }: Props) {
             </div>
             <div
               data-layer="Input"
-              className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
+              className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
             >
               <div
                 data-layer="Frame 13"

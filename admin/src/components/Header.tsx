@@ -1,3 +1,4 @@
+import { type ReactElement } from "react";
 import React, { useRef, useState } from "react";
 import HandshakeIcon from "../assets/icons/handshake";
 
@@ -11,12 +12,12 @@ export default function Header({
   userName = "Admin",
   onSearch,
   onLogout,
-}: HeaderProps) {
+}: HeaderProps): ReactElement{
   const [query, setQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
-  const submitSearch = () => {
+  const submitSearch = (): void => {
     if (onSearch) onSearch(query.trim());
   };
 
@@ -28,13 +29,13 @@ export default function Header({
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     setMenuOpen(false);
     if (onLogout) onLogout();
   };
 
   // simple blur handler to close menu when clicking outside
-  const handleBlur = (e: React.FocusEvent) => {
+  const handleBlur = (e: React.FocusEvent): void => {
     // if focus moved outside the menu container, close
     if (menuRef.current && !menuRef.current.contains(e.relatedTarget as Node)) {
       setMenuOpen(false);
@@ -58,7 +59,7 @@ export default function Header({
       <div className="flex flex-row items-center gap-4">
         <div
           data-layer="Main/text-field"
-          className="MainTextField w-[287px] h-12 relative bg-zinc-800 rounded-lg outline outline-1 outline-offset-[-1px] outline-zinc-800 inline-flex flex-col justify-center items-start gap-2.5"
+          className="MainTextField w-[287px] h-12 relative bg-zinc-800 rounded-lg outline-1 -outline-offset-1 outline-zinc-800 inline-flex flex-col justify-center items-start gap-2.5"
         >
           <div
             data-layer="Frame 13"
@@ -95,7 +96,7 @@ export default function Header({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
-                onBlur={() => {}}
+                onBlur={(): void => {}}
                 className="bg-transparent text-zinc-200 text-base font-normal font-['Poppins'] leading-normal outline-none"
                 placeholder="Search"
               />
@@ -164,7 +165,7 @@ export default function Header({
           className="relative Button pl-3 pr-1 py-2 bg-zinc-800 rounded-lg inline-flex justify-start items-center gap-2"
         >
           <button
-            onClick={() => setMenuOpen((s) => !s)}
+            onClick={(): void => setMenuOpen((s) => !s)}
             className="flex items-center gap-2 bg-transparent border-none p-0"
             aria-haspopup="true"
             aria-expanded={menuOpen}

@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactElement} from "react";
 import { ChevronDown } from "lucide-react";
 import ComparisionsCard from "./ComparisionCard";
 
-export default function ArticleGrid() {
+export default function ArticleGrid(): ReactElement{
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(true);
 
@@ -51,7 +51,7 @@ export default function ArticleGrid() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return posts;
-    return posts.filter((p) => {
+    return posts.filter((p): boolean => {
       const hay = `${p.title} ${p.description} ${p.tags.join(
         " "
       )}`.toLowerCase();
@@ -69,7 +69,7 @@ export default function ArticleGrid() {
           type="button"
           className="w-6 h-6 flex items-center justify-center rounded hover:bg-zinc-700/20 focus:outline-none focus:ring-2 focus:ring-[#7f57e2]"
           aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
+          onClick={(): void => setOpen((v) => !v)}
           aria-label={open ? "Collapse article list" : "Expand article list"}
         >
           <ChevronDown
@@ -80,7 +80,7 @@ export default function ArticleGrid() {
         </button>
       </div>
       {open && (
-        <div className="self-stretch relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-700 px-3 py-2">
+        <div className="self-stretch relative bg-zinc-800 rounded-xl outline-1 -outline-offset-1 outline-zinc-700 px-3 py-2">
           <div className="flex items-center gap-3">
             <div className="w-5 h-5 rounded flex items-center justify-center">
               {/* simple search circle visual (keeps original look) */}
@@ -120,7 +120,7 @@ export default function ArticleGrid() {
 
       {open && (
         <div className="self-stretch grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {filtered.map((p) => (
+          {filtered.map((p): ReactElement=> (
             <ComparisionsCard
               key={p.id}
               id={p.id}

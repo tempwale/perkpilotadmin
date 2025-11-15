@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactElement } from "react";
 import { useNavigate } from "react-router-dom";
 import Author from "../../components/Comparisions/AddComparision/Author";
 import Header from "../../components/Comparisions/AddComparision/Header";
@@ -10,10 +10,17 @@ import FeatureComparision from "../../components/Comparisions/AddComparision/Fea
 import ProConGrid from "../../components/Comparisions/AddComparision/ProConGrid";
 import MoreComparisions from "../../components/Comparisions/AddComparision/MoreComparisions";
 import FooterActions from "../../components/Comparisions/AddComparision/FooterActions";
+import type {
+  Tool,
+  FeaturesData,
+  ProsConsCard,
+  ComparisonData,
+} from "../../types/comparison.types";
+import type { FeatureComparisonApiResponse, BlogSectionApiResponse } from "../../types/api.types";
 
-export default function AddComparisionPage() {
+export default function AddComparisionPage(): ReactElement {
   const navigate = useNavigate();
-  const [comparisonData, setComparisonData] = useState<Record<string, any>>({
+  const [comparisonData, setComparisonData] = useState<ComparisonData>({
     pageType: "Tool Comparison Blog",
     heroHeading: "",
     heroBody: "",
@@ -37,7 +44,7 @@ export default function AddComparisionPage() {
     isPublished: true,
   });
 
-  const handleHeroHeadingChange = (heading: string) => {
+  const handleHeroHeadingChange = (heading: string): void => {
     const slug = heading
       .toLowerCase()
       .trim()
@@ -52,14 +59,14 @@ export default function AddComparisionPage() {
     }));
   };
 
-  const handleHeroBodyChange = (body: string) => {
+  const handleHeroBodyChange = (body: string): void => {
     setComparisonData((prev) => ({
       ...prev,
       heroBody: body,
     }));
   };
 
-  const handleToolsChange = (tools: any[]) => {
+  const handleToolsChange = (tools: Tool[]): void => {
     // Transform tools to match backend structure with default placeholder logos
     const toolsMentioned = tools.map((tool) => ({
       toolName: tool.name || "",
@@ -75,46 +82,46 @@ export default function AddComparisionPage() {
     }));
   };
 
-  const handleToolsHeadlineChange = (headline: string) => {
+  const handleToolsHeadlineChange = (headline: string): void => {
     setComparisonData((prev) => ({
       ...prev,
       sectionHeadline: headline,
     }));
   };
 
-  const handleTipChange = (tip: string) => {
+  const handleTipChange = (tip: string): void => {  
     setComparisonData((prev) => ({
       ...prev,
       tipBulbText: tip,
     }));
   };
 
-  const handleAuthorChange = (authorId: string) => {
+  const handleAuthorChange = (authorId: string): void => {
     setComparisonData((prev) => ({
       ...prev,
       authorId, // Changed from 'author' to 'authorId'
     }));
   };
 
-  const handleBlogCategoryChange = (category: string) => {
+  const handleBlogCategoryChange = (category: string): void => {
     setComparisonData((prev) => ({
       ...prev,
       blogCategory: category,
     }));
   };
 
-  const handleReadingTimeChange = (time: string) => {
+  const handleReadingTimeChange = (time: string): void => {
     setComparisonData((prev) => ({
       ...prev,
       readingTime: time,
     }));
   };
 
-  const handleToolBlogCardsChange = (cards: any[]) => {
-    const toolBlogCards = cards.map((card, index) => ({
-      sectionNumber: index + 1,
-      blogTitle: card.title,
-      blogBody: card.body,
+  const handleToolBlogCardsChange = (cards: BlogSectionApiResponse[]): void => {
+    const toolBlogCards = cards.map((card) => ({
+      sectionNumber: card.sectionNumber,
+      blogTitle: card.blogTitle,
+      blogBody: card.blogBody,
     }));
     setComparisonData((prev) => ({
       ...prev,
@@ -122,7 +129,7 @@ export default function AddComparisionPage() {
     }));
   };
 
-  const handleHeroImageChange = (imageUrl: string) => {
+  const handleHeroImageChange = (imageUrl: string): void => {
     setComparisonData((prev) => ({
       ...prev,
       comparisonHeroImage:
@@ -130,21 +137,28 @@ export default function AddComparisionPage() {
     }));
   };
 
-  const handleFeaturesChange = (featuresData: any) => {
-    // Features are already transformed by FeatureComparison component
-    // Just pass them through with proper structure
+  const handleFeaturesChange = (featuresData: FeatureComparisonApiResponse): void => {
+    // Transform FeatureComparisonApiResponse to FeaturesData
+    const transformedFeatures: FeaturesData = {
+      sectionTitle: featuresData.sectionTitle,
+      featuresHeadline: featuresData.featuresHeadline,
+      tools: featuresData.tools,
+      features: featuresData.features.map((f) => ({
+        featureName: f.featureName,
+        toolAvailability: {
+          "0": f.tool1Available,
+          "1": f.tool2Available,
+          "2": f.tool3Available,
+        },
+      })),
+    };
     setComparisonData((prev) => ({
       ...prev,
-      featuresComparison: {
-        sectionTitle: featuresData.sectionTitle || "Features",
-        featuresHeadline: featuresData.featuresHeadline || "Feature Comparison",
-        tools: featuresData.tools || [],
-        features: featuresData.features || [],
-      },
+      featuresComparison: transformedFeatures,
     }));
   };
 
-  const handleProsConsChange = (prosConsData: any[]) => {
+  const handleProsConsChange = (prosConsData: ProsConsCard[]): void => {
     console.log("Received pros/cons data:", prosConsData);
 
     // Use the data exactly as it comes from ProConCard
@@ -163,20 +177,22 @@ export default function AddComparisionPage() {
     }));
   };
 
-  const handleSaveSuccess = () => {
-    navigate("/comparisons");
+  const handleSaveSuccess = (): void => {
+    void Promise.resolve(navigate("/comparisons"));
   };
 
-  const handleSaveError = (error: string) => {
+  const handleSaveError = (error: string): void => {
     console.error("Save error:", error);
   };
 
   return (
     <div
       data-layer="Frame 2147206029"
-      className="Frame2147206029 w-[1116px] p-6 bg-zinc-900 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-800 inline-flex flex-col justify-start items-start gap-6"
+      className="Frame2147206029 w-[1116px] p-6 bg-zinc-900 rounded-3xl outline-1 -outline-offset-1 outline-zinc-800 inline-flex flex-col justify-start items-start gap-6"
     >
-      <Header onBack={() => navigate(-1)} />
+      <Header onBack={() => {
+        void Promise.resolve(navigate(-1));
+      }} />
       <Hero
         onHeadingChange={handleHeroHeadingChange}
         onBodyChange={handleHeroBodyChange}

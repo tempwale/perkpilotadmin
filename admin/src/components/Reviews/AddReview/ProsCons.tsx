@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import {useState, type ReactElement} from "react";
 import { GripVertical, Trash2, Plus } from "lucide-react";
 
 type ProsConsItem = {
@@ -11,12 +11,12 @@ type ProsConsItem = {
   enabled: boolean;
 };
 
-export default function ProsCons() {
+export default function ProsCons(): ReactElement{
   const [items, setItems] = useState<ProsConsItem[]>([
     { id: 1, title: "", pros: "", cons: "", enabled: true },
   ]);
 
-  const addItem = () => {
+  const addItem = (): void => {
     setItems([
       ...items,
       {
@@ -29,11 +29,11 @@ export default function ProsCons() {
     ]);
   };
 
-  const deleteItem = (id: number) => {
-    setItems(items.filter((item) => item.id !== id));
+  const deleteItem = (id: number): void => {
+    setItems(items.filter((item): boolean => item.id !== id));
   };
 
-  const toggleItem = (id: number) => {
+  const toggleItem = (id: number): void => {
     setItems(
       items.map((item) =>
         item.id === id ? { ...item, enabled: !item.enabled } : item
@@ -45,7 +45,7 @@ export default function ProsCons() {
     id: number,
     field: keyof Pick<ProsConsItem, "title" | "pros" | "cons">,
     value: string
-  ) => {
+  ): void => {
     setItems(
       items.map((item) => (item.id === id ? { ...item, [field]: value } : item))
     );
@@ -67,7 +67,7 @@ export default function ProsCons() {
         <div
           key={item.id}
           data-layer="Row"
-          className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-700 flex flex-col justify-center items-start gap-4 overflow-hidden"
+          className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 flex flex-col justify-center items-start gap-4 overflow-hidden"
         >
           <div
             data-layer="Row"
@@ -95,9 +95,9 @@ export default function ProsCons() {
               className="Column self-stretch px-6 py-3 border-b border-zinc-700 flex justify-start items-center gap-4"
             >
               <button
-                onClick={() => toggleItem(item.id)}
+                onClick={(): void => toggleItem(item.id)}
                 data-layer="Button"
-                className="Button w-[53.33px] h-7 relative bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline outline-1 outline-offset-[-1px] outline-[#501bd6] overflow-hidden"
+                className="Button w-[53.33px] h-7 relative bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden"
               >
                 <div
                   data-layer="Button"
@@ -107,7 +107,7 @@ export default function ProsCons() {
                 />
               </button>
               <button
-                onClick={() => deleteItem(item.id)}
+                onClick={(): void => deleteItem(item.id)}
                 data-layer="fluent:delete-16-regular"
                 className="FluentDelete16Regular w-6 h-6 relative overflow-hidden cursor-pointer hover:opacity-70 transition-opacity"
               >
@@ -141,7 +141,7 @@ export default function ProsCons() {
                   }
                   placeholder="Title"
                   data-layer="Input"
-                  className="Input self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-2 focus:outline-[#501bd6]"
+                  className="Input self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-2 focus:outline-[#501bd6]"
                 />
               </div>
               <div
@@ -166,7 +166,7 @@ export default function ProsCons() {
                     }
                     placeholder="Pros"
                     data-layer="Input"
-                    className="Input self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-2 focus:outline-[#501bd6]"
+                    className="Input self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-2 focus:outline-[#501bd6]"
                   />
                 </div>
                 <div
@@ -187,7 +187,7 @@ export default function ProsCons() {
                     }
                     placeholder="Cons"
                     data-layer="Input"
-                    className="Input self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-2 focus:outline-[#501bd6]"
+                    className="Input self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-2 focus:outline-[#501bd6]"
                   />
                 </div>
               </div>

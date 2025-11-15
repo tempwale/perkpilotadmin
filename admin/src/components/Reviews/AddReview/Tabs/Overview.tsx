@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, type FormEvent } from "react";
+import {useState, useRef, type FormEvent, ReactElement} from "react";
 import {
   GripVertical,
   Trash2,
@@ -23,7 +23,7 @@ import {
   Tag,
 } from "lucide-react";
 
-export default function Overview() {
+export default function Overview(): ReactElement{
   const [isEnabled, setIsEnabled] = useState(true);
   const [fontSize, setFontSize] = useState(16);
   const [content, setContent] = useState(
@@ -32,41 +32,41 @@ export default function Overview() {
   const [heading, setHeading] = useState("Heading 1");
   const contentRef = useRef<HTMLDivElement | null>(null);
 
-  const handleToggle = () => {
+  const handleToggle = (): void => {
     setIsEnabled(!isEnabled);
   };
 
-  const handleDelete = () => {
+  const handleDelete = (): void => {
     if (window.confirm("Are you sure you want to delete this content?")) {
       setContent("");
       setHeading("");
     }
   };
 
-  const execCommand = (command: string, value?: string) => {
+  const execCommand = (command: string, value?: string): void => {
     // document.execCommand expects a string or undefined for the value
     document.execCommand(command, false, value);
     contentRef.current?.focus();
   };
 
-  const handleFontSizeChange = (direction: "up" | "down") => {
+  const handleFontSizeChange = (direction: "up" | "down"): void => {
     setFontSize((prev) =>
       direction === "up" ? prev + 1 : Math.max(8, prev - 1)
     );
   };
 
-  const handleContentChange = (e: FormEvent<HTMLDivElement>) => {
+  const handleContentChange = (e: FormEvent<HTMLDivElement>): void => {
     const el = e.currentTarget as HTMLDivElement;
     setContent(el.innerText);
   };
 
-  const handleHeadingChange = (e: FormEvent<HTMLDivElement>) => {
+  const handleHeadingChange = (e: FormEvent<HTMLDivElement>): void => {
     const el = e.currentTarget as HTMLDivElement;
     setHeading(el.innerText);
   };
 
   return (
-    <div className="Row w-[1068px] py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-700 flex flex-col justify-center items-start gap-4 overflow-hidden">
+    <div className="Row w-[1068px] py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 flex flex-col justify-center items-start gap-4 overflow-hidden">
       {/* Header Row */}
       <div className="Row self-stretch h-14 inline-flex justify-start items-center">
         <div className="Column flex-1 self-stretch px-6 py-3 border-b border-zinc-700 flex justify-start items-center gap-3">
@@ -80,7 +80,7 @@ export default function Overview() {
         <div className="Column self-stretch px-6 py-3 border-b border-zinc-700 flex justify-start items-center gap-4">
           <button
             onClick={handleToggle}
-            className="Button w-[53.33px] h-7 relative bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline outline-1 outline-offset-[-1px] outline-[#501bd6] overflow-hidden cursor-pointer transition-opacity hover:opacity-90"
+            className="Button w-[53.33px] h-7 relative bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden cursor-pointer transition-opacity hover:opacity-90"
             aria-label="Toggle content"
           >
             <div
@@ -100,7 +100,7 @@ export default function Overview() {
       </div>
 
       {/* Editor Area */}
-      <div className="Frame self-stretch px-4 bg-zinc-800 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-700 flex flex-col justify-start items-start overflow-hidden">
+      <div className="Frame self-stretch px-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 flex flex-col justify-start items-start overflow-hidden">
         {/* Toolbar */}
         <div className="Frame self-stretch border-b border-zinc-700 inline-flex justify-center items-center">
           <div className="Frame flex justify-start items-start">
@@ -123,14 +123,14 @@ export default function Overview() {
                 </div>
                 <div className="flex flex-col">
                   <button
-                    onClick={() => handleFontSizeChange("up")}
+                    onClick={(): void => handleFontSizeChange("up")}
                     className="hover:opacity-70"
                     aria-label="Increase font size"
                   >
                     <ChevronUp size={12} className="text-neutral-50" />
                   </button>
                   <button
-                    onClick={() => handleFontSizeChange("down")}
+                    onClick={(): void => handleFontSizeChange("down")}
                     className="hover:opacity-70"
                     aria-label="Decrease font size"
                   >
@@ -143,42 +143,42 @@ export default function Overview() {
             {/* Text Formatting */}
             <div className="Frame p-2 border-r border-zinc-700 flex justify-start items-start gap-2">
               <button
-                onClick={() => execCommand("bold")}
+                onClick={(): void => execCommand("bold")}
                 className="ButtonIcon w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                 title="Bold"
               >
                 <Bold size={20} className="text-neutral-50" />
               </button>
               <button
-                onClick={() => execCommand("italic")}
+                onClick={(): void => execCommand("italic")}
                 className="ButtonIcon w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                 title="Italic"
               >
                 <Italic size={20} className="text-neutral-50" />
               </button>
               <button
-                onClick={() => execCommand("underline")}
+                onClick={(): void => execCommand("underline")}
                 className="ButtonIcon w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                 title="Underline"
               >
                 <Underline size={20} className="text-neutral-50" />
               </button>
               <button
-                onClick={() => execCommand("strikeThrough")}
+                onClick={(): void => execCommand("strikeThrough")}
                 className="ButtonIcon w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                 title="Strikethrough"
               >
                 <Strikethrough size={20} className="text-neutral-50" />
               </button>
               <button
-                onClick={() => execCommand("superscript")}
+                onClick={(): void => execCommand("superscript")}
                 className="ButtonIcon w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                 title="Superscript"
               >
                 <Superscript size={20} className="text-neutral-50" />
               </button>
               <button
-                onClick={() => execCommand("subscript")}
+                onClick={(): void => execCommand("subscript")}
                 className="ButtonIcon w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                 title="Subscript"
               >
@@ -189,21 +189,21 @@ export default function Overview() {
             {/* Alignment */}
             <div className="Frame p-2 border-r border-zinc-700 flex justify-start items-start gap-2">
               <button
-                onClick={() => execCommand("justifyLeft")}
+                onClick={(): void => execCommand("justifyLeft")}
                 className="ButtonIcon w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                 title="Align Left"
               >
                 <AlignLeft size={20} className="text-neutral-50" />
               </button>
               <button
-                onClick={() => execCommand("justifyCenter")}
+                onClick={(): void => execCommand("justifyCenter")}
                 className="ButtonIcon w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                 title="Align Center"
               >
                 <AlignCenter size={20} className="text-neutral-50" />
               </button>
               <button
-                onClick={() => execCommand("justifyRight")}
+                onClick={(): void => execCommand("justifyRight")}
                 className="ButtonIcon w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                 title="Align Right"
               >
@@ -214,14 +214,14 @@ export default function Overview() {
             {/* Lists */}
             <div className="Frame p-2 border-r border-zinc-700 flex justify-start items-start gap-2">
               <button
-                onClick={() => execCommand("insertOrderedList")}
+                onClick={(): void => execCommand("insertOrderedList")}
                 className="ButtonIcon w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                 title="Ordered List"
               >
                 <ListOrdered size={20} className="text-neutral-50" />
               </button>
               <button
-                onClick={() => execCommand("insertUnorderedList")}
+                onClick={(): void => execCommand("insertUnorderedList")}
                 className="ButtonIcon w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                 title="Unordered List"
               >
@@ -232,7 +232,7 @@ export default function Overview() {
             {/* Image and Links */}
             <div className="Frame p-2 border-r border-zinc-700 flex justify-start items-start gap-2">
               <button
-                onClick={() => {
+                onClick={(): void => {
                   const url = prompt("Enter image URL:");
                   if (url) execCommand("insertImage", url);
                 }}
@@ -242,7 +242,7 @@ export default function Overview() {
                 <Type size={20} className="text-neutral-50" />
               </button>
               <button
-                onClick={() => {
+                onClick={(): void => {
                   const url = prompt("Enter URL:");
                   if (url) execCommand("createLink", url);
                 }}
@@ -252,7 +252,7 @@ export default function Overview() {
                 <Link2 size={20} className="text-neutral-50" />
               </button>
               <button
-                onClick={() => execCommand("unlink")}
+                onClick={(): void => execCommand("unlink")}
                 className="ButtonIcon w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                 title="Remove Link"
               >

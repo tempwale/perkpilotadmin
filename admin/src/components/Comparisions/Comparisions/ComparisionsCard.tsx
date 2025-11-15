@@ -1,7 +1,8 @@
-import React from "react";
+import React, { type ReactElement } from "react";
 import { Link } from "react-router-dom";
 import CardPopup from "./CardPopup";
 import { useState } from "react";
+import type { ComparisonApiResponse } from "../../../types/api.types";
 interface ComparisionsCardProps {
   id?: string | number;
   app1Logo?: React.ReactNode;
@@ -14,7 +15,7 @@ interface ComparisionsCardProps {
 }
 
 // Example Slack and Google Meet SVGs (replace with your own as needed)
-const SlackLogo = () => (
+const SlackLogo = (): React.ReactElement => (
   <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
     <rect width="32" height="32" rx="7" fill="#4A154B" />
     <path
@@ -35,7 +36,7 @@ const SlackLogo = () => (
     />
   </svg>
 );
-function FramerLogo() {
+function FramerLogo(): React.ReactElement {
   return (
     <svg
       width="21"
@@ -59,7 +60,7 @@ function FramerLogo() {
   );
 }
 
-const LineIcon = () => (
+const LineIcon = (): ReactElement => (
   <div className="h-0 w-4 relative">
     <div className="absolute inset-0 border-t border-zinc-400"></div>
   </div>
@@ -77,8 +78,8 @@ const ComparisionsCard: React.FC<ComparisionsCardProps> = ({
 }) => {
   const [showModal, setShowModal] = useState(false);
 
-  const openModal = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
+  const openModal = (): void => setShowModal(true);
+  const closeModal = (): void => setShowModal(false);
   return (
     <div className="flex flex-col justify-center items-center w-full">
       <div
@@ -108,12 +109,12 @@ const ComparisionsCard: React.FC<ComparisionsCardProps> = ({
           />
         </svg>
       </div>
-      <div className="w-full lg:w-[350px] h-[480px] p-4 sm:p-6 bg-white/5 rounded-3xl outline outline-1 outline-offset-[-1px] outline-white/10 inline-flex flex-col justify-start items-start gap-6">
+      <div className="w-full lg:w-[350px] h-[480px] p-4 sm:p-6 bg-white/5 rounded-3xl outline-1 -outline-offset-1 outline-white/10 inline-flex flex-col justify-start items-start gap-6">
         {/* Top Section: Logos and VS */}
         <div className="self-stretch flex flex-col justify-start items-center gap-4">
-          <div className="w-full max-w-[28rem] inline-flex justify-center items-center mx-auto px-2">
+          <div className="w-full max-w-md inline-flex justify-center items-center mx-auto px-2">
             {/* App 1 Logo */}
-            <div className="w-12 h-12 sm:w-14 sm:h-14 p-1.5 sm:p-2.5 bg-neutral-50 rounded-[100px] outline outline-1 outline-offset-[-1px] outline-neutral-50 flex justify-center items-center gap-2.5">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 p-1.5 sm:p-2.5 bg-neutral-50 rounded-[100px] outline-1 -outline-offset-1 outline-neutral-50 flex justify-center items-center gap-2.5">
               <div className="w-8 h-8 sm:w-8 sm:h-8 relative flex items-center justify-center">
                 {app1Logo}
               </div>
@@ -127,7 +128,7 @@ const ComparisionsCard: React.FC<ComparisionsCardProps> = ({
             </div>
             {/* Line */}
             <LineIcon /> {/* App 2 Logo */}
-            <div className="w-12 h-12 sm:w-14 sm:h-14 p-1.5 sm:p-2.5 bg-neutral-50 rounded-[100px] outline outline-1 outline-offset-[-1px] outline-neutral-50 flex justify-center items-center gap-2.5">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 p-1.5 sm:p-2.5 bg-neutral-50 rounded-[100px] outline-1 -outline-offset-1 outline-neutral-50 flex justify-center items-center gap-2.5">
               <div className="w-8 h-8 sm:w-8 sm:h-8 relative flex items-center justify-center">
                 {app2Logo}
               </div>
@@ -158,8 +159,8 @@ const ComparisionsCard: React.FC<ComparisionsCardProps> = ({
         {/* CTA Button */}
         <Link
           to={`/comparison/${id}`}
-          onClick={() => onReadComparison && onReadComparison()}
-          className="self-stretch h-10 sm:h-12 px-3 py-2 bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[100px] inline-flex justify-center items-center cursor-pointer"
+          onClick={(): void => onReadComparison && onReadComparison()}
+          className="self-stretch h-10 sm:h-12 px-3 py-2 bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[100px] inline-flex justify-center items-center cursor-pointer"
         >
           <div className="text-neutral-50 text-sm sm:text-base font-normal font-['Poppins'] leading-normal">
             Read Full Comparison
@@ -172,13 +173,33 @@ const ComparisionsCard: React.FC<ComparisionsCardProps> = ({
           onClose={closeModal}
           onDelete={onDelete}
           Comparision={{
-            id,
-            title,
-            description,
-            app1Logo,
-            app2Logo,
-            tags,
-          }}
+            id: typeof id === "string" ? id : String(id),
+            title: title ?? "",
+            description: description ?? "",
+            tags: tags ?? [],
+            pageType: "Tool Comparison Blog",
+            heroHeading: title ?? "",
+            heroBody: description ?? "",
+            comparisonHeroImage: "",
+            sectionHeadline: "",
+            tipBulbText: "",
+            toolsMentioned: [],
+            author: "",
+            authorId: "",
+            blogCategory: "",
+            readingTime: "",
+            toolBlogCards: [],
+            featuresComparison: {
+              sectionTitle: "",
+              featuresHeadline: "",
+              tools: [],
+              features: [],
+            },
+            prosConsCards: [],
+            slug: "",
+            isPublished: false,
+            viewCount: 0,
+          } as ComparisonApiResponse}
         />
       )}
     </div>

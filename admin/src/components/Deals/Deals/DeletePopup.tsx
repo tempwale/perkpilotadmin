@@ -1,6 +1,7 @@
-import { useState } from "react";
+import {useState, type ReactElement} from "react";
 import DealCard from "./DealsCard";
 import { DEALS_API } from "../../../config/backend";
+import type { DealApiResponse, ApiError } from "../../../types/api.types";
 
 export default function DeletePopup({
   onClose,
@@ -9,12 +10,12 @@ export default function DeletePopup({
 }: {
   onClose?: () => void;
   onConfirm?: () => void;
-  deal?: any;
-}) {
+  deal?: DealApiResponse;
+}): ReactElement{
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleConfirm = async () => {
+  const handleConfirm = async (): Promise<void> => {
     setError(null);
     const id = String(deal?.id ?? deal?._id ?? "");
     if (!id) {
@@ -30,16 +31,17 @@ export default function DeletePopup({
       });
 
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
+        const body = (await res.json().catch(() => ({}))) as ApiError | { message?: string };
         throw new Error(body.message || `Server returned ${res.status}`);
       }
 
       // success
       onConfirm?.();
       onClose?.();
-    } catch (err: any) {
+    } catch (err) {
       console.error("Delete failed", err);
-      setError(err?.message || "Failed to delete deal");
+      const errorMessage = err instanceof Error ? err.message : "Failed to delete deal";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -48,12 +50,12 @@ export default function DeletePopup({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={() => onClose?.()}
+        onClick={(): void => onClose?.()}
         aria-hidden
       />
       <div
         data-layer="Card Popup"
-        className="relative w-[380px] p-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-700 inline-flex flex-col justify-center items-center gap-3 z-10"
+        className="relative w-[380px] p-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-1 outline-zinc-700 inline-flex flex-col justify-center items-center gap-3 z-10"
       >
         <div
           data-layer="Frame 1321315042"
@@ -88,15 +90,15 @@ export default function DeletePopup({
           <div className="w-[420px]">
             <DealCard
               id={String(deal?.id ?? deal?._id ?? "preview")}
-              title={deal?.title}
-              category={deal?.category ?? deal?.dealType}
-              description={deal?.description}
-              logoComponent={deal?.logoComponent}
-              verified={deal?.verified}
-              dealType={deal?.dealType}
-              features={deal?.features}
-              discount={deal?.discount}
-              savings={deal?.savings}
+              title={deal?.title ?? undefined}
+              category={(deal?.category ?? deal?.dealType) ?? undefined}
+              description={deal?.description ?? undefined}
+              logoComponent={deal?.logoComponent ?? undefined}
+              verified={deal?.verified ?? undefined}
+              dealType={deal?.dealType ?? undefined}
+              features={deal?.features ?? undefined}
+              discount={deal?.discount ?? undefined}
+              savings={deal?.savings ?? undefined}
             />
           </div>
         </div>
@@ -146,10 +148,10 @@ export default function DeletePopup({
               data-layer="Buttons/main"
               data-button="ghost"
               data-size="Large"
-              className={`ButtonsMain flex-1 h-10 px-4 py-2 rounded-full outline outline-1 outline-offset-[-1px] outline-[#ebeef4] flex justify-center items-center gap-2 ${
+              className={`ButtonsMain flex-1 h-10 px-4 py-2 rounded-full outline-1 -outline-offset-1 outline-[#ebeef4] flex justify-center items-center gap-2 ${
                 loading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
               }`}
-              onClick={() => !loading && onClose?.()}
+              onClick={(): void => !loading && onClose?.()}
               role="button"
               tabIndex={0}
               aria-disabled={loading}
@@ -168,7 +170,7 @@ export default function DeletePopup({
               className={`ButtonsMain flex-1 px-4 py-2 bg-neutral-50 rounded-full flex justify-center items-center gap-2 ${
                 loading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
               }`}
-              onClick={() => !loading && handleConfirm()}
+              onClick={(): void => !loading && handleConfirm()}
               role="button"
               tabIndex={0}
               aria-disabled={loading}

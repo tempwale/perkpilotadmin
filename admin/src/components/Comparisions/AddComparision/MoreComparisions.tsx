@@ -1,23 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactElement } from "react";
 import type { ChangeEvent } from "react";
 import ComparisionsGrid from "../../HomeManagement/ComparisionsGrid";
 import { ChevronDown, Trash } from "lucide-react";
+import type { ComparisonApiResponse } from "../../../types/api.types";
 
-type ComparisonItem = {
-  id?: string;
+type ComparisonItem = Partial<ComparisonApiResponse> & {
   title?: string;
   description?: string;
-  [key: string]: any;
+  pageType?: string;
 };
 
-export default function MoreComparisions() {
+export default function MoreComparisions(): ReactElement {
   const [query, setQuery] = useState("");
   const [filteredData, setFilteredData] = useState<ComparisonItem[]>([]);
   const [allComparisons, setAllComparisons] = useState<ComparisonItem[]>([]);
   const [isExpanded, setIsExpanded] = useState(true);
 
   // Fetch or set initial data
-  useEffect(() => {
+  useEffect((): void => {
     // Replace this with your actual data fetching logic
     // Example: fetch('/api/comparisons').then(res => res.json()).then(setAllComparisons)
     setAllComparisons([]); // Your comparison data here
@@ -25,28 +25,33 @@ export default function MoreComparisions() {
   }, []);
 
   // Filter comparisons based on search query
-  useEffect(() => {
+  useEffect((): void => {
     if (query.trim() === "") {
       setFilteredData(allComparisons);
     } else {
+      const normalizedQuery = query.toLowerCase();
       const filtered = allComparisons.filter(
-        (item) =>
-          item.title?.toLowerCase().includes(query.toLowerCase()) ||
-          item.description?.toLowerCase().includes(query.toLowerCase())
+        (item: ComparisonItem): boolean => {
+          const titleValue = item.title;
+          const descriptionValue = item.description;
+          const title = typeof titleValue === "string" ? titleValue.toLowerCase() : "";
+          const description = typeof descriptionValue === "string" ? descriptionValue.toLowerCase() : "";
+          return title.includes(normalizedQuery) || description.includes(normalizedQuery);
+        }
       );
       setFilteredData(filtered);
     }
   }, [query, allComparisons]);
 
-  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setQuery(e.target.value);
   };
 
-  const handleToggleSection = () => {
+  const handleToggleSection = (): void => {
     setIsExpanded(!isExpanded);
   };
 
-  const handleDeleteSection = () => {
+  const handleDeleteSection = (): void => {
     if (window.confirm("Are you sure you want to delete this section?")) {
       // Implement delete logic here
       console.log("Section deleted");
@@ -129,7 +134,7 @@ export default function MoreComparisions() {
             </button>
           </div>
 
-          <div className="self-stretch relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-700 px-3 py-2">
+          <div className="self-stretch relative bg-zinc-800 rounded-xl outline-1 -outline-offset-1 outline-zinc-700 px-3 py-2">
             <div className="flex items-center gap-3">
               <div className="w-5 h-5 rounded flex items-center justify-center">
                 <svg
@@ -165,7 +170,18 @@ export default function MoreComparisions() {
             </div>
           </div>
 
-          <ComparisionsGrid data={filteredData} searchQuery={query} />
+          <ComparisionsGrid data={filteredData.filter((item): item is ComparisonApiResponse => {
+            return typeof item.pageType === "string" && 
+                   typeof item.title === "string" &&
+                   typeof item.subtitle === "string" &&
+                   typeof item.description === "string";
+          }).map((item): ComparisonApiResponse => ({
+            ...item,
+            pageType: item.pageType ?? "Tool Comparison Blog",
+            title: item.title ?? "",
+            subtitle: item.subtitle ?? "",
+            description: item.description ?? "",
+          }))} searchQuery={query} />
         </>
       )}
     </div>

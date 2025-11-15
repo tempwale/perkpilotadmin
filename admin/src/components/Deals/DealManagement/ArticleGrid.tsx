@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import {useMemo, useState, type ReactElement} from "react";
 import DealsCard from "./DealCard";
 import { ChevronDown } from "lucide-react";
-function FramerLogo() {
+function FramerLogo(): ReactElement{
   return (
     <svg
       width="21"
@@ -25,7 +25,7 @@ function FramerLogo() {
   );
 }
 
-function FigmaLogo() {
+function FigmaLogo(): ReactElement{
   return (
     <svg
       width="24"
@@ -58,7 +58,7 @@ function FigmaLogo() {
   );
 }
 
-function NotionLogo() {
+function NotionLogo(): ReactElement{
   return (
     <svg
       width="24"
@@ -75,7 +75,7 @@ function NotionLogo() {
   );
 }
 
-function SlackLogo() {
+function SlackLogo(): ReactElement{
   return (
     <svg
       width="24"
@@ -104,7 +104,7 @@ function SlackLogo() {
   );
 }
 
-function AirtableLogo() {
+function AirtableLogo(): ReactElement{
   return (
     <svg
       width="24"
@@ -130,7 +130,7 @@ function AirtableLogo() {
   );
 }
 
-function WebflowLogo() {
+function WebflowLogo(): ReactElement{
   return (
     <svg
       width="24"
@@ -146,7 +146,7 @@ function WebflowLogo() {
     </svg>
   );
 }
-export default function ArticleGrid() {
+export default function ArticleGrid(): ReactElement{
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(true);
 
@@ -267,7 +267,7 @@ export default function ArticleGrid() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return posts;
-    return posts.filter((p) => {
+    return posts.filter((p): boolean => {
       const hay = `${p.title} ${p.description} ${p.category} ${p.dealType} ${(
         p.features || []
       ).join(" ")}`.toLowerCase();
@@ -285,7 +285,7 @@ export default function ArticleGrid() {
           type="button"
           className="w-6 h-6 flex items-center justify-center rounded hover:bg-zinc-700/20 focus:outline-none focus:ring-2 focus:ring-[#7f57e2]"
           aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
+          onClick={(): void => setOpen((v) => !v)}
           aria-label={open ? "Collapse article list" : "Expand article list"}
         >
           <ChevronDown
@@ -296,7 +296,7 @@ export default function ArticleGrid() {
         </button>
       </div>
       {open && (
-        <div className="self-stretch relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-700 px-3 py-2">
+        <div className="self-stretch relative bg-zinc-800 rounded-xl outline-1 -outline-offset-1 outline-zinc-700 px-3 py-2">
           <div className="flex items-center gap-3">
             <div className="w-5 h-5 rounded flex items-center justify-center">
               {/* simple search circle visual (keeps original look) */}

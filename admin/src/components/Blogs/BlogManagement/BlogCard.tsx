@@ -1,8 +1,9 @@
+import { type ReactElement } from "react";
 import React from "react";
 import { Link } from "react-router-dom";
 
 // Eye Icon SVG
-const EyeIcon = () => (
+const EyeIcon = (): ReactElement=> (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -20,7 +21,7 @@ const EyeIcon = () => (
 );
 
 // Arrow Up Icon SVG (rotated)
-const ArrowUpIcon = () => (
+const ArrowUpIcon = (): ReactElement=> (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -61,7 +62,7 @@ const BlogsCard: React.FC<BlogsCardProps> = ({
   return (
     <Link
       to={`/blog/${id}`}
-      className="w-full w-[466px] p-6 bg-white/5 rounded-3xl shadow-[0px_1px_4px_0px_rgba(12,12,13,0.05)] outline outline-1 outline-offset-[-1px] outline-white/10 inline-flex flex-col justify-center items-start gap-6"
+      className="w-[466px] p-6 bg-white/5 rounded-3xl shadow-[0px_1px_4px_0px_rgba(12,12,13,0.05)] outline-1 -outline-offset-1 outline-white/10 inline-flex flex-col justify-center items-start gap-6"
     >
       {/* Image Section */}
       <div className="self-stretch h-[238px] bg-white/10 rounded-2xl flex flex-col justify-center items-start gap-3 overflow-hidden">
@@ -82,7 +83,7 @@ const BlogsCard: React.FC<BlogsCardProps> = ({
           <div className="self-stretch inline-flex justify-between items-center">
             <div className="flex justify-center items-center gap-3">
               {featured && (
-                <div className="px-2 py-1 bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[100px] flex justify-center items-center gap-2.5">
+                <div className="px-2 py-1 bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[100px] flex justify-center items-center gap-2.5">
                   <div className="justify-start text-neutral-50 text-xs font-medium font-['Poppins']">
                     Featured Article
                   </div>
@@ -108,7 +109,7 @@ const BlogsCard: React.FC<BlogsCardProps> = ({
           </div>
           {/* Tags */}
           <div className="inline-flex justify-center items-center gap-3">
-            {tags.map((tag, idx) => (
+            {tags.map((tag, idx): ReactElement=> (
               <div
                 key={idx}
                 className="px-2 py-1 bg-white/10 rounded-[100px] flex justify-center items-center gap-2.5"

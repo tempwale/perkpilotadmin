@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import {useState, type ReactElement} from "react";
 import { GripVertical, Trash2, Plus } from "lucide-react";
 
 type FaqItem = {
@@ -9,30 +9,30 @@ type FaqItem = {
   answer: string;
 };
 
-export default function FAQ() {
+export default function FAQ(): ReactElement{
   const [faqs, setFaqs] = useState<FaqItem[]>([
     { id: 1, question: "", answer: "" },
     { id: 2, question: "", answer: "" },
     { id: 3, question: "", answer: "" },
   ]);
 
-  const handleQuestionChange = (id: number, value: string) => {
+  const handleQuestionChange = (id: number, value: string): void => {
     setFaqs(
       faqs.map((faq) => (faq.id === id ? { ...faq, question: value } : faq))
     );
   };
 
-  const handleAnswerChange = (id: number, value: string) => {
+  const handleAnswerChange = (id: number, value: string): void => {
     setFaqs(
       faqs.map((faq) => (faq.id === id ? { ...faq, answer: value } : faq))
     );
   };
 
-  const deleteFaq = (id: number) => {
-    setFaqs(faqs.filter((faq) => faq.id !== id));
+  const deleteFaq = (id: number): void => {
+    setFaqs(faqs.filter((faq): boolean => faq.id !== id));
   };
 
-  const addFaq = () => {
+  const addFaq = (): void => {
     const newId = Math.max(...faqs.map((f) => f.id), 0) + 1;
     setFaqs([...faqs, { id: newId, question: "", answer: "" }]);
   };
@@ -53,7 +53,7 @@ export default function FAQ() {
         <div
           key={faq.id}
           data-layer="Row"
-          className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-700 inline-flex justify-start items-center overflow-hidden"
+          className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 inline-flex justify-start items-center overflow-hidden"
         >
           <div
             data-layer="Column"
@@ -91,9 +91,9 @@ export default function FAQ() {
               <input
                 type="text"
                 value={faq.question}
-                onChange={(e) => handleQuestionChange(faq.id, e.target.value)}
+                onChange={(e): void => handleQuestionChange(faq.id, e.target.value)}
                 placeholder="Question here..."
-                className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-zinc-400 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
+                className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-400 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
               />
             </div>
 
@@ -112,7 +112,7 @@ export default function FAQ() {
                 value={faq.answer}
                 onChange={(e) => handleAnswerChange(faq.id, e.target.value)}
                 placeholder="Answer here..."
-                className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-zinc-400 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
+                className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-400 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
               />
             </div>
           </div>
@@ -122,7 +122,7 @@ export default function FAQ() {
             className="Column self-stretch px-6 py-3 flex justify-start items-center gap-4"
           >
             <button
-              onClick={() => deleteFaq(faq.id)}
+              onClick={(): void => deleteFaq(faq.id)}
               className="hover:opacity-70 transition-opacity"
               aria-label="Delete FAQ"
             >

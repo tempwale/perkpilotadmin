@@ -1,8 +1,8 @@
 import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+import {useState, type ReactElement} from "react";
 import StatsGrid from "./StatsGrid";
 
-export default function Stats() {
+export default function Stats(): ReactElement{
   const [open, setOpen] = useState(true);
 
   return (
@@ -15,7 +15,7 @@ export default function Stats() {
         <button
           type="button"
           aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
+          onClick={(): void => setOpen((v) => !v)}
           className="w-6 h-6 flex items-center justify-center rounded hover:bg-zinc-700/20 focus:outline-none focus:ring-2 focus:ring-[#7f57e2]"
           aria-label={open ? "Collapse settings" : "Expand settings"}
         >

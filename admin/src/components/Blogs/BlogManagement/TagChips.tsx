@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 
 type Props = {
   tags?: string[];
@@ -13,14 +13,14 @@ export default function TagChips({
   onAdd,
   onRemove,
   placeholder,
-}: Props) {
+}: Props): ReactElement{
   const [internalTags, setInternalTags] = useState<string[]>(
     tags ?? ["AI Tools", "No-code", "Marketing"]
   );
 
   const [input, setInput] = useState("");
 
-  function addTag(tag?: string) {
+  function addTag(tag?: string): void {
     const t = (tag ?? input).trim();
     if (!t) return;
     if (internalTags.includes(t)) {
@@ -32,12 +32,12 @@ export default function TagChips({
     setInput("");
   }
 
-  useEffect(() => {
+  useEffect((): void => {
     if (tags !== undefined) setInternalTags(tags);
   }, [tags]);
 
   // keep callbacks referenced to prevent unused-variable warnings
-  useEffect(() => {
+  useEffect((): void => {
     void onAdd;
     void onRemove;
   }, [onAdd, onRemove]);
@@ -48,13 +48,13 @@ export default function TagChips({
         Popular Category Tags
       </div>
 
-      <div className="self-stretch h-14 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700">
+      <div className="self-stretch h-14 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700">
         <div className="left-[16px] top-[16px] absolute flex items-center gap-3">
           <input
             className="bg-transparent text-zinc-400 placeholder:text-zinc-500 outline-none w-[260px]"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
+            onChange={(e): void => setInput(e.target.value)}
+            onKeyDown={(e): void => {
               if (e.key === "Enter") {
                 e.preventDefault();
                 addTag();
@@ -75,9 +75,9 @@ export default function TagChips({
               <div className="w-4 h-4 relative flex items-center justify-left">
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={(): void => {
                     // remove visually without changing layout
-                    setInternalTags((s) => s.filter((x) => x !== t));
+                    setInternalTags((s) => s.filter((x): boolean => x !== t));
                     if (onRemove) onRemove(t);
                   }}
                   aria-label={`Remove ${t}`}

@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, type ReactElement } from "react";
 import CardPopup from "./CardPopup";
 
 // card-local state is used to control the details modal
 
-function VerificationIcon() {
+function VerificationIcon(): ReactElement {
   return (
     <svg
       width="25"
@@ -38,7 +38,7 @@ interface DealCardProps {
   onDelete?: () => void;
 }
 
-function CheckCircle({ className }: { className?: string }) {
+function CheckCircle({ className }: { className?: string }): ReactElement {
   return (
     <div className={className}>
       <VerificationIcon />
@@ -65,11 +65,15 @@ export default function DealCard({
   onViewDetails,
   onGetDeal,
   onDelete,
-}: DealCardProps) {
+}: DealCardProps): ReactElement {
   const [showModal, setShowModal] = useState(false);
 
-  const openModal = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
+  const openModal = (): void => {
+    setShowModal(true);
+  };
+  const closeModal = (): void => {
+    setShowModal(false);
+  };
 
   return (
     <div>
@@ -270,7 +274,7 @@ export default function DealCard({
               e.stopPropagation();
               onGetDeal?.();
             }}
-            className="group bg-white hover:bg-gradient-to-b hover:from-[#501BD6] hover:to-[#7F57E2] box-border content-stretch flex flex-[1_0_0] items-center justify-center min-h-px min-w-px px-[12px] py-[8px] relative rounded-[100px] shrink-0 transition-all duration-200"
+            className="group bg-white hover:bg-linear-to-b hover:from-[#501BD6] hover:to-[#7F57E2] box-border content-stretch flex flex-[1_0_0] items-center justify-center min-h-px min-w-px px-[12px] py-[8px] relative rounded-[100px] shrink-0 transition-all duration-200"
             data-name="All Assets"
             data-node-id="1:1691"
           >
@@ -293,7 +297,7 @@ export default function DealCard({
             title,
             category,
             description,
-            logoComponent,
+            logoComponent: typeof logoComponent === "string" ? logoComponent : undefined,
             verified,
             dealType,
             features,

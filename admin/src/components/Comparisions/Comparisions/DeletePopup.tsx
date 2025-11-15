@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, type ReactElement } from "react";
 import ComparisionCard from "./ComparisionsCard";
 import { BACKEND_URL } from "../../../config/backend";
+import type { ComparisonApiResponse, ApiError } from "../../../types/api.types";
 
 export default function DeletePopup({
   onClose,
@@ -9,12 +10,12 @@ export default function DeletePopup({
 }: {
   onClose?: () => void;
   onConfirm?: () => void;
-  Comparision?: any;
-}) {
+  Comparision?: ComparisonApiResponse;
+}): ReactElement {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleConfirm = async () => {
+  const handleConfirm = async (): Promise<void> => {
     setError(null);
     const id = String(Comparision?.id ?? Comparision?._id ?? "");
     if (!id) {
@@ -30,16 +31,17 @@ export default function DeletePopup({
       });
 
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
+        const body = (await res.json().catch(() => ({}))) as ApiError | { message?: string };
         throw new Error(body.message || `Server returned ${res.status}`);
       }
 
       // success
       onConfirm?.();
       onClose?.();
-    } catch (err: any) {
+    } catch (err) {
       console.error("Delete failed", err);
-      setError(err?.message || "Failed to delete Comparision");
+      const errorMessage = err instanceof Error ? err.message : "Failed to delete Comparision";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -48,12 +50,12 @@ export default function DeletePopup({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={() => onClose?.()}
+        onClick={(): void => onClose?.()}
         aria-hidden
       />
       <div
         data-layer="Card Popup"
-        className="relative w-[380px] p-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-700 inline-flex flex-col justify-center items-center gap-3 z-10"
+        className="relative w-[380px] p-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-1 outline-zinc-700 inline-flex flex-col justify-center items-center gap-3 z-10"
       >
         <div
           data-layer="Frame 1321315042"
@@ -88,13 +90,17 @@ export default function DeletePopup({
           <div className="w-[420px]">
             <ComparisionCard
               id={String(Comparision?.id ?? Comparision?._id ?? "preview")}
-              title={Comparision?.title}
-              description={Comparision?.description}
+              title={Comparision && typeof Comparision.title === "string" ? Comparision.title : (Comparision && typeof Comparision.heroHeading === "string" ? Comparision.heroHeading : undefined)}
+              description={Comparision && typeof Comparision.description === "string" ? Comparision.description : (Comparision && typeof Comparision.heroBody === "string" ? Comparision.heroBody : undefined)}
               tags={
-                Comparision?.tags ||
-                [Comparision?.category, Comparision?.ComparisionType].filter(
-                  Boolean
-                )
+                Comparision && Array.isArray(Comparision.tags) 
+                  ? Comparision.tags.filter((tag): tag is string => typeof tag === "string")
+                  : Comparision
+                    ? [
+                        typeof Comparision.toolCategory === "string" ? Comparision.toolCategory : undefined,
+                        typeof Comparision.ComparisionType === "string" ? Comparision.ComparisionType : undefined,
+                      ].filter((tag): tag is string => typeof tag === "string")
+                    : []
               }
               app1Logo={Comparision?.app1Logo}
               app2Logo={Comparision?.app2Logo}
@@ -147,10 +153,14 @@ export default function DeletePopup({
               data-layer="Buttons/main"
               data-button="ghost"
               data-size="Large"
-              className={`ButtonsMain flex-1 h-10 px-4 py-2 rounded-full outline outline-1 outline-offset-[-1px] outline-[#ebeef4] flex justify-center items-center gap-2 ${
+              className={`ButtonsMain flex-1 h-10 px-4 py-2 rounded-full outline-1 -outline-offset-1 outline-[#ebeef4] flex justify-center items-center gap-2 ${
                 loading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
               }`}
-              onClick={() => !loading && onClose?.()}
+              onClick={(): void => {
+                if (!loading) {
+                  onClose?.();
+                }
+              }}
               role="button"
               tabIndex={0}
               aria-disabled={loading}
@@ -169,7 +179,11 @@ export default function DeletePopup({
               className={`ButtonsMain flex-1 px-4 py-2 bg-neutral-50 rounded-full flex justify-center items-center gap-2 ${
                 loading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
               }`}
-              onClick={() => !loading && handleConfirm()}
+              onClick={(): void => {
+                if (!loading) {
+                  void handleConfirm();
+                }
+              }}
               role="button"
               tabIndex={0}
               aria-disabled={loading}

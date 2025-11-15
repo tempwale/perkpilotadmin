@@ -1,6 +1,7 @@
-import { useState } from "react";
+import {useState, type ReactElement} from "react";
 import { useNavigate } from "react-router-dom";
 import DeletePopup from "./DeletePopup";
+import type { ReviewApiResponse } from "../../../types/api.types";
 
 export default function CardPopup({
   onClose,
@@ -9,8 +10,8 @@ export default function CardPopup({
 }: {
   onClose?: () => void;
   onDelete?: () => void;
-  deal?: any;
-}) {
+  deal?: ReviewApiResponse;
+}): ReactElement{
   const [confirmOpen, setConfirmOpen] = useState(false);
   const navigate = useNavigate();
   const id = String(deal?.id ?? deal?._id ?? "");
@@ -20,16 +21,16 @@ export default function CardPopup({
       {/* Overlay with blur */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={() => onClose?.()}
+        onClick={(): void => onClose?.()}
         aria-hidden
       />
 
       <div
         data-layer="Card Popup"
-        className="relative w-[min(680px,92%)] p-6 bg-zinc-800 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-700 inline-flex flex-col justify-center items-center gap-6 z-10"
+        className="relative w-[min(680px,92%)] p-6 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 inline-flex flex-col justify-center items-center gap-6 z-10"
       >
         <button
-          onClick={() => onClose?.()}
+          onClick={(): void => onClose?.()}
           aria-label="Close popup"
           className="absolute right-4 top-4 text-zinc-300 hover:text-white"
         >
@@ -105,8 +106,8 @@ export default function CardPopup({
                   data-layer="Buttons/main"
                   data-button="ghost"
                   data-size="Large"
-                  className="ButtonsMain flex-1 h-14 px-10 py-4 rounded-[100px] outline outline-1 outline-offset-[-1px] outline-[#ebeef4] flex justify-center items-center gap-2 cursor-pointer"
-                  onClick={() => setConfirmOpen(true)}
+                  className="ButtonsMain flex-1 h-14 px-10 py-4 rounded-[100px] outline-1 -outline-offset-1 outline-[#ebeef4] flex justify-center items-center gap-2 cursor-pointer"
+                  onClick={(): void => setConfirmOpen(true)}
                   role="button"
                   tabIndex={0}
                 >
@@ -122,8 +123,10 @@ export default function CardPopup({
                   data-button="on"
                   data-size="Large"
                   className="ButtonsMain flex-1 px-10 py-4 bg-neutral-50 rounded-[100px] flex justify-center items-center gap-2"
-                  onClick={() => {
-                    if (id) navigate(`/updatedeal/${id}`);
+                  onClick={(): void => {
+                    if (id) {
+                      void Promise.resolve(navigate(`/updatedeal/${id}`));
+                    }
                   }}
                 >
                   <div

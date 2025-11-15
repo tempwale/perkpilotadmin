@@ -1,11 +1,10 @@
-import {
-  useState,
+import {useState,
   type ChangeEvent,
   type FormEvent,
   type KeyboardEvent,
-} from "react";
+  type ReactElement} from "react";
 
-export default function ToolComparisonForm() {
+export default function ToolComparisonForm(): ReactElement{
   type FormDataShape = {
     toolName: string;
     toolCategory: string;
@@ -71,7 +70,7 @@ export default function ToolComparisonForm() {
   // Handle input changes for all text fields
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  ): void => {
     const { name, value } = e.target as HTMLInputElement & HTMLSelectElement;
     setFormData((prev) => ({
       ...prev,
@@ -80,7 +79,7 @@ export default function ToolComparisonForm() {
   };
 
   // Handle checkbox toggle
-  const handleCheckboxChange = (field: keyof FormDataShape) => {
+  const handleCheckboxChange = (field: keyof FormDataShape): void => {
     setFormData((prev) => ({
       ...prev,
       [field]: !prev[field],
@@ -89,7 +88,7 @@ export default function ToolComparisonForm() {
 
   // Handle star rating click
   // Handle star rating click
-  const handleRatingClick = (rating: number) => {
+  const handleRatingClick = (rating: number): void => {
     console.log("Rating clicked:", rating); // Debug log
     setFormData((prev) => ({
       ...prev,
@@ -98,16 +97,16 @@ export default function ToolComparisonForm() {
   };
 
   // Accessible star button component
-  const StarButton = ({ star }: { star: number }) => {
+  const StarButton = ({ star }: { star: number }): ReactElement=> {
     const filled = star <= (hoverRating || formData.averageRating);
 
-    const onClick = (e?: any) => {
+    const onClick = (e?: React.MouseEvent<HTMLDivElement>): void => {
       e?.preventDefault();
       e?.stopPropagation();
       if (formData.showAverageRating) handleRatingClick(star);
     };
 
-    const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    const onKeyDown = (e: KeyboardEvent<HTMLDivElement>): void => {
       if (!formData.showAverageRating) return;
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
@@ -121,8 +120,12 @@ export default function ToolComparisonForm() {
         tabIndex={formData.showAverageRating ? 0 : -1}
         onClick={onClick}
         onKeyDown={onKeyDown}
-        onMouseEnter={() => formData.showAverageRating && setHoverRating(star)}
-        onMouseLeave={() => formData.showAverageRating && setHoverRating(0)}
+        onMouseEnter={(): void => {
+          if (formData.showAverageRating) setHoverRating(star);
+        }}
+        onMouseLeave={(): void => {
+          if (formData.showAverageRating) setHoverRating(0);
+        }}
         aria-pressed={formData.averageRating === star}
         className={`w-6 h-6 p-0 bg-transparent transition-all flex items-center justify-center ${
           formData.showAverageRating
@@ -147,7 +150,7 @@ export default function ToolComparisonForm() {
   };
 
   // Handle logo selection
-  const handleLogoSelect = (index: number) => {
+  const handleLogoSelect = (index: number): void => {
     setSelectedLogo(index);
   };
 
@@ -155,7 +158,7 @@ export default function ToolComparisonForm() {
   const handleLogoUpload = (
     index: number,
     e: ChangeEvent<HTMLInputElement>
-  ) => {
+  ): void => {
     const file = e.target.files?.[0];
     if (file) {
       const newLogoFiles = [...logoFiles];
@@ -166,7 +169,7 @@ export default function ToolComparisonForm() {
   };
 
   // Handle form submission
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     console.log("Form Data:", formData);
     console.log("Selected Logo Index:", selectedLogo);
@@ -201,7 +204,7 @@ export default function ToolComparisonForm() {
               </div>
               <div
                 data-layer="Input"
-                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
               >
                 <input
                   type="text"
@@ -226,7 +229,7 @@ export default function ToolComparisonForm() {
               </div>
               <div
                 data-layer="Input"
-                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
               >
                 <select
                   name="toolCategory"
@@ -263,7 +266,7 @@ export default function ToolComparisonForm() {
             </div>
             <div
               data-layer="Input"
-              className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+              className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
             >
               <input
                 type="text"
@@ -312,7 +315,7 @@ export default function ToolComparisonForm() {
                         ? "border-2 border-[#501bd6]"
                         : "border border-zinc-700"
                     } ${logoFiles[index] ? "" : "bg-zinc-800"}`}
-                    onClick={() => handleLogoSelect(index)}
+                    onClick={(): void => handleLogoSelect(index)}
                   >
                     {logoFiles[index] ? (
                       <img
@@ -349,7 +352,7 @@ export default function ToolComparisonForm() {
             <div
               data-layer="Select/Selected"
               className="SelectSelected w-[163px] h-7 relative cursor-pointer"
-              onClick={() => handleCheckboxChange("showProductUsedBy")}
+              onClick={(): void => handleCheckboxChange("showProductUsedBy")}
             >
               <div
                 data-layer="Product Used By"
@@ -368,7 +371,7 @@ export default function ToolComparisonForm() {
               {formData.showProductUsedBy && (
                 <div
                   data-layer="Rectangle 3.2"
-                  className="Rectangle32 w-[18px] h-[18px] left-[5px] top-[5px] absolute bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[14px]"
+                  className="Rectangle32 w-[18px] h-[18px] left-[5px] top-[5px] absolute bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[14px]"
                 />
               )}
             </div>
@@ -395,7 +398,7 @@ export default function ToolComparisonForm() {
               </div>
               <div
                 data-layer="Input"
-                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
               >
                 <input
                   type="text"
@@ -430,7 +433,7 @@ export default function ToolComparisonForm() {
                 </div>
                 <div
                   data-layer="Input"
-                  className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                  className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
                 >
                   <input
                     type="text"
@@ -465,7 +468,7 @@ export default function ToolComparisonForm() {
               </div>
               <div
                 data-layer="Input"
-                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
               >
                 <input
                   type="text"
@@ -508,7 +511,7 @@ export default function ToolComparisonForm() {
               </div>
               <div
                 data-layer="Input"
-                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
               >
                 <input
                   type="text"
@@ -533,7 +536,7 @@ export default function ToolComparisonForm() {
               </div>
               <div
                 data-layer="Input"
-                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
               >
                 <input
                   type="text"
@@ -558,7 +561,7 @@ export default function ToolComparisonForm() {
               </div>
               <div
                 data-layer="Input"
-                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
               >
                 <input
                   type="text"
@@ -583,7 +586,7 @@ export default function ToolComparisonForm() {
               </div>
               <div
                 data-layer="Input"
-                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
               >
                 <input
                   type="text"

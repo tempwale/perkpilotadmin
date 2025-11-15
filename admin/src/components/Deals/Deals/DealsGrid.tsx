@@ -1,10 +1,11 @@
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode, type ReactElement } from "react";
 import DealCard from "./DealsCard";
 import Pagination from "./Pagination";
-import fetchDeals, { type Deal } from "../../../hooks/useDeals";
+import fetchDeals from "../../../hooks/useDeals";
+import type { DealApiResponse } from "../../../types/api.types";
 
 // UI-facing deal shape that may include backend-specific fields.
-type UIDeal = Partial<Deal> & {
+type UIDeal = Partial<DealApiResponse> & {
   _id?: string;
   id?: number;
   logoUri?: string;
@@ -32,7 +33,7 @@ export default function DealGrid({
   onGetDeal,
   itemsPerPage = 6,
   showPagination = true,
-}: DealGridProps) {
+}: DealGridProps): ReactElement {
   const [currentPage, setCurrentPage] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
   const [apiDeals, setApiDeals] = useState<UIDeal[]>([]);
@@ -42,18 +43,20 @@ export default function DealGrid({
 
   // Check if mobile on mount and window resize
   useEffect(() => {
-    const checkMobile = () => {
+    const checkMobile = (): void => {
       setIsMobile(window.innerWidth < 768); // md breakpoint
     };
 
     checkMobile();
     window.addEventListener("resize", checkMobile);
 
-    return () => window.removeEventListener("resize", checkMobile);
+    return (): void => {
+      window.removeEventListener("resize", checkMobile);
+    };
   }, []);
 
   // Reset to page 1 when switching between mobile/desktop
-  useEffect(() => {
+  useEffect((): void => {
     setCurrentPage(1);
   }, [isMobile]);
 
@@ -62,7 +65,7 @@ export default function DealGrid({
     if (deals && deals.length) return; // caller provided deals
 
     let mounted = true;
-    async function load() {
+    async function load(): Promise<void> {
       setLoading(true);
       setFetchError(null);
       try {
@@ -70,16 +73,26 @@ export default function DealGrid({
         if (!mounted) return;
         // cast minimal Deal[] into UIDeal[] for UI mapping (safe: fields are optional)
         setApiDeals(data as UIDeal[]);
-      } catch (e: any) {
+      } catch (e) {
         console.error("fetchDeals error", e);
-        if (mounted) setFetchError(e.message || String(e));
+        if (mounted) {
+          const errorMessage = e instanceof Error ? e.message : String(e);
+          setFetchError(errorMessage);
+        }
       } finally {
         if (mounted) setLoading(false);
       }
     }
 
-    load();
-    return () => {
+    load().catch((error) => {
+      console.error("Failed to load deals:", error);
+      if (mounted) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        setFetchError(errorMessage);
+        setLoading(false);
+      }
+    });
+    return (): void => {
       mounted = false;
     };
   }, [deals]);
@@ -93,7 +106,7 @@ export default function DealGrid({
   // Filter by single global search query (title, category, description, features)
   const normalizedQuery = query.trim().toLowerCase();
   const filteredDeals = normalizedQuery
-    ? sourceDeals.filter((d) => {
+    ? sourceDeals.filter((d): boolean => {
         const title = (d.title ?? "").toString().toLowerCase();
         const category = (d.category ?? d.dealType ?? "")
           .toString()
@@ -120,13 +133,13 @@ export default function DealGrid({
     ? filteredDeals.slice(startIndex, endIndex)
     : filteredDeals;
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = (page: number): void => {
     setCurrentPage(page);
     // Scroll to top of grid when page changes
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleViewDetails = (dealId: string | number) => {
+  const handleViewDetails = (dealId: string | number): void => {
     if (onViewDetails) {
       onViewDetails(dealId);
     } else {
@@ -134,7 +147,7 @@ export default function DealGrid({
     }
   };
 
-  const handleGetDeal = (dealId: string | number) => {
+  const handleGetDeal = (dealId: string | number): void => {
     if (onGetDeal) {
       onGetDeal(dealId);
     } else {
@@ -143,7 +156,7 @@ export default function DealGrid({
   };
 
   // Delete handler: only works when using internal apiDeals state (not when `deals` prop is provided)
-  const handleDelete = (dealId: string | number, sourceIndex: number) => {
+  const handleDelete = (dealId: string | number, sourceIndex: number): void => {
     if (deals && deals.length) {
       console.warn("Cannot delete deals passed in via props");
       return;
@@ -162,9 +175,9 @@ export default function DealGrid({
       }
 
       // fallback: remove by matching id fields
-      return prev.filter((d) => {
+      return prev.filter((d): boolean => {
         const dId = d._id ?? d.id;
-        return !(String(dId) === String(dealId));
+        return String(dId) !== String(dealId);
       });
     });
 

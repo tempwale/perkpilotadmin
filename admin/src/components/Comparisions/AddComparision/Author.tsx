@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactElement } from "react";
 import { ChevronDown, Plus } from "lucide-react";
 import { AUTHORS_API } from "../../../config/backend";
+import type { AuthorsApiResponse } from "../../../types/api.types";
 
 type Props = {
   onAuthorChange?: (author: string) => void;
@@ -12,9 +13,9 @@ export default function Author({
   onAuthorChange,
   onCategoryChange,
   onReadingTimeChange,
-}: Props) {
-  const [selectedAuthor, setSelectedAuthor] = useState("Select Author");
-  const [selectedCategory, setSelectedCategory] = useState("Select Category");
+}: Props): ReactElement {
+  const [selectedAuthor, setSelectedAuthor] = useState<string>("Select Author");
+  const [selectedCategory, setSelectedCategory] = useState<string>("Select Category");
   const [readingTime, setReadingTime] = useState("5 Minute");
 
   const [showAuthors, setShowAuthors] = useState(false);
@@ -27,17 +28,17 @@ export default function Author({
   const categories = ["Tech", "Design", "Marketing", "Finance"];
 
   // Fetch authors from backend
-  useEffect(() => {
-    const fetchAuthors = async () => {
+  useEffect((): void => {
+    const fetchAuthors = async (): Promise<void> => {
       setLoadingAuthors(true);
       try {
         const response = await fetch(`${AUTHORS_API}?limit=100`);
         if (!response.ok) {
           throw new Error("Failed to fetch authors");
         }
-        const result = await response.json();
+        const result = await response.json() as AuthorsApiResponse;
         // Extract author id and name from the response
-        const authorsList = result.data.map((author: any) => ({
+        const authorsList = result.data.map((author) => ({
           id: author._id,
           name: author.authorName,
         }));
@@ -56,22 +57,22 @@ export default function Author({
       }
     };
 
-    fetchAuthors();
+    void fetchAuthors();
   }, []);
 
-  const handleAuthorSelect = (author: { id: string; name: string }) => {
+  const handleAuthorSelect = (author: { id: string; name: string }): void => {
     setSelectedAuthor(author.name);
     setShowAuthors(false);
     onAuthorChange?.(author.id); // Send author ID to backend
   };
 
-  const handleCategorySelect = (category: string) => {
+  const handleCategorySelect = (category: string): void => {
     setSelectedCategory(category);
     setShowCategories(false);
     onCategoryChange?.(category);
   };
 
-  const handleReadingTimeChange = (time: string) => {
+  const handleReadingTimeChange = (time: string): void => {
     setReadingTime(time);
     onReadingTimeChange?.(time);
   };
@@ -90,8 +91,8 @@ export default function Author({
           Author
         </div>
         <div
-          className="Input self-stretch h-14 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-zinc-700 inline-flex justify-between items-center cursor-pointer"
-          onClick={() => setShowAuthors(!showAuthors)}
+          className="Input self-stretch h-14 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 outline-zinc-700 inline-flex justify-between items-center cursor-pointer"
+          onClick={(): void => setShowAuthors(!showAuthors)}
         >
           <span className="text-neutral-50 text-base font-normal font-['Poppins']">
             {selectedAuthor}
@@ -112,7 +113,7 @@ export default function Author({
                   <div
                     key={a.id}
                     className="px-4 py-2 hover:bg-zinc-700 cursor-pointer text-neutral-50 text-sm font-['Poppins']"
-                    onClick={() => handleAuthorSelect(a)}
+                    onClick={(): void => handleAuthorSelect(a)}
                   >
                     {a.name}
                   </div>
@@ -120,7 +121,7 @@ export default function Author({
               )}
               <div
                 className="px-4 py-3 border-t border-zinc-700 hover:bg-zinc-700 cursor-pointer flex items-center gap-2 text-[#7f57e2] text-sm font-medium font-['Poppins']"
-                onClick={(e) => {
+                onClick={(e): void => {
                   e.stopPropagation();
                   window.location.href = "/addauthor";
                 }}
@@ -142,8 +143,8 @@ export default function Author({
           Blog Category
         </div>
         <div
-          className="Input self-stretch h-14 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-zinc-700 inline-flex justify-between items-center cursor-pointer"
-          onClick={() => setShowCategories(!showCategories)}
+          className="Input self-stretch h-14 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 outline-zinc-700 inline-flex justify-between items-center cursor-pointer"
+          onClick={(): void => setShowCategories(!showCategories)}
         >
           <span className="text-neutral-50 text-base font-normal font-['Poppins']">
             {selectedCategory}
@@ -155,7 +156,7 @@ export default function Author({
                 <div
                   key={c}
                   className="px-4 py-2 hover:bg-zinc-700 cursor-pointer text-neutral-50 text-sm font-['Poppins']"
-                  onClick={() => handleCategorySelect(c)}
+                  onClick={(): void => handleCategorySelect(c)}
                 >
                   {c}
                 </div>
@@ -176,8 +177,8 @@ export default function Author({
         <input
           type="text"
           value={readingTime}
-          onChange={(e) => handleReadingTimeChange(e.target.value)}
-          className="self-stretch h-14 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] focus:outline-none"
+          onChange={(e): void => handleReadingTimeChange(e.target.value)}
+          className="self-stretch h-14 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] focus:outline-none"
         />
       </div>
     </div>

@@ -1,36 +1,37 @@
-import { useState } from "react";
+import { useState , type ReactElement} from "react";
 import { Plus } from "lucide-react";
 import ProConCard from "./ProConCard";
+import type { ProsConsCardApiResponse } from "../../../types/api.types";
 
 type Props = {
-  onProsConsChange?: (prosConsData: any[]) => void;
+  onProsConsChange?: (prosConsData: ProsConsCardApiResponse[]) => void;
 };
 
-export default function ProConGrid({ onProsConsChange }: Props) {
+export default function ProConGrid({ onProsConsChange }: Props): ReactElement{
   const [cards, setCards] = useState<number[]>([1]); // Start with 1 card
-  const [allCardsData, setAllCardsData] = useState<any[]>([]);
+  const [allCardsData, setAllCardsData] = useState<ProsConsCardApiResponse[]>([]);
 
-  const addCard = () => {
+  const addCard = (): void => {
     if (cards.length < 3) {
       setCards([...cards, cards.length + 1]);
     }
   };
 
-  const removeCard = (index: number) => {
-    const newCards = cards.filter((_, i) => i !== index);
+  const removeCard = (index: number): void => {
+    const newCards = cards.filter((_, i): boolean => i !== index);
     setCards(newCards);
     // Also remove the data for that card
-    const newData = allCardsData.filter((_, i) => i !== index);
+    const newData = allCardsData.filter((_, i): boolean => i !== index);
     setAllCardsData(newData);
     onProsConsChange?.(newData);
   };
 
-  const handleCardChange = (index: number, data: any) => {
+  const handleCardChange = (index: number, data: ProsConsCardApiResponse): void => {
     // Update the specific card's data
     const newData = [...allCardsData];
-    newData[index] = data[0]; // ProConCard returns array with single item
+    newData[index] = data;
     setAllCardsData(newData);
-    onProsConsChange?.(newData.filter(Boolean));
+    onProsConsChange?.(newData.filter((card): card is ProsConsCardApiResponse => Boolean(card)));
   };
 
   return (
@@ -52,7 +53,7 @@ export default function ProConGrid({ onProsConsChange }: Props) {
             {cards.length > 1 && (
               <button
                 type="button"
-                onClick={() => removeCard(index)}
+                onClick={(): void => removeCard(index)}
                 className="text-red-500 hover:text-red-400 transition-colors p-2 rounded-lg hover:bg-zinc-800"
                 title="Remove card"
               >
@@ -63,7 +64,9 @@ export default function ProConGrid({ onProsConsChange }: Props) {
 
           <ProConCard
             cardNumber={index + 1}
-            onProsConsChange={(data) => handleCardChange(index, data)}
+            onProsConsChange={(data: ProsConsCardApiResponse) => {
+              handleCardChange(index, data);
+            }}
           />
         </div>
       ))}

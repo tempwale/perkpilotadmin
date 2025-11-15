@@ -1,3 +1,4 @@
+import { type ReactElement } from "react";
 type Props = {
   title?: string;
   onBack?: () => void;
@@ -10,7 +11,7 @@ export default function Header({
   onBack,
   showBack = true,
   className = "",
-}: Props) {
+}: Props): ReactElement{
   return (
     <div
       data-layer="Container"
