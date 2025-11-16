@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactElement } from "react";
 import { Plus, Trash2, ChevronDown } from "lucide-react";
+import type { FeatureComparisonApiResponse } from "../../../types/api.types";
 
 interface Tool {
   id: number;
@@ -13,10 +14,10 @@ interface Feature {
 }
 
 type Props = {
-  onFeaturesChange?: (featuresData: any) => void;
+  onFeaturesChange?: (featuresData: FeatureComparisonApiResponse) => void;
 };
 
-export default function FeatureComparison({ onFeaturesChange }: Props) {
+export default function FeatureComparison({ onFeaturesChange }: Props): ReactElement {
   const [sectionTitle, setSectionTitle] = useState<string>("");
   const [featureHeadline, setFeatureHeadline] = useState<string>("");
   const [tools, setTools] = useState<Tool[]>([
@@ -31,17 +32,15 @@ export default function FeatureComparison({ onFeaturesChange }: Props) {
     { id: 4, name: "", availability: [true, true, true] },
   ]);
 
-  useEffect(() => {
-    // Transform features to match backend schema with tool1Available, tool2Available, etc.
+  useEffect((): void => {
+    // Transform features to match FeatureApiResponse type
     const transformedFeatures = features.map((f) => {
-      const featureObj: any = {
+      return {
         featureName: f.name || "Untitled Feature",
+        tool1Available: f.availability[0] ?? false,
+        tool2Available: f.availability[1] ?? false,
+        tool3Available: f.availability[2] ?? false,
       };
-      // Add tool availability as tool1Available, tool2Available, tool3Available, etc.
-      f.availability.forEach((available, index) => {
-        featureObj[`tool${index + 1}Available`] = available;
-      });
-      return featureObj;
     });
 
     onFeaturesChange?.({
@@ -62,7 +61,7 @@ export default function FeatureComparison({ onFeaturesChange }: Props) {
   };
 
   const removeFeature = (id: number): void => {
-    setFeatures(features.filter((f) => f.id !== id));
+    setFeatures(features.filter((f): boolean => f.id !== id));
   };
 
   const updateFeatureName = (id: number, name: string): void => {
@@ -84,8 +83,10 @@ export default function FeatureComparison({ onFeaturesChange }: Props) {
 
   const updateToolName = (index: number, name: string): void => {
     const newTools = [...tools];
-    newTools[index].name = name;
-    setTools(newTools);
+    if (newTools[index]) {
+      newTools[index].name = name;
+      setTools(newTools);
+    }
   };
 
   return (
@@ -126,7 +127,7 @@ export default function FeatureComparison({ onFeaturesChange }: Props) {
                 />
               </div>
 
-              {tools.map((tool, index) => (
+              {tools.map((tool, index): React.ReactElement => (
                 <div key={tool.id} className="flex-1 flex flex-col gap-2">
                   <div className="text-neutral-50 text-sm font-medium font-['Poppins']">
                     Select Tool
@@ -146,7 +147,7 @@ export default function FeatureComparison({ onFeaturesChange }: Props) {
             </div>
 
             {/* Features List */}
-            {features.map((feature) => (
+            {features.map((feature): ReactElement => (
               <div
                 key={feature.id}
                 className="flex justify-start items-center gap-6"
@@ -162,7 +163,7 @@ export default function FeatureComparison({ onFeaturesChange }: Props) {
                     className="flex-1 h-12 px-6 py-3 bg-zinc-800 rounded-xl border border-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder-zinc-400 focus:outline-none focus:border-purple-500"
                   />
                   <button
-                    onClick={() => removeFeature(feature.id)}
+                    onClick={(): void => removeFeature(feature.id)}
                     className="p-2 hover:bg-zinc-700 rounded-lg transition-colors"
                     aria-label="Remove feature"
                   >
@@ -170,7 +171,7 @@ export default function FeatureComparison({ onFeaturesChange }: Props) {
                   </button>
                 </div>
 
-                {tools.map((tool, toolIndex) => (
+                {tools.map((tool, toolIndex): ReactElement => (
                   <div
                     key={toolIndex}
                     className="flex-1 flex justify-start items-center gap-6"
@@ -179,10 +180,10 @@ export default function FeatureComparison({ onFeaturesChange }: Props) {
                       Feature Available
                     </div>
                     <button
-                      onClick={() => toggleAvailability(feature.id, toolIndex)}
+                      onClick={(): void => toggleAvailability(feature.id, toolIndex)}
                       className={`w-[53.33px] h-7 rounded-full relative transition-all ${
                         feature.availability[toolIndex]
-                          ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2] border border-[#501bd6]"
+                          ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2] border border-[#501bd6]"
                           : "bg-zinc-700 border border-zinc-600"
                       }`}
                       aria-label={`Toggle availability for ${

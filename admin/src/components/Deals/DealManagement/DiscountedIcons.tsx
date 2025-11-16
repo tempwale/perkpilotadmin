@@ -1,5 +1,5 @@
 import { ChevronDown } from "lucide-react";
-import { useEffect, useState } from "react";
+import {useEffect, useState, type ReactElement} from "react";
 import UploadIconGrid from "../../HomeManagement/UploadIconGrid";
 
 type Props = {
@@ -31,7 +31,7 @@ export default function DiscountedIcons({
   onChange,
   open: openProp,
   onToggleOpen,
-}: Props) {
+}: Props): ReactElement{
   const [internalOpen, setInternalOpen] = useState(true);
 
   // fields internal state
@@ -52,38 +52,38 @@ export default function DiscountedIcons({
   const [internalCtaLink, setInternalCtaLink] = useState<string>(ctaLink ?? "");
 
   // sync prop -> internal when props change
-  useEffect(() => {
+  useEffect((): void => {
     if (topTagline !== undefined) setInternalTop(topTagline);
   }, [topTagline]);
-  useEffect(() => {
+  useEffect((): void => {
     if (mainHeadline !== undefined) setInternalMain(mainHeadline);
   }, [mainHeadline]);
-  useEffect(() => {
+  useEffect((): void => {
     if (subHeadline !== undefined) setInternalSub(subHeadline);
   }, [subHeadline]);
-  useEffect(() => {
+  useEffect((): void => {
     if (tags !== undefined) setInternalTags(tags);
   }, [tags]);
 
   // sync CTA props when they change
-  useEffect(() => {
+  useEffect((): void => {
     if (ctaText !== undefined) setInternalCtaText(ctaText);
   }, [ctaText]);
 
-  useEffect(() => {
+  useEffect((): void => {
     if (ctaLink !== undefined) setInternalCtaLink(ctaLink);
   }, [ctaLink]);
 
   const open = openProp ?? internalOpen;
 
-  function toggleOpen() {
+  function toggleOpen(): void {
     const next = !open;
     if (openProp === undefined) setInternalOpen(next);
     if (onToggleOpen) onToggleOpen(next);
   }
 
   // notify parent when fields change
-  useEffect(() => {
+  useEffect((): void => {
     if (onChange)
       onChange({
         topTagline: internalTop,
@@ -100,6 +100,7 @@ export default function DiscountedIcons({
     internalCtaText,
     internalCtaLink,
     internalTags,
+    onChange,
   ]);
 
   return (
@@ -131,7 +132,7 @@ export default function DiscountedIcons({
               Top Tagline
             </label>
             <input
-              className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-zinc-200"
+              className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-200"
               value={internalTop}
               onChange={(e) => setInternalTop(e.target.value)}
             />
@@ -142,7 +143,7 @@ export default function DiscountedIcons({
               Main Headline
             </label>
             <input
-              className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-zinc-200"
+              className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-200"
               value={internalMain}
               onChange={(e) => setInternalMain(e.target.value)}
             />
@@ -153,7 +154,7 @@ export default function DiscountedIcons({
               Sub-Headline ( Body )
             </label>
             <textarea
-              className="self-stretch h-24 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-zinc-200"
+              className="self-stretch h-24 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-200"
               value={internalSub}
               onChange={(e) => setInternalSub(e.target.value)}
             />
@@ -164,7 +165,7 @@ export default function DiscountedIcons({
                 Primary CTA Button Text
               </label>
               <input
-                className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-zinc-200"
+                className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-200"
                 value={internalCtaText}
                 onChange={(e) => setInternalCtaText(e.target.value)}
               />
@@ -174,7 +175,7 @@ export default function DiscountedIcons({
                 Primary CTA Button Link
               </label>
               <input
-                className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-zinc-200"
+                className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-200"
                 value={internalCtaLink}
                 onChange={(e) => setInternalCtaLink(e.target.value)}
               />

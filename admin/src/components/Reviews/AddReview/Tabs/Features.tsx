@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import {useState, type ReactElement} from "react";
 import { GripVertical, Trash2, Plus } from "lucide-react";
 
 interface Feature {
@@ -17,7 +17,7 @@ interface ProductFeaturesProps {
 export default function ProductFeatures({
   initialFeatures,
   onFeaturesChange,
-}: ProductFeaturesProps) {
+}: ProductFeaturesProps): ReactElement{
   const [isEnabled, setIsEnabled] = useState<boolean>(true);
   const [features, setFeatures] = useState<Feature[]>(
     initialFeatures || [
@@ -28,7 +28,7 @@ export default function ProductFeatures({
     ]
   );
 
-  const updateFeatures = (newFeatures: Feature[]) => {
+  const updateFeatures = (newFeatures: Feature[]): void => {
     setFeatures(newFeatures);
     onFeaturesChange?.(newFeatures);
   };
@@ -48,7 +48,7 @@ export default function ProductFeatures({
   };
 
   const deleteFeature = (id: number): void => {
-    const updatedFeatures = features.filter((feature) => feature.id !== id);
+    const updatedFeatures = features.filter((feature): boolean => feature.id !== id);
     updateFeatures(updatedFeatures);
   };
 
@@ -65,7 +65,7 @@ export default function ProductFeatures({
   return (
     <div
       data-layer="Row"
-      className="Row w-[1068px] py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-700 inline-flex flex-col justify-center items-start gap-4 overflow-hidden"
+      className="Row w-[1068px] py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 inline-flex flex-col justify-center items-start gap-4 overflow-hidden"
     >
       {/* Header */}
       <div
@@ -96,7 +96,7 @@ export default function ProductFeatures({
         >
           <button
             onClick={handleToggle}
-            className="w-[53.33px] h-7 relative bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline outline-1 outline-offset-[-1px] outline-[#501bd6] overflow-hidden transition-all"
+            className="w-[53.33px] h-7 relative bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden transition-all"
             aria-label={isEnabled ? "Disable features" : "Enable features"}
           >
             <div
@@ -106,7 +106,7 @@ export default function ProductFeatures({
             />
           </button>
           <button
-            onClick={() => {}}
+            onClick={(): void => {}}
             className="hover:opacity-70 transition-opacity"
             aria-label="Delete section"
           >
@@ -124,7 +124,7 @@ export default function ProductFeatures({
           <div
             key={feature.id}
             data-layer="Row"
-            className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-zinc-700 inline-flex justify-center items-end gap-6 overflow-hidden"
+            className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline-1 outline-zinc-700 inline-flex justify-center items-end gap-6 overflow-hidden"
           >
             {/* Drag Handle */}
             <div
@@ -168,7 +168,7 @@ export default function ProductFeatures({
                       handleTitleChange(feature.id, e.target.value)
                     }
                     placeholder="Feature title"
-                    className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-zinc-500"
+                    className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-zinc-500"
                   />
                 </div>
               </div>
@@ -202,7 +202,7 @@ export default function ProductFeatures({
                       handleBodyChange(feature.id, e.target.value)
                     }
                     placeholder="Feature body"
-                    className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-zinc-500"
+                    className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-zinc-500"
                   />
                 </div>
               </div>
@@ -214,7 +214,7 @@ export default function ProductFeatures({
               className="Column self-stretch px-6 py-3 flex justify-center items-center gap-4"
             >
               <button
-                onClick={() => deleteFeature(feature.id)}
+                onClick={(): void => deleteFeature(feature.id)}
                 className="hover:opacity-70 transition-opacity"
                 aria-label={`Delete feature ${feature.id}`}
               >

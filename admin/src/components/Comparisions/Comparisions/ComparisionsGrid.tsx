@@ -1,12 +1,13 @@
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode, type ReactElement } from "react";
 import ComparisionCard from "./ComparisionsCard";
 import Pagination from "./Pagination";
-import fetchComparisions, { type Deal } from "../../../hooks/useComparisions";
+import fetchComparisions from "../../../hooks/useComparisions";
+import type { ComparisonApiResponse } from "../../../types/api.types";
 
 // UI-facing Comparision shape that may include backend-specific fields.
-type UIComparision = Partial<Deal> & {
+type UIComparision = Partial<ComparisonApiResponse> & {
   _id?: string;
-  id?: number;
+  id?: number | string;
   logoUri?: string;
   logoComponent?: ReactNode;
   verified?: boolean;
@@ -16,6 +17,8 @@ type UIComparision = Partial<Deal> & {
   discount?: string;
   savings?: string;
   category?: string;
+  title?: string;
+  description?: string;
 };
 
 interface ComparisionGridProps {
@@ -31,7 +34,7 @@ export default function ComparisionGrid({
   onViewDetails,
   itemsPerPage = 6,
   showPagination = true,
-}: ComparisionGridProps) {
+}: ComparisionGridProps): ReactElement {
   const [currentPage, setCurrentPage] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
   const [apiComparisions, setApiComparisions] = useState<UIComparision[]>([]);
@@ -41,18 +44,20 @@ export default function ComparisionGrid({
 
   // Check if mobile on mount and window resize
   useEffect(() => {
-    const checkMobile = () => {
+    const checkMobile = (): void => {
       setIsMobile(window.innerWidth < 768); // md breakpoint
     };
 
     checkMobile();
     window.addEventListener("resize", checkMobile);
 
-    return () => window.removeEventListener("resize", checkMobile);
+    return (): void => {
+      window.removeEventListener("resize", checkMobile);
+    };
   }, []);
 
   // Reset to page 1 when switching between mobile/desktop
-  useEffect(() => {
+  useEffect((): void => {
     setCurrentPage(1);
   }, [isMobile]);
 
@@ -61,7 +66,7 @@ export default function ComparisionGrid({
     if (Comparisions && Comparisions.length) return; // caller provided Comparisions
 
     let mounted = true;
-    async function load() {
+    async function load(): Promise<void> {
       setLoading(true);
       setFetchError(null);
       try {
@@ -69,16 +74,26 @@ export default function ComparisionGrid({
         if (!mounted) return;
         // cast minimal Comparision[] into UIComparision[] for UI mapping (safe: fields are optional)
         setApiComparisions(data as UIComparision[]);
-      } catch (e: any) {
+      } catch (e) {
         console.error("fetchComparisions error", e);
-        if (mounted) setFetchError(e.message || String(e));
+        if (mounted) {
+          const errorMessage = e instanceof Error ? e.message : String(e);
+          setFetchError(errorMessage);
+        }
       } finally {
         if (mounted) setLoading(false);
       }
     }
 
-    load();
-    return () => {
+    load().catch((error) => {
+      console.error("Failed to load comparisons:", error);
+      if (mounted) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        setFetchError(errorMessage);
+        setLoading(false);
+      }
+    });
+    return (): void => {
       mounted = false;
     };
   }, [Comparisions]);
@@ -93,12 +108,12 @@ export default function ComparisionGrid({
   // Filter by single global search query (title, category, description, features)
   const normalizedQuery = query.trim().toLowerCase();
   const filteredComparisions = normalizedQuery
-    ? sourceComparisions.filter((d) => {
-        const title = (d.title ?? "").toString().toLowerCase();
-        const category = (d.category ?? d.ComparisionType ?? "")
-          .toString()
-          .toLowerCase();
-        const description = (d.description ?? "").toString().toLowerCase();
+    ? sourceComparisions.filter((d): boolean => {
+        const title = typeof d.title === "string" ? d.title.toLowerCase() : "";
+        const category = typeof d.category === "string" 
+          ? d.category.toLowerCase() 
+          : (typeof d.ComparisionType === "string" ? d.ComparisionType.toLowerCase() : "");
+        const description = typeof d.description === "string" ? d.description.toLowerCase() : "";
         const features = Array.isArray(d.features)
           ? d.features.join(" ").toLowerCase()
           : "";
@@ -120,13 +135,13 @@ export default function ComparisionGrid({
     ? filteredComparisions.slice(startIndex, endIndex)
     : filteredComparisions;
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = (page: number): void => {
     setCurrentPage(page);
     // Scroll to top of grid when page changes
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleViewDetails = (ComparisionId: string | number) => {
+  const handleViewDetails = (ComparisionId: string | number): void => {
     if (onViewDetails) {
       onViewDetails(ComparisionId);
     } else {
@@ -134,10 +149,10 @@ export default function ComparisionGrid({
     }
   };
 
-  const handleDeleteComparision = (ComparisionId: string | number) => {
+  const handleDeleteComparision = (ComparisionId: string | number): void => {
     // Remove from API comparisions state
     setApiComparisions((prev) =>
-      prev.filter((c) => {
+      prev.filter((c): boolean => {
         const cId =
           c.id ?? c._id ?? `Comparision-${sourceComparisions.indexOf(c)}`;
         return cId !== ComparisionId;
@@ -220,32 +235,37 @@ export default function ComparisionGrid({
           // parts we need into the card props below.
 
           // Map API shape to the UI card props expected by the new ComparisionsCard
-          const apiToComparisionCardProps = (item: UIComparision) => {
-            const anyItem = item as any;
-            const tools = Array.isArray(anyItem.toolsMentioned)
-              ? anyItem.toolsMentioned
+          const apiToComparisionCardProps = (item: UIComparision): {
+            app1Logo: React.ReactNode;
+            app2Logo: React.ReactNode;
+            title: string;
+            description: string;
+            tags: string[];
+          } => {
+            const tools = Array.isArray(item.toolsMentioned)
+              ? item.toolsMentioned
               : [];
-            const t1 = tools[0] ?? {};
-            const t2 = tools[1] ?? {};
+            const t1 = tools[0];
+            const t2 = tools[1];
 
-            const app1Logo = t1.toolLogo ? (
+            const app1Logo: React.ReactNode = t1?.toolLogo ? (
               <img
                 src={t1.toolLogo}
-                alt={t1.toolName ?? item.title ?? "logo"}
+                alt={typeof t1.toolName === "string" ? t1.toolName : (typeof item.title === "string" ? item.title : "logo")}
                 className="w-8 h-8 object-contain"
               />
             ) : (
-              item.logoComponent ??
+              (item.logoComponent ?? null) ??
               (item.logoUri ? (
                 <img
                   src={item.logoUri}
-                  alt={item.title ?? "logo"}
+                  alt={typeof item.title === "string" ? item.title : "logo"}
                   className="w-8 h-8 object-contain"
                 />
               ) : null)
             );
 
-            const app2Logo = t2.toolLogo ? (
+            const app2Logo: React.ReactNode = t2?.toolLogo ? (
               <img
                 src={t2.toolLogo}
                 alt={t2.toolName ?? "logo"}
@@ -253,21 +273,27 @@ export default function ComparisionGrid({
               />
             ) : null;
 
-            const title = (anyItem.heroHeading ??
-              item.title ??
-              anyItem.slug ??
-              "") as string;
-            const description = (anyItem.heroBody ??
-              item.description ??
-              "") as string;
+            const heroHeadingValue = item.heroHeading;
+            const titleValue = item.title;
+            const slugValue = item.slug;
+            const heroBodyValue = item.heroBody;
+            const descriptionValue = item.description;
+            
+            const title = (typeof heroHeadingValue === "string" ? heroHeadingValue : undefined) ??
+              (typeof titleValue === "string" ? titleValue : undefined) ??
+              (typeof slugValue === "string" ? slugValue : undefined) ??
+              "";
+            const description = (typeof heroBodyValue === "string" ? heroBodyValue : undefined) ??
+              (typeof descriptionValue === "string" ? descriptionValue : undefined) ??
+              "";
 
             const tags = [
-              item.category,
-              item.ComparisionType,
-              (anyItem.tag as string) ?? undefined,
-              (t1.toolCategory as string) ?? undefined,
-              (t2.toolCategory as string) ?? undefined,
-            ].filter(Boolean) as string[];
+              typeof item.category === "string" ? item.category : undefined,
+              typeof item.ComparisionType === "string" ? item.ComparisionType : undefined,
+              typeof item.tag === "string" ? item.tag : undefined,
+              typeof t1?.toolCategory === "string" ? t1.toolCategory : undefined,
+              typeof t2?.toolCategory === "string" ? t2.toolCategory : undefined,
+            ].filter((tag): tag is string => typeof tag === "string" && tag.length > 0);
 
             return {
               app1Logo,

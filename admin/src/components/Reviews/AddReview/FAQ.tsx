@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import {useState, type ReactElement} from "react";
 import { GripVertical, Trash2, Plus } from "lucide-react";
 
 type FaqItem = {
@@ -14,7 +14,7 @@ type Props = {
   onFaqsChange?: (faqs: Array<{ question: string; answer: string }>) => void;
 };
 
-export default function FAQ({ initialFaqs, onFaqsChange }: Props = {}) {
+export default function FAQ({ initialFaqs, onFaqsChange }: Props = {}): ReactElement {
   const [faqs, setFaqs] = useState<FaqItem[]>(
     initialFaqs?.map((faq, idx) => ({
       id: idx + 1,
@@ -27,7 +27,7 @@ export default function FAQ({ initialFaqs, onFaqsChange }: Props = {}) {
     ]
   );
 
-  const updateFaqs = (newFaqs: FaqItem[]) => {
+  const updateFaqs = (newFaqs: FaqItem[]): void => {
     setFaqs(newFaqs);
     onFaqsChange?.(newFaqs.map(f => ({
       question: f.question,
@@ -35,23 +35,23 @@ export default function FAQ({ initialFaqs, onFaqsChange }: Props = {}) {
     })));
   };
 
-  const handleQuestionChange = (id: number, value: string) => {
+  const handleQuestionChange = (id: number, value: string): void => {
     updateFaqs(
       faqs.map((faq) => (faq.id === id ? { ...faq, question: value } : faq))
     );
   };
 
-  const handleAnswerChange = (id: number, value: string) => {
+  const handleAnswerChange = (id: number, value: string): void => {
     updateFaqs(
       faqs.map((faq) => (faq.id === id ? { ...faq, answer: value } : faq))
     );
   };
 
-  const deleteFaq = (id: number) => {
+  const deleteFaq = (id: number): void => {
     updateFaqs(faqs.filter((faq) => faq.id !== id));
   };
 
-  const addFaq = () => {
+  const addFaq = (): void => {
     const newId = Math.max(...faqs.map((f) => f.id), 0) + 1;
     updateFaqs([...faqs, { id: newId, question: "", answer: "" }]);
   };
@@ -72,7 +72,7 @@ export default function FAQ({ initialFaqs, onFaqsChange }: Props = {}) {
         <div
           key={faq.id}
           data-layer="Row"
-          className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-700 inline-flex justify-start items-center overflow-hidden"
+          className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 inline-flex justify-start items-center overflow-hidden"
         >
           <div
             data-layer="Column"
@@ -110,9 +110,9 @@ export default function FAQ({ initialFaqs, onFaqsChange }: Props = {}) {
               <input
                 type="text"
                 value={faq.question}
-                onChange={(e) => handleQuestionChange(faq.id, e.target.value)}
+                onChange={(e): void => handleQuestionChange(faq.id, e.target.value)}
                 placeholder="Question here..."
-                className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-zinc-400 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
+                className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-400 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
               />
             </div>
 
@@ -131,7 +131,7 @@ export default function FAQ({ initialFaqs, onFaqsChange }: Props = {}) {
                 value={faq.answer}
                 onChange={(e) => handleAnswerChange(faq.id, e.target.value)}
                 placeholder="Answer here..."
-                className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-zinc-400 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
+                className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-400 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
               />
             </div>
           </div>
@@ -141,7 +141,7 @@ export default function FAQ({ initialFaqs, onFaqsChange }: Props = {}) {
             className="Column self-stretch px-6 py-3 flex justify-start items-center gap-4"
           >
             <button
-              onClick={() => deleteFaq(faq.id)}
+              onClick={(): void => deleteFaq(faq.id)}
               className="hover:opacity-70 transition-opacity"
               aria-label="Delete FAQ"
             >

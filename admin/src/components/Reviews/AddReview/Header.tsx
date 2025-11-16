@@ -1,3 +1,4 @@
+import { type ReactElement } from "react";
 type Props = {
   title?: string;
   onBack?: () => void;
@@ -10,7 +11,7 @@ export default function Header({
   onBack,
   showBack = true,
   className = "",
-}: Props) {
+}: Props): ReactElement{
   return (
     <div
       data-layer="Container"
@@ -21,7 +22,7 @@ export default function Header({
           type="button"
           aria-label="Back"
           onClick={onBack}
-          className="SolarArrowUpOutline w-[32px]  h-[32px] px-[5px] py-[3px]  bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[100px] flex justify-center items-center gap-2.5 overflow-hidden focus:outline-none focus:ring-2 focus:ring-offset-1"
+          className="SolarArrowUpOutline w-[32px]  h-[32px] px-[5px] py-[3px]  bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[100px] flex justify-center items-center gap-2.5 overflow-hidden focus:outline-none focus:ring-2 focus:ring-offset-1"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

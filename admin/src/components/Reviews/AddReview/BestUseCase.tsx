@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useState, type ReactElement} from "react";
 import { GripVertical, Plus, Trash2 } from "lucide-react";
 
 type UseCase = {
@@ -13,19 +13,19 @@ type Props = {
   onUseCasesChange?: (useCases: UseCase[]) => void;
 };
 
-export default function BestUseCase({ initialUseCases, onUseCasesChange }: Props = {}) {
+export default function BestUseCase({ initialUseCases, onUseCasesChange }: Props = {}): ReactElement {
   const [useCases, setUseCases] = useState<UseCase[]>(
     initialUseCases || [
       { id: 1, title: "", description: "" },
     ]
   );
 
-  const updateUseCasesState = (newUseCases: UseCase[]) => {
+  const updateUseCasesState = (newUseCases: UseCase[]): void => {
     setUseCases(newUseCases);
     onUseCasesChange?.(newUseCases);
   };
 
-  const addUseCase = () => {
+  const addUseCase = (): void => {
     const newUseCase = {
       id: Date.now(),
       title: "",
@@ -34,7 +34,7 @@ export default function BestUseCase({ initialUseCases, onUseCasesChange }: Props
     updateUseCasesState([...useCases, newUseCase]);
   };
 
-  const deleteUseCase = (id: number) => {
+  const deleteUseCase = (id: number): void => {
     updateUseCasesState(useCases.filter((useCase) => useCase.id !== id));
   };
 
@@ -42,7 +42,7 @@ export default function BestUseCase({ initialUseCases, onUseCasesChange }: Props
     id: number,
     field: keyof Omit<UseCase, "id">,
     value: string
-  ) => {
+  ): void => {
     updateUseCasesState(
       useCases.map((useCase) =>
         useCase.id === id ? { ...useCase, [field]: value } : useCase
@@ -109,7 +109,7 @@ export default function BestUseCase({ initialUseCases, onUseCasesChange }: Props
           <div
             key={useCase.id}
             data-layer="Row"
-            className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-700 inline-flex justify-start items-center overflow-hidden"
+            className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 inline-flex justify-start items-center overflow-hidden"
           >
             <div
               data-layer="Column"
@@ -144,7 +144,7 @@ export default function BestUseCase({ initialUseCases, onUseCasesChange }: Props
                 </div>
                 <div
                   data-layer="Input"
-                  className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
+                  className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
                 >
                   <input
                     type="text"
@@ -169,7 +169,7 @@ export default function BestUseCase({ initialUseCases, onUseCasesChange }: Props
                 </div>
                 <div
                   data-layer="Input"
-                  className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
+                  className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
                 >
                   <input
                     type="text"
@@ -188,7 +188,7 @@ export default function BestUseCase({ initialUseCases, onUseCasesChange }: Props
               className="Column self-stretch px-6 py-3 flex justify-start items-center gap-4"
             >
               <button
-                onClick={() => deleteUseCase(useCase.id)}
+                onClick={(): void => deleteUseCase(useCase.id)}
                 className="cursor-pointer hover:opacity-80 transition-opacity"
                 aria-label="Delete use case"
               >

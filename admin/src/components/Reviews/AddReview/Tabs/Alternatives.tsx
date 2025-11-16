@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import {useState, type ReactElement} from "react";
 import { GripVertical, Trash2, Search, Star } from "lucide-react";
 
 interface Alternative {
@@ -22,7 +22,7 @@ interface AlternativesProps {
 
 export default function Alternatives({
   initialAlternatives,
-}: AlternativesProps) {
+}: AlternativesProps): ReactElement{
   const [isEnabled, setIsEnabled] = useState<boolean>(true);
   const [sectionTitle, setSectionTitle] = useState<string>(
     "Product Alternatives Section"
@@ -108,14 +108,14 @@ export default function Alternatives({
     console.log("Delete section");
   };
 
-  const filteredAlternatives = alternatives.filter((alt) =>
+  const filteredAlternatives = alternatives.filter((alt): boolean =>
     alt.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <div
       data-layer="Row"
-      className="Row w-[1068px] py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-700 inline-flex flex-col justify-center items-start gap-4 overflow-hidden"
+      className="Row w-[1068px] py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 inline-flex flex-col justify-center items-start gap-4 overflow-hidden"
     >
       {/* Header */}
       <div
@@ -146,7 +146,7 @@ export default function Alternatives({
         >
           <button
             onClick={handleToggle}
-            className="Button w-[53.33px] h-7 relative bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline outline-1 outline-offset-[-1px] outline-[#501bd6] overflow-hidden transition-all"
+            className="Button w-[53.33px] h-7 relative bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden transition-all"
             aria-label={isEnabled ? "Disable section" : "Enable section"}
           >
             <div
@@ -204,7 +204,7 @@ export default function Alternatives({
           data-layer="Frame 2147205556"
           className="Frame2147205556 self-stretch inline-flex justify-start items-center gap-6"
         >
-          <div className="flex-1 h-12 px-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 flex justify-start items-center gap-3">
+          <div className="flex-1 h-12 px-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 flex justify-start items-center gap-3">
             <Search className="w-[22px] h-[22px] text-zinc-400" />
             <input
               type="text"
@@ -251,9 +251,9 @@ interface AlternativeCardProps {
   alternative: Alternative;
 }
 
-const AlternativeCard: React.FC<AlternativeCardProps> = ({ alternative }) => {
+const AlternativeCard: React.FC<AlternativeCardProps> = ({ alternative }): ReactElement=> {
   return (
-    <div className="flex-1 p-6 bg-white/5 rounded-3xl outline outline-1 outline-offset-[-1px] outline-white/10 inline-flex flex-col justify-start items-start gap-[35px]">
+    <div className="flex-1 p-6 bg-white/5 rounded-3xl outline-1 -outline-offset-1 outline-white/10 inline-flex flex-col justify-start items-start gap-[35px]">
       {/* Header */}
       <div className="self-stretch relative inline-flex justify-between items-center">
         {/* Logo and Name */}

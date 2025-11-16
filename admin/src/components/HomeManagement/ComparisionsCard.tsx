@@ -1,3 +1,4 @@
+import { type ReactElement } from "react";
 import React from "react";
 
 interface ComparisionsCardProps {
@@ -21,13 +22,13 @@ const ComparisionsCard: React.FC<ComparisionsCardProps> = ({
   description,
   onViewComparison,
 }) => {
-  const LineIcon = () => (
+  const LineIcon = (): ReactElement=> (
     <div className="h-0 w-4 relative">
       <div className="absolute inset-0 border-t border-zinc-400"></div>
     </div>
   );
 
-  const DotIcon = () => (
+  const DotIcon = (): ReactElement=> (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="13"
@@ -40,9 +41,9 @@ const ComparisionsCard: React.FC<ComparisionsCardProps> = ({
   );
 
   return (
-    <div className="bg-gradient-to-b from-[#1b132c] to-[#0f0d15] rounded-[24px] p-4 sm:p-6 flex flex-col w-full max-w-sm h-full min-h-[260px]">
+    <div className="bg-linear-to-b from-[#1b132c] to-[#0f0d15] rounded-[24px] p-4 sm:p-6 flex flex-col w-full max-w-sm h-full min-h-[260px]">
       {/* Icons and VS Section */}
-      <div className="flex flex-col gap-3 items-center w-full flex-grow">
+      <div className="flex flex-col gap-3 items-center w-full grow">
         {/* Icon Row */}
         <div className="flex items-center">
           {/* App 1 Icon */}
@@ -115,7 +116,7 @@ const ComparisionsCard: React.FC<ComparisionsCardProps> = ({
       {/* CTA Button */}
       <button
         onClick={onViewComparison}
-        className="group bg-gradient-to-b from-[#501bd6] to-[#7f57e2] hover:bg-white hover:from-white hover:to-white rounded-full h-10 sm:h-12 flex items-center justify-center px-3 py-2 w-full transition-all duration-200 mt-4"
+        className="group bg-linear-to-b from-[#501bd6] to-[#7f57e2] hover:bg-white hover:from-white hover:to-white rounded-full h-10 sm:h-12 flex items-center justify-center px-3 py-2 w-full transition-all duration-200 mt-4"
       >
         <p
           className="text-neutral-50 group-hover:text-black text-sm sm:text-base font-normal leading-6 transition-colors duration-200"

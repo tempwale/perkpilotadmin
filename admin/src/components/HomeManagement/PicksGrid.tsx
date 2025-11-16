@@ -1,11 +1,12 @@
+import { type ReactElement } from "react";
 import React, { useState, useEffect } from "react";
 import Pick from "./PicksCard";
 
 const PicksGrid: React.FC = () => {
   const [isDesktop, setIsDesktop] = useState(false);
 
-  useEffect(() => {
-    const checkScreenSize = () => {
+  useEffect((): void => {
+    const checkScreenSize = (): ReactElement=> {
       setIsDesktop(window.innerWidth >= 1024);
     };
 
@@ -59,7 +60,7 @@ const PicksGrid: React.FC = () => {
         <div className="flex gap-4 items-stretch snap-x snap-mandatory">
           {picksData
             .slice(0, isDesktop ? picksData.length : 3)
-            .map((pick, index) => (
+            .map((pick, index): ReactElement=> (
               <div
                 key={index}
                 className="min-w-[260px] md:min-w-[300px] lg:min-w-[340px] snap-start flex-shrink-0"

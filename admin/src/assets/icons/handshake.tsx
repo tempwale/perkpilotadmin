@@ -1,4 +1,4 @@
-export default function HandshakeIcon() {
+export default function HandshakeIcon(): ReactElement{
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

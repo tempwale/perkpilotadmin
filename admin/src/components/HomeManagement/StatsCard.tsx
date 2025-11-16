@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState, type ReactElement} from "react";
 
 type Props = {
   numberValue?: string | number;
@@ -14,40 +14,40 @@ export default function StatsCard({
   message,
   onMessageChange,
   onDelete,
-}: Props) {
+}: Props): ReactElement{
   const [localNumber, setLocalNumber] = useState<string>(
     numberValue != null ? String(numberValue) : ""
   );
   const [localMessage, setLocalMessage] = useState<string>(message ?? "");
 
-  useEffect(() => {
+  useEffect((): void => {
     if (numberValue != null) setLocalNumber(String(numberValue));
   }, [numberValue]);
 
-  useEffect(() => {
+  useEffect((): void => {
     if (message != null) setLocalMessage(message);
   }, [message]);
 
-  function handleNumberChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleNumberChange(e: React.ChangeEvent<HTMLInputElement>): void {
     const v = e.target.value;
     setLocalNumber(v);
     if (onNumberChange) onNumberChange(v);
   }
 
-  function handleMessageChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleMessageChange(e: React.ChangeEvent<HTMLInputElement>): void {
     const v = e.target.value;
     setLocalMessage(v);
     if (onMessageChange) onMessageChange(v);
   }
 
-  function handleDelete() {
+  function handleDelete(): void {
     if (onDelete) onDelete();
   }
 
   return (
     <div
       data-layer="Row"
-      className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-zinc-700 inline-flex justify-start items-center overflow-hidden"
+      className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline-1 outline-zinc-700 inline-flex justify-start items-center overflow-hidden"
     >
       <div
         data-layer="Column"
@@ -93,7 +93,7 @@ export default function StatsCard({
           </div>
           <div
             data-layer="Input"
-            className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
+            className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
           >
             <label htmlFor="stats-number" className="sr-only">
               Number
@@ -119,7 +119,7 @@ export default function StatsCard({
           </div>
           <div
             data-layer="Input"
-            className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
+            className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
           >
             <label htmlFor="stats-message" className="sr-only">
               Message body

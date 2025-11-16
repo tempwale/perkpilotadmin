@@ -1,3 +1,6 @@
+import { type ReactElement } from "react";
+
+
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -10,9 +13,9 @@ export default function Pagination({
   totalPages,
   onPageChange,
   maxVisiblePages = 3,
-}: PaginationProps) {
-  const getVisiblePages = () => {
-    const pages: (number | "ellipsis")[] = [];
+}: PaginationProps): ReactElement| null {
+  const getVisiblePages = (): (number | string)[] => {
+    const pages: (number | string)[] = [];
 
     if (totalPages <= maxVisiblePages + 2) {
       // Show all pages if total is small
@@ -59,8 +62,8 @@ export default function Pagination({
 
   return (
     <div className="content-stretch flex gap-[8px] items-center justify-center relative w-full mt-8">
-      {visiblePages.map((page, index) => {
-        if (page === "ellipsis") {
+      {visiblePages.map((page, index): ReactElement=> {
+        if (typeof page === "string") {
           return (
             <div
               key={`ellipsis-${index}`}
@@ -73,15 +76,16 @@ export default function Pagination({
           );
         }
 
-        const isCurrentPage = page === currentPage;
+        const pageNumber = page;
+        const isCurrentPage = pageNumber === currentPage;
 
         return (
           <button
-            key={page}
-            onClick={() => onPageChange(page)}
+            key={pageNumber}
+            onClick={(): void => onPageChange(pageNumber)}
             className={`box-border content-stretch flex flex-col items-center justify-center px-[12px] py-[8px] relative rounded-[8px] shrink-0 transition-colors hover:opacity-80 ${
               isCurrentPage
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : "bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.12)]"
             }`}
           >

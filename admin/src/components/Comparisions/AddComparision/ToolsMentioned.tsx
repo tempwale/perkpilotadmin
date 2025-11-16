@@ -1,5 +1,5 @@
 import { GripVertical, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState , type ReactElement} from "react";
 
 type Tool = {
   id: string;
@@ -31,18 +31,18 @@ export default function ToolsMentioned({
   onTipChange,
   showSearch = true,
   searchPlaceholder = "Search blogs",
-}: Props) {
+}: Props): ReactElement{
   const [tools, setTools] = useState<Tool[]>(initialTools);
   const [query, setQuery] = useState("");
   const [headlineState, setHeadlineState] = useState(headline);
   const [tipState, setTipState] = useState(tip);
 
-  useEffect(() => setTools(initialTools), [initialTools]);
-  useEffect(() => onToolsChange?.(tools), [tools, onToolsChange]);
-  useEffect(() => setHeadlineState(headline), [headline]);
-  useEffect(() => setTipState(tip), [tip]);
+  useEffect((): void => setTools(initialTools), [initialTools]);
+  useEffect((): void => onToolsChange?.(tools), [tools, onToolsChange]);
+  useEffect((): void => setHeadlineState(headline), [headline]);
+  useEffect((): void => setTipState(tip), [tip]);
 
-  function addTool(name: string) {
+  function addTool(name: string): void {
     const trimmed = name.trim();
     if (!trimmed) return;
     const exists = tools.some(
@@ -60,19 +60,19 @@ export default function ToolsMentioned({
     setQuery("");
   }
 
-  function removeTool(id: string) {
-    setTools((s) => s.filter((t) => t.id !== id));
+  function removeTool(id: string): void {
+    setTools((s) => s.filter((t): boolean => t.id !== id));
   }
 
-  function updateToolLogo(id: string, logo: string) {
+  function updateToolLogo(id: string, logo: string): void {
     setTools((s) => s.map((t) => (t.id === id ? { ...t, logo } : t)));
   }
 
-  function updateToolCategory(id: string, category: string) {
+  function updateToolCategory(id: string, category: string): void {
     setTools((s) => s.map((t) => (t.id === id ? { ...t, category } : t)));
   }
 
-  function onKey(e: React.KeyboardEvent<HTMLInputElement>) {
+  function onKey(e: React.KeyboardEvent<HTMLInputElement>): void {
     if (e.key === "Enter") addTool(query);
   }
 
@@ -113,7 +113,7 @@ export default function ToolsMentioned({
               </div>
               <div
                 data-layer="Input"
-                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
+                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
               >
                 <div
                   data-layer="Frame 13"
@@ -126,7 +126,7 @@ export default function ToolsMentioned({
                     <input
                       aria-label="Section headline"
                       value={headlineState}
-                      onChange={(e) => {
+                      onChange={(e): void => {
                         setHeadlineState(e.target.value);
                         onHeadlineChange?.(e.target.value);
                       }}
@@ -148,7 +148,7 @@ export default function ToolsMentioned({
               </div>
               <div
                 data-layer="Input"
-                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
+                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
               >
                 <div
                   data-layer="Frame 13"
@@ -161,7 +161,7 @@ export default function ToolsMentioned({
                     <input
                       aria-label="Tip text"
                       value={tipState}
-                      onChange={(e) => {
+                      onChange={(e): void => {
                         setTipState(e.target.value);
                         onTipChange?.(e.target.value);
                       }}
@@ -183,7 +183,7 @@ export default function ToolsMentioned({
               data-layer="Main/text-field"
               className="MainTextField flex-1 self-stretch relative bg-zinc-800 rounded-xl  outline-zinc-700 inline-flex flex-col justify-center items-start gap-2.5"
             >
-              <div className="self-stretch relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-700 px-3 py-2">
+              <div className="self-stretch relative bg-zinc-800 rounded-xl outline-1 -outline-offset-1 outline-zinc-700 px-3 py-2">
                 <div className="flex items-center gap-3">
                   <div className="w-5 h-5 rounded flex items-center justify-center">
                     {/* simple search circle visual (keeps original look) */}
@@ -212,7 +212,7 @@ export default function ToolsMentioned({
                   </div>
                   <input
                     value={query}
-                    onChange={(e) => setQuery(e.target.value)}
+                    onChange={(e): void => setQuery(e.target.value)}
                     onKeyDown={onKey}
                     placeholder={searchPlaceholder}
                     className="bg-transparent outline-none text-zinc-400 placeholder:text-zinc-500 w-full"
@@ -229,7 +229,7 @@ export default function ToolsMentioned({
             <div
               key={tool.id}
               data-layer="Card"
-              className="Card self-stretch w-full h-[88px] px-4 bg-zinc-800 rounded-3xl outline outline-1 outline-zinc-700 inline-flex justify-start items-center gap-4"
+              className="Card self-stretch w-full h-[88px] px-4 bg-zinc-800 rounded-3xl outline-1 outline-zinc-700 inline-flex justify-start items-center gap-4"
             >
               <div
                 data-layer="Frame 2147205991"
@@ -306,14 +306,14 @@ export default function ToolsMentioned({
                   <input
                     type="text"
                     value={tool.logo || ""}
-                    onChange={(e) => updateToolLogo(tool.id, e.target.value)}
+                    onChange={(e): void => updateToolLogo(tool.id, e.target.value)}
                     placeholder="Logo URL"
                     className="h-8 px-2 py-1 bg-zinc-700 rounded text-xs text-zinc-400 placeholder:text-zinc-500 outline-none"
                   />
                   <input
                     type="text"
                     value={tool.category || ""}
-                    onChange={(e) =>
+                    onChange={(e): void =>
                       updateToolCategory(tool.id, e.target.value)
                     }
                     placeholder="Category"
@@ -323,7 +323,7 @@ export default function ToolsMentioned({
               </div>
               <X
                 className="text-zinc-400 w-6 h-6 cursor-pointer"
-                onClick={() => removeTool(tool.id)}
+                onClick={(): void => removeTool(tool.id)}
               />
             </div>
           ))}

@@ -1,24 +1,25 @@
-import { useState } from "react";
+import {useState, type ReactElement} from "react";
 import DealCard from "./ReviewsCard";
 import { DEALS_API } from "../../../config/backend";
+import type { ReviewApiResponse, ApiError } from "../../../types/api.types";
 
 export default function DeletePopup({
   onClose,
   onConfirm,
-  deal,
+  review,
 }: {
   onClose?: () => void;
   onConfirm?: () => void;
-  deal?: any;
-}) {
+  review?: ReviewApiResponse;
+}): ReactElement{
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleConfirm = async () => {
+  const handleConfirm = async (): Promise<void> => {
     setError(null);
-    const id = String(deal?.id ?? deal?._id ?? "");
+    const id = String(review?.id ?? review?._id ?? "");
     if (!id) {
-      setError("Missing deal id");
+      setError("Missing review id");
       return;
     }
 
@@ -30,16 +31,17 @@ export default function DeletePopup({
       });
 
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
+        const body = (await res.json().catch(() => ({}))) as ApiError | { message?: string };
         throw new Error(body.message || `Server returned ${res.status}`);
       }
 
       // success
       onConfirm?.();
       onClose?.();
-    } catch (err: any) {
+    } catch (err) {
       console.error("Delete failed", err);
-      setError(err?.message || "Failed to delete deal");
+      const errorMessage = err instanceof Error ? err.message : "Failed to delete review";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -48,12 +50,12 @@ export default function DeletePopup({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={() => onClose?.()}
+        onClick={(): void => onClose?.()}
         aria-hidden
       />
       <div
         data-layer="Card Popup"
-        className="relative w-[380px] p-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-700 inline-flex flex-col justify-center items-center gap-3 z-10"
+        className="relative w-[380px] p-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-1 outline-zinc-700 inline-flex flex-col justify-center items-center gap-3 z-10"
       >
         <div
           data-layer="Frame 1321315042"
@@ -87,16 +89,14 @@ export default function DeletePopup({
           {/* Render the DealCard inside popup as a compact preview */}
           <div className="w-[420px]">
             <DealCard
-              id={String(deal?.id ?? deal?._id ?? "preview")}
-              title={deal?.title}
-              category={deal?.category ?? deal?.dealType}
-              description={deal?.description}
-              logoComponent={deal?.logoComponent}
-              verified={deal?.verified}
-              dealType={deal?.dealType}
-              features={deal?.features}
-              discount={deal?.discount}
-              savings={deal?.savings}
+              id={String(review?.id ?? review?._id ?? "preview")}
+              title={typeof review?.productName === "string" ? review?.productName : undefined}
+              category={typeof review?.dealType === "string" ? review?.dealType : undefined}
+              description={typeof review?.description === "string" ? review?.description : undefined}
+              logoComponent={review?.logoComponent ?? undefined}
+              verified={review?.verified ?? undefined}
+              dealType={review?.dealType ?? undefined}
+              features={review?.features ?? undefined}
             />
           </div>
         </div>
@@ -128,7 +128,7 @@ export default function DeletePopup({
                 data-layer="Note: Can’t be undone later! and you are free to edit this deal stack instead of deleting it full."
                 className="NoteCanTBeUndoneLaterAndYouAreFreeToEditThisDealStackInsteadOfDeletingItFull flex-1 justify-start text-neutral-50 text-xs font-normal font-['Poppins']"
               >
-                Note: Can’t be undone later! and you are free to edit this deal
+                Note: Can&apos;t be undone later! and you are free to edit this deal
                 stack instead of deleting it full.
               </div>
             </div>
@@ -146,10 +146,10 @@ export default function DeletePopup({
               data-layer="Buttons/main"
               data-button="ghost"
               data-size="Large"
-              className={`ButtonsMain flex-1 h-10 px-4 py-2 rounded-full outline outline-1 outline-offset-[-1px] outline-[#ebeef4] flex justify-center items-center gap-2 ${
+              className={`ButtonsMain flex-1 h-10 px-4 py-2 rounded-full outline-1 -outline-offset-1 outline-[#ebeef4] flex justify-center items-center gap-2 ${
                 loading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
               }`}
-              onClick={() => !loading && onClose?.()}
+              onClick={(): void => !loading && onClose?.()}
               role="button"
               tabIndex={0}
               aria-disabled={loading}
@@ -168,7 +168,7 @@ export default function DeletePopup({
               className={`ButtonsMain flex-1 px-4 py-2 bg-neutral-50 rounded-full flex justify-center items-center gap-2 ${
                 loading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
               }`}
-              onClick={() => !loading && handleConfirm()}
+              onClick={(): void => !loading && handleConfirm()}
               role="button"
               tabIndex={0}
               aria-disabled={loading}

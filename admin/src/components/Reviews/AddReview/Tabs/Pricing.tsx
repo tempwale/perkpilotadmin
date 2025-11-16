@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import {useState, type ReactElement} from "react";
 import { GripVertical, Trash2, Plus } from "lucide-react";
 
 interface PricingPlan {
@@ -20,7 +20,7 @@ interface PricingProps {
 export default function Pricing({
   initialPlans,
   onPlansChange,
-}: PricingProps) {
+}: PricingProps): ReactElement{
   const [isEnabled, setIsEnabled] = useState<boolean>(true);
   const [plans, setPlans] = useState<PricingPlan[]>(
     initialPlans || [
@@ -103,7 +103,7 @@ export default function Pricing({
   };
 
   const deletePlan = (id: number): void => {
-    const updatedPlans = plans.filter((plan) => plan.id !== id);
+    const updatedPlans = plans.filter((plan): boolean => plan.id !== id);
     updatePlans(updatedPlans);
   };
 
@@ -128,7 +128,7 @@ export default function Pricing({
   };
 
   return (
-    <div className="w-full max-w-[1068px] py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-700 flex flex-col gap-4">
+    <div className="w-full max-w-[1068px] py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 flex flex-col gap-4">
       {/* Header */}
       <div
         data-layer="Row"
@@ -157,7 +157,7 @@ export default function Pricing({
         >
           <button
             onClick={handleToggle}
-            className="Button w-[53.33px] h-7 relative bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline outline-1 outline-offset-[-1px] outline-[#501bd6] overflow-hidden transition-all"
+            className="Button w-[53.33px] h-7 relative bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden transition-all"
             aria-label={isEnabled ? "Disable pricing" : "Enable pricing"}
           >
             <div
@@ -167,7 +167,7 @@ export default function Pricing({
             />
           </button>
           <button
-            onClick={() => {}}
+            onClick={(): void => {}}
             className="hover:opacity-70 transition-opacity"
             aria-label="Delete section"
           >
@@ -181,7 +181,7 @@ export default function Pricing({
         {plans.map((plan) => (
           <div
             key={plan.id}
-            className="w-full py-4 px-6 bg-zinc-800 rounded-2xl outline outline-1 outline-zinc-700 flex flex-col gap-4"
+            className="w-full py-4 px-6 bg-zinc-800 rounded-2xl outline-1 outline-zinc-700 flex flex-col gap-4"
           >
             {/* Plan Title and Price Row */}
             <div className="flex items-start gap-6">
@@ -206,7 +206,7 @@ export default function Pricing({
                     handlePlanTitleChange(plan.id, e.target.value)
                   }
                   placeholder="Plan Title"
-                  className="h-12 px-6 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-zinc-500"
+                  className="h-12 px-6 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-zinc-500"
                 />
               </div>
 
@@ -219,7 +219,7 @@ export default function Pricing({
                   Price
                 </label>
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 flex items-center h-12 px-6 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700">
+                  <div className="flex-1 flex items-center h-12 px-6 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700">
                     <span className="text-neutral-50 text-base font-normal font-['Poppins'] mr-2">
                       $
                     </span>
@@ -242,7 +242,7 @@ export default function Pricing({
                         e.target.value as "Monthly" | "Yearly" | "Lifetime"
                       )
                     }
-                    className="h-12 px-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
+                    className="h-12 px-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
                   >
                     <option value="Monthly">Monthly</option>
                     <option value="Yearly">Yearly</option>
@@ -254,7 +254,7 @@ export default function Pricing({
               {/* Delete Button */}
               <div className="pt-8">
                 <button
-                  onClick={() => deletePlan(plan.id)}
+                  onClick={(): void => deletePlan(plan.id)}
                   className="hover:opacity-70 transition-opacity"
                   aria-label={`Delete plan ${plan.id}`}
                 >
@@ -281,7 +281,7 @@ export default function Pricing({
                     handleCTATextChange(plan.id, e.target.value)
                   }
                   placeholder="Get The Deal"
-                  className="h-12 px-6 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-zinc-500"
+                  className="h-12 px-6 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-zinc-500"
                 />
               </div>
 
@@ -301,7 +301,7 @@ export default function Pricing({
                     handleCTALinkChange(plan.id, e.target.value)
                   }
                   placeholder="https://..."
-                  className="h-12 px-6 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-zinc-500"
+                  className="h-12 px-6 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-zinc-500"
                 />
               </div>
             </div>

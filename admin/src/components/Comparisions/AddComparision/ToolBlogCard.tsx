@@ -1,31 +1,52 @@
 import { Plus, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactElement } from "react";
+
+import type { BlogSectionApiResponse } from "../../../types/api.types";
 
 type Props = {
-  onCardsChange?: (cards: any[]) => void;
+  onCardsChange?: (cards: BlogSectionApiResponse[]) => void;
 };
 
-export default function ToolBlogCard({ onCardsChange }: Props) {
-  const [cards, setCards] = useState([
-    { id: 1, title: "", body: "", note: "" },
+export default function ToolBlogCard({ onCardsChange }: Props): ReactElement {
+  const [cards, setCards] = useState<Array<BlogSectionApiResponse & { id: number }>>([
+    { id: 1, sectionNumber: 1, blogTitle: "", blogBody: "", additionalNote: "" },
   ]);
 
-  useEffect(() => {
-    onCardsChange?.(cards);
+  useEffect((): void => {
+    // Map cards to BlogSectionApiResponse format (remove id field)
+    const mappedCards: BlogSectionApiResponse[] = cards.map(({ id: _id, ...rest }) => rest);
+    onCardsChange?.(mappedCards);
   }, [cards, onCardsChange]);
 
-  const handleAddCard = () => {
-    const newCard = { id: Date.now(), title: "", body: "", note: "" };
+  const handleAddCard = (): void => {
+    const newCard: BlogSectionApiResponse & { id: number } = { 
+      id: Date.now(), 
+      sectionNumber: cards.length + 1, 
+      blogTitle: "", 
+      blogBody: "", 
+      additionalNote: "" 
+    };
     setCards([...cards, newCard]);
   };
 
-  const handleDeleteCard = (id: number) => {
-    setCards(cards.filter((card) => card.id !== id));
+  const handleDeleteCard = (id: number): void => {
+    setCards(cards.filter((card): boolean => card.id !== id));
   };
 
-  const handleChange = (id: number, field: string, value: string) => {
+  const handleChange = (id: number, field: string, value: string): void => {
     setCards(
-      cards.map((card) => (card.id === id ? { ...card, [field]: value } : card))
+      cards.map((card) => {
+        if (card.id === id) {
+          if (field === "title") {
+            return { ...card, blogTitle: value };
+          } else if (field === "body") {
+            return { ...card, blogBody: value };
+          } else if (field === "note") {
+            return { ...card, additionalNote: value };
+          }
+        }
+        return card;
+      })
     );
   };
 
@@ -63,9 +84,9 @@ export default function ToolBlogCard({ onCardsChange }: Props) {
                 <div className="Frame2147205991 inline-flex justify-start items-center">
                   {/* Dots (for visual only) */}
                   <div className="CharmMenuKebab w-6 h-6 relative overflow-hidden">
-                    <div className="Vector w-[2.25px] h-[2.25px] left-[10.88px] top-[2.62px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-neutral-50" />
-                    <div className="Vector w-[2.25px] h-[2.25px] left-[10.88px] top-[10.88px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-neutral-50" />
-                    <div className="Vector w-[2.25px] h-[2.25px] left-[10.88px] top-[19.12px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-neutral-50" />
+                    <div className="Vector w-[2.25px] h-[2.25px] left-[10.88px] top-[2.62px] absolute outline-[1.50px] outline-offset-[-0.75px] outline-neutral-50" />
+                    <div className="Vector w-[2.25px] h-[2.25px] left-[10.88px] top-[10.88px] absolute outline-[1.50px] outline-offset-[-0.75px] outline-neutral-50" />
+                    <div className="Vector w-[2.25px] h-[2.25px] left-[10.88px] top-[19.12px] absolute outline-[1.50px] outline-offset-[-0.75px] outline-neutral-50" />
                   </div>
                 </div>
               </div>
@@ -77,7 +98,7 @@ export default function ToolBlogCard({ onCardsChange }: Props) {
             <div className="Frame2147206053 self-stretch flex justify-start items-center gap-6">
               <div
                 className="FluentDelete16Regular w-6 h-6 relative overflow-hidden cursor-pointer"
-                onClick={() => handleDeleteCard(card.id)}
+                onClick={(): void => handleDeleteCard(card.id)}
                 title="Delete card"
               >
                 <X className="text-zinc-400 w-6 h-6" />
@@ -95,9 +116,9 @@ export default function ToolBlogCard({ onCardsChange }: Props) {
               <input
                 type="text"
                 placeholder="Blog Heading"
-                value={card.title}
+                value={card.blogTitle}
                 onChange={(e) => handleChange(card.id, "title", e.target.value)}
-                className="self-stretch h-14 px-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-zinc-700 text-zinc-200 font-normal font-['Poppins'] text-base"
+                className="self-stretch h-14 px-4 py-3 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-zinc-200 font-normal font-['Poppins'] text-base"
               />
             </div>
 
@@ -108,9 +129,9 @@ export default function ToolBlogCard({ onCardsChange }: Props) {
               </div>
               <textarea
                 placeholder="Blog Body Message"
-                value={card.body}
+                value={card.blogBody}
                 onChange={(e) => handleChange(card.id, "body", e.target.value)}
-                className="self-stretch px-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-zinc-700 text-zinc-200 font-normal font-['Poppins'] text-base"
+                className="self-stretch px-4 py-3 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-zinc-200 font-normal font-['Poppins'] text-base"
               />
             </div>
 
@@ -122,9 +143,9 @@ export default function ToolBlogCard({ onCardsChange }: Props) {
               <input
                 type="text"
                 placeholder="Text here"
-                value={card.note}
+                value={card.additionalNote ?? ""}
                 onChange={(e) => handleChange(card.id, "note", e.target.value)}
-                className="self-stretch h-14 px-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-zinc-700 text-zinc-200 font-normal font-['Poppins'] text-base"
+                className="self-stretch h-14 px-4 py-3 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-zinc-200 font-normal font-['Poppins'] text-base"
               />
             </div>
           </div>

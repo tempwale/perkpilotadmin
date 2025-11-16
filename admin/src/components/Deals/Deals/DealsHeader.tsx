@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronRight, Plus } from "lucide-react";
-import { useState } from "react";
+import {useState, type ReactElement} from "react";
 
 // Type definitions
 type SortOption =
@@ -24,7 +24,7 @@ interface DealsHeaderProps {
 export default function DealsHeader({
   onSortChange,
   onAddDeal,
-}: DealsHeaderProps) {
+}: DealsHeaderProps): ReactElement{
   const [sortBy, setSortBy] = useState<SortOption>("newly-published");
   const [showSortDropdown, setShowSortDropdown] = useState<boolean>(false);
   // Sort options with proper typing
@@ -71,12 +71,12 @@ export default function DealsHeader({
         {/* Sort Dropdown */}
         <div className="relative">
           <button
-            onClick={() => setShowSortDropdown(!showSortDropdown)}
+            onClick={(): void => setShowSortDropdown(!showSortDropdown)}
             type="button"
             aria-expanded={showSortDropdown}
             aria-haspopup="true"
             data-layer="Button"
-            className="Button pl-3 pr-2 py-2 bg-zinc-800 rounded-lg outline outline-1 outline-offset-[-1px] outline-zinc-700 flex justify-start items-center gap-2 hover:bg-zinc-700 transition-colors"
+            className="Button pl-3 pr-2 py-2 bg-zinc-800 rounded-lg outline-1 -outline-offset-1 outline-zinc-700 flex justify-start items-center gap-2 hover:bg-zinc-700 transition-colors"
           >
             <div className="HorizontalContainer flex justify-start items-center gap-2">
               <div className="NewlyPublishedFirst justify-start text-neutral-50 text-base font-normal font-['Poppins'] leading-6">
@@ -89,12 +89,12 @@ export default function DealsHeader({
           </button>
 
           {showSortDropdown && (
-            <div className="absolute top-full mt-2 right-0 bg-zinc-800 rounded-lg outline outline-1 outline-zinc-700 shadow-lg z-10 min-w-[200px]">
+            <div className="absolute top-full mt-2 right-0 bg-zinc-800 rounded-lg outline-1 outline-zinc-700 shadow-lg z-10 min-w-[200px]">
               {sortOptions.map((option: SortOptionItem) => (
                 <button
                   key={option.value}
                   type="button"
-                  onClick={() => handleSortChange(option.value)}
+                  onClick={(): void => handleSortChange(option.value)}
                   className={`w-full text-left px-4 py-2 text-neutral-50 hover:bg-zinc-700 transition-colors first:rounded-t-lg last:rounded-b-lg ${
                     sortBy === option.value ? "bg-zinc-700" : ""
                   }`}
@@ -108,7 +108,7 @@ export default function DealsHeader({
         <div
           data-layer="Button"
           className="Button pl-3 pr-2 py-2 bg-neutral-50 rounded-lg inline-flex justify-start items-center gap-2"
-          onClick={() => window.location.assign("/dealsmanagement")}
+          onClick={(): void => window.location.assign("/dealsmanagement")}
         >
           <div
             data-layer="Horizontal container"

@@ -1,4 +1,5 @@
 import "./App.css";
+import { type ReactElement } from "react";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import BlogManagementPage from "./pages/BlogManagementPage";
@@ -15,13 +16,13 @@ import ComparisionsPage from "./pages/Comparisions/ComparisionsPage";
 import AddAuthor from "./pages/AddAuthor";
 import ReviewsPage from "./pages/Reviews/ReviewsPage";
 
-function AppContent() {
+function AppContent(): ReactElement{
   const navigate = useNavigate();
 
   return (
     <div className="flex min-h-screen bg-black">
       {/* Sidebar on the left - pass navigation handler */}
-      <Sidebar onNavigate={(key) => navigate(`/${key}`)} />
+      <Sidebar onNavigate={(key) => { void navigate(`/${key}`); }} />
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col">
@@ -55,7 +56,7 @@ function AppContent() {
   );
 }
 
-function App() {
+function App(): ReactElement{
   return (
     <BrowserRouter>
       <AppContent />

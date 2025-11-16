@@ -1,14 +1,16 @@
+import { type ReactElement } from "react";
 import Alternatives from "./Tabs/Alternatives";
 import Features from "./Tabs/Features";
 import Overview from "./Tabs/Overview";
 import Pricing from "./Tabs/Pricing";
+import type { ReviewApiResponse } from "../../../types/api.types";
 
 type Props = {
-  reviewData?: any;
-  updateReviewData?: (updates: any) => void;
+  reviewData?: ReviewApiResponse;
+  updateReviewData?: (updates: Partial<ReviewApiResponse>) => void;
 };
 
-export default function Tabs({ reviewData, updateReviewData }: Props = {}) {
+export default function Tabs({ reviewData, updateReviewData }: Props = {}): ReactElement {
   return (
     <div>
       <div
@@ -28,10 +30,10 @@ export default function Tabs({ reviewData, updateReviewData }: Props = {}) {
           }}
         />
         <Features
-          initialFeatures={reviewData?.features?.map((f: any, idx: number) => ({
+          initialFeatures={reviewData?.features?.map((f, idx) => ({
             id: idx + 1,
             title: f.title,
-            body: f.description,
+            body: f.description || "",
           }))}
           onFeaturesChange={(features) => {
             updateReviewData?.({
@@ -43,7 +45,7 @@ export default function Tabs({ reviewData, updateReviewData }: Props = {}) {
           }}
         />
         <Pricing
-          initialPlans={reviewData?.pricing?.map((p: any, idx: number) => ({
+          initialPlans={reviewData?.pricing?.map((p, idx) => ({
             id: idx + 1,
             planTitle: p.plan,
             price: p.amount,
@@ -63,15 +65,15 @@ export default function Tabs({ reviewData, updateReviewData }: Props = {}) {
         />
         <Alternatives
           initialAlternatives={reviewData?.alternatives?.map(
-            (a: any, idx: number) => ({
+            (a, idx) => ({
               id: idx + 1,
               logo: a.avatarUrl || null,
               name: a.name,
               isVerified: true,
-              category: a.type,
-              rating: a.rating,
-              reviewCount: a.reviewCount,
-              pricing: a.price,
+              category: a.type || "",
+              rating: a.rating || 0,
+              reviewCount: a.reviewCount || 0,
+              pricing: a.price || "",
               compareLink: a.compareNote || "",
             })
           )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import {useState, type ReactElement} from "react";
 import { GripVertical, Trash2, Plus, Star } from "lucide-react";
 
 type Feature = {
@@ -16,7 +16,7 @@ type Props = {
   onCategoriesChange?: (categories: Array<{ category: string; value: number; outOf: number }>) => void;
 };
 
-export default function RatingBreakdown({ initialCategories, onCategoriesChange }: Props = {}) {
+export default function RatingBreakdown({ initialCategories, onCategoriesChange }: Props = {}): ReactElement {
   const [isEnabled, setIsEnabled] = useState(true);
   const [title, setTitle] = useState("Rating Breakdown");
 
@@ -42,7 +42,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
     ]
   );
 
-  const updateFeatures = (newFeatures: Feature[]) => {
+  const updateFeatures = (newFeatures: Feature[]): void => {
     setFeatures(newFeatures);
     onCategoriesChange?.(newFeatures.map(f => ({
       category: f.name,
@@ -51,7 +51,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
     })));
   };
 
-  const handleFeatureNameChange = (id: number, value: string) => {
+  const handleFeatureNameChange = (id: number, value: string): void => {
     updateFeatures(
       features.map((feature) =>
         feature.id === id ? { ...feature, name: value } : feature
@@ -59,7 +59,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
     );
   };
 
-  const handleRatingChange = (id: number, rating: number) => {
+  const handleRatingChange = (id: number, rating: number): void => {
     updateFeatures(
       features.map((feature) =>
         feature.id === id ? { ...feature, rating } : feature
@@ -67,7 +67,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
     );
   };
 
-  const handleMinScoreChange = (id: number, value: string) => {
+  const handleMinScoreChange = (id: number, value: string): void => {
     updateFeatures(
       features.map((feature) =>
         feature.id === id ? { ...feature, minScore: value } : feature
@@ -75,7 +75,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
     );
   };
 
-  const handleMaxScoreChange = (id: number, value: string) => {
+  const handleMaxScoreChange = (id: number, value: string): void => {
     updateFeatures(
       features.map((feature) =>
         feature.id === id ? { ...feature, maxScore: value } : feature
@@ -83,11 +83,11 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
     );
   };
 
-  const deleteFeature = (id: number) => {
+  const deleteFeature = (id: number): void => {
     updateFeatures(features.filter((feature) => feature.id !== id));
   };
 
-  const addFeature = () => {
+  const addFeature = (): void => {
     const newId = Math.max(...features.map((f) => f.id), 0) + 1;
     updateFeatures([
       ...features,
@@ -98,7 +98,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
   return (
     <div
       data-layer="Row"
-      className="Row w-[1068px] py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-700 inline-flex flex-col justify-center items-start gap-4 overflow-hidden"
+      className="Row w-[1068px] py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 inline-flex flex-col justify-center items-start gap-4 overflow-hidden"
     >
       <div
         data-layer="Row"
@@ -126,8 +126,8 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
           className="Column self-stretch px-6 py-3 border-b border-zinc-700 flex justify-start items-center gap-4"
         >
           <button
-            onClick={() => setIsEnabled(!isEnabled)}
-            className="w-[53.33px] h-7 relative bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline outline-1 outline-offset-[-1px] outline-[#501bd6] overflow-hidden transition-all"
+            onClick={(): void => setIsEnabled(!isEnabled)}
+            className="w-[53.33px] h-7 relative bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden transition-all"
           >
             <div
               className={`w-[23.33px] h-[22.67px] absolute bg-white rounded-[66.67px] transition-all top-[2.67px] ${
@@ -136,7 +136,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
             />
           </button>
           <button
-            onClick={() => {}}
+            onClick={(): void => {}}
             className="hover:opacity-70 transition-opacity"
             aria-label="Delete"
           >
@@ -167,7 +167,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-zinc-400 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
+              className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-400 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
             />
           </div>
         </div>
@@ -176,7 +176,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
           <div
             key={feature.id}
             data-layer="Row"
-            className="Row self-stretch pl-20 py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-zinc-700 inline-flex justify-center items-end gap-6 overflow-hidden"
+            className="Row self-stretch pl-20 py-4 bg-zinc-800 rounded-3xl outline-1 outline-zinc-700 inline-flex justify-center items-end gap-6 overflow-hidden"
           >
             <div
               data-layer="Column"
@@ -217,7 +217,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
                       handleFeatureNameChange(feature.id, e.target.value)
                     }
                     placeholder="Enter feature name..."
-                    className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-zinc-400 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
+                    className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-400 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
                   />
                 </div>
               </div>
@@ -244,7 +244,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       key={star}
-                      onClick={() => handleRatingChange(feature.id, star)}
+                      onClick={(): void => handleRatingChange(feature.id, star)}
                       className="hover:scale-110 transition-transform"
                     >
                       <Star
@@ -270,7 +270,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
                 onChange={(e) =>
                   handleMinScoreChange(feature.id, e.target.value)
                 }
-                className="w-64 self-stretch pl-6 pr-4 py-3 bg-zinc-800 rounded-tl-xl rounded-bl-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
+                className="w-64 self-stretch pl-6 pr-4 py-3 bg-zinc-800 rounded-tl-xl rounded-bl-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
               />
               <input
                 type="text"
@@ -278,7 +278,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
                 onChange={(e) =>
                   handleMaxScoreChange(feature.id, e.target.value)
                 }
-                className="self-stretch px-4 py-3 bg-zinc-800 rounded-tr-xl rounded-br-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
+                className="self-stretch px-4 py-3 bg-zinc-800 rounded-tr-xl rounded-br-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
               />
             </div>
 
@@ -287,7 +287,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
               className="Column self-stretch px-6 py-3 flex justify-center items-center gap-4"
             >
               <button
-                onClick={() => deleteFeature(feature.id)}
+                onClick={(): void => deleteFeature(feature.id)}
                 className="hover:opacity-70 transition-opacity"
                 aria-label="Delete feature"
               >

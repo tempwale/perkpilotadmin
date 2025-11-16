@@ -1,18 +1,19 @@
-import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
+import {useState, useEffect, type ChangeEvent, type FormEvent, ReactElement} from "react";
 import FooterActions from "./FooterActions";
 import { Plus } from "lucide-react";
 import { DEALS_API } from "../../../config/backend";
 import { fetchLogoByDomain } from "../../../utils/LogoFetch";
+import type { DealApiResponse, ApiError } from "../../../types/api.types";
 export default function Hero({
   reviewId,
   create,
 }: {
   reviewId?: string;
   create?: boolean;
-}) {
+}): ReactElement{
   const [loadingDeal, setLoadingDeal] = useState(false);
 
-  useEffect(() => {
+  useEffect((): void => {
     // If a reviewId (deal id) was provided, fetch the deal and prefill the form
     if (!reviewId) {
       if (create) console.log("Hero running in create mode");
@@ -21,25 +22,30 @@ export default function Hero({
 
     let mounted = true;
 
-    (async () => {
+    (async (): Promise<void> => {
       setLoadingDeal(true);
       setErrorMessage(null);
       try {
         const res = await fetch(`${DEALS_API}/${reviewId}`);
         if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
+          const body = (await res.json().catch((): ReactElement=> ({}))) as ApiError | { message?: string };
           throw new Error(body.message || `Server returned ${res.status}`);
         }
-        const data = await res.json();
+        const data = await res.json() as DealApiResponse;
         if (!mounted) return;
 
         // Map backend deal model to our form fields
+        const primaryCtaTextValue = ((typeof data.primary_cta_text === "string" ? data.primary_cta_text : undefined) ?? (typeof data.primaryCtaText === "string" ? data.primaryCtaText : undefined)) as string | undefined;
+        const secondaryCtaTextValue = ((typeof data.secondary_cta_text === "string" ? data.secondary_cta_text : undefined) ?? (typeof data.secondaryCtaText === "string" ? data.secondaryCtaText : undefined)) as string | undefined;
+        const primaryCtaLinkValue = ((typeof data.primary_cta_link === "string" ? data.primary_cta_link : undefined) ?? (typeof data.primaryCtaLink === "string" ? data.primaryCtaLink : undefined)) as string | undefined;
+        const secondaryCtaLinkValue = ((typeof data.secondary_cta_link === "string" ? data.secondary_cta_link : undefined) ?? (typeof data.secondaryCtaLink === "string" ? data.secondaryCtaLink : undefined)) as string | undefined;
+        
         setFormData((prev) => ({
           ...prev,
-          toolName: data.name ?? prev.toolName,
-          toolCategory: data.category ?? prev.toolCategory,
-          toolDescription: data.description ?? prev.toolDescription,
-          dealBadge: data.tag ?? prev.dealBadge,
+          toolName: typeof data.title === "string" ? data.title : prev.toolName,
+          toolCategory: typeof data.category === "string" ? data.category : prev.toolCategory,
+          toolDescription: typeof data.description === "string" ? data.description : prev.toolDescription,
+          dealBadge: typeof data.tag === "string" ? data.tag : prev.dealBadge,
           features:
             Array.isArray(data.features) && data.features.length > 0
               ? data.features
@@ -53,18 +59,10 @@ export default function Hero({
             data.discountPercentage !== null
               ? String(data.discountPercentage)
               : prev.discountValue,
-          primaryCtaText:
-            data.primary_cta_text ?? data.primaryCtaText ?? prev.primaryCtaText,
-          secondaryCtaText:
-            data.secondary_cta_text ??
-            data.secondaryCtaText ??
-            prev.secondaryCtaText,
-          primaryCtaLink:
-            data.primary_cta_link ?? data.primaryCtaLink ?? prev.primaryCtaLink,
-          secondaryCtaLink:
-            data.secondary_cta_link ??
-            data.secondaryCtaLink ??
-            prev.secondaryCtaLink,
+          primaryCtaText: primaryCtaTextValue ?? prev.primaryCtaText,
+          secondaryCtaText: secondaryCtaTextValue ?? prev.secondaryCtaText,
+          primaryCtaLink: primaryCtaLinkValue ?? prev.primaryCtaLink,
+          secondaryCtaLink: secondaryCtaLinkValue ?? prev.secondaryCtaLink,
         }));
 
         // If server provided a logo URI, place it into logoFiles[0]
@@ -72,10 +70,12 @@ export default function Hero({
           setLogoFiles([data.logoUri, null, null]);
           setSelectedLogo(0);
         }
-      } catch (err: any) {
+      } catch (err) {
         console.error("Failed to fetch deal:", err);
-        if (mounted)
-          setErrorMessage(err?.message || "Failed to load deal data");
+        if (mounted) {
+          const errorMessage = err instanceof Error ? err.message : "Failed to load deal data";
+          setErrorMessage(errorMessage);
+        }
       } finally {
         if (mounted) setLoadingDeal(false);
       }
@@ -157,7 +157,7 @@ export default function Hero({
   // Handle input changes for all text fields
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  ): void => {
     const { name, value } = e.target as HTMLInputElement & HTMLSelectElement;
     setFormData((prev) => ({
       ...prev,
@@ -166,7 +166,7 @@ export default function Hero({
   };
 
   // Handle feature input changes
-  const handleFeatureChange = (index: number, value: string) => {
+  const handleFeatureChange = (index: number, value: string): void => {
     const updatedFeatures = [...formData.features];
     updatedFeatures[index] = value;
     setFormData((prev) => ({
@@ -176,7 +176,7 @@ export default function Hero({
   };
 
   // Add new feature field
-  const addFeature = () => {
+  const addFeature = (): void => {
     setFormData((prev) => ({
       ...prev,
       features: [...prev.features, ""],
@@ -184,9 +184,9 @@ export default function Hero({
   };
 
   // Remove feature field
-  const removeFeature = (index: number) => {
+  const removeFeature = (index: number): void => {
     if (formData.features.length > 1) {
-      const updatedFeatures = formData.features.filter((_, i) => i !== index);
+      const updatedFeatures = formData.features.filter((_, i): boolean => i !== index);
       setFormData((prev) => ({
         ...prev,
         features: updatedFeatures,
@@ -195,7 +195,7 @@ export default function Hero({
   };
 
   // Handle logo selection
-  const handleLogoSelect = (index: number) => {
+  const handleLogoSelect = (index: number): void => {
     setSelectedLogo(index);
   };
 
@@ -203,7 +203,7 @@ export default function Hero({
   const handleLogoUpload = (
     index: number,
     e: ChangeEvent<HTMLInputElement>
-  ) => {
+  ): void => {
     const file = e.target.files?.[0];
     if (file) {
       const newLogoFiles = [...logoFiles];
@@ -214,7 +214,7 @@ export default function Hero({
   };
 
   // Handle logo fetch from domain
-  const handleFetchLogo = async () => {
+  const handleFetchLogo = async (): Promise<void> => {
     if (!logoFetchUrl.trim()) {
       setLogoFetchError("Please enter a domain or company name");
       return;
@@ -247,7 +247,7 @@ export default function Hero({
   };
 
   // Handle form submission
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     setSuccessMessage(null);
     setErrorMessage(null);
@@ -262,7 +262,7 @@ export default function Hero({
         "Please fill in the required fields: Tool Name, Category and Description."
       );
       // helpful debug info for devs (view in browser console)
-      // eslint-disable-next-line no-console
+       
       console.debug("AddDeal validation failed", {
         name,
         category,
@@ -271,7 +271,7 @@ export default function Hero({
       return;
     }
 
-    (async () => {
+    (async (): Promise<void> => {
       setSubmitting(true);
       try {
         // Build payload to match backend Deal model
@@ -293,7 +293,7 @@ export default function Hero({
           secondary_cta_text: formData.secondaryCtaText || null,
           primary_cta_link: formData.primaryCtaLink || null,
           secondary_cta_link: formData.secondaryCtaLink || null,
-        } as any;
+        };
 
         const res = await fetch(`${DEALS_API}/`, {
           method: "POST",
@@ -304,11 +304,11 @@ export default function Hero({
         });
 
         if (!res.ok) {
-          const errBody = await res.json().catch(() => ({}));
+          const errBody = (await res.json().catch((): ReactElement=> ({}))) as ApiError | { message?: string };
           throw new Error(errBody.message || `Server returned ${res.status}`);
         }
 
-        const data = await res.json();
+        const data = await res.json() as DealApiResponse;
         setSuccessMessage("Deal created successfully.");
         console.log("Created deal:", data);
         // Optionally reset form or navigate to deals list
@@ -322,9 +322,10 @@ export default function Hero({
           features: ["", ""],
         }));
         setLogoFiles([null, null, null]);
-      } catch (err: any) {
+      } catch (err) {
         console.error(err);
-        setErrorMessage(err.message || "Failed to create deal");
+        const errorMessage = err instanceof Error ? err.message : "Failed to create deal";
+        setErrorMessage(errorMessage);
       } finally {
         setSubmitting(false);
       }
@@ -358,7 +359,7 @@ export default function Hero({
               </div>
               <div
                 data-layer="Input"
-                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
               >
                 <input
                   type="text"
@@ -383,7 +384,7 @@ export default function Hero({
               </div>
               <div
                 data-layer="Input"
-                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
               >
                 <select
                   name="toolCategory"
@@ -414,7 +415,7 @@ export default function Hero({
               {showCustomCategory && (
                 <div
                   data-layer="Input"
-                  className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                  className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
                 >
                   <input
                     type="text"
@@ -453,7 +454,7 @@ export default function Hero({
             </div>
             <div
               data-layer="Input"
-              className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+              className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
             >
               <input
                 type="text"
@@ -502,7 +503,7 @@ export default function Hero({
                         ? "border-2 border-[#501bd6]"
                         : "border border-zinc-700"
                     } ${logoFiles[index] ? "" : "bg-zinc-800"}`}
-                    onClick={() => handleLogoSelect(index)}
+                    onClick={(): void => handleLogoSelect(index)}
                   >
                     {logoFiles[index] ? (
                       <img
@@ -526,7 +527,7 @@ export default function Hero({
               <div className="flex gap-2">
                 <div
                   data-layer="Input"
-                  className="Input flex-1 h-10 px-3 py-2 relative bg-zinc-800 rounded-lg outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                  className="Input flex-1 h-10 px-3 py-2 relative bg-zinc-800 rounded-lg outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
                 >
                   <input
                     type="text"
@@ -575,7 +576,7 @@ export default function Hero({
               </div>
               <div
                 data-layer="Input"
-                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
               >
                 <input
                   type="text"
@@ -603,7 +604,7 @@ export default function Hero({
           </div>
           <div
             data-layer="Input"
-            className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+            className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
           >
             <input
               type="text"
@@ -626,7 +627,7 @@ export default function Hero({
             <div className="flex w-full items-center gap-3">
               <div
                 data-layer="Input"
-                className="Input flex-1 h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                className="Input flex-1 h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
               >
                 <input
                   type="text"
@@ -639,7 +640,7 @@ export default function Hero({
               {formData.features.length > 1 && (
                 <button
                   type="button"
-                  onClick={() => removeFeature(index)}
+                  onClick={(): void => removeFeature(index)}
                   className="text-red-500 hover:text-red-400"
                 >
                   ✕
@@ -686,7 +687,7 @@ export default function Hero({
           >
             <div
               data-layer="Input"
-              className="Input h-14 px-4 py-3 bg-zinc-800 rounded-tl-xl rounded-bl-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 flex justify-start items-center overflow-hidden"
+              className="Input h-14 px-4 py-3 bg-zinc-800 rounded-tl-xl rounded-bl-xl outline-1 -outline-offset-0.5 outline-zinc-700 flex justify-start items-center overflow-hidden"
             >
               <div className="justify-start text-neutral-50 text-base font-normal font-['Poppins'] leading-6">
                 Save Upto
@@ -694,7 +695,7 @@ export default function Hero({
             </div>
             <div
               data-layer="Input"
-              className="Input flex-1 h-14 px-4 py-3 bg-zinc-900 outline outline-1 outline-offset-[-0.50px] outline-zinc-700 flex justify-start items-center"
+              className="Input flex-1 h-14 px-4 py-3 bg-zinc-900 outline-1 -outline-offset-0.5 outline-zinc-700 flex justify-start items-center"
             >
               <input
                 type="number"
@@ -706,7 +707,7 @@ export default function Hero({
             </div>
             <div
               data-layer="Input"
-              className="Input w-[124px] h-14 px-4 py-3 bg-zinc-800 rounded-tr-xl rounded-br-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 flex justify-between items-center overflow-hidden"
+              className="Input w-[124px] h-14 px-4 py-3 bg-zinc-800 rounded-tr-xl rounded-br-xl outline-1 -outline-offset-0.5 outline-zinc-700 flex justify-between items-center overflow-hidden"
             >
               <select
                 name="saveUptoUnit"
@@ -738,7 +739,7 @@ export default function Hero({
           >
             <div
               data-layer="Input"
-              className="Input w-[114px] h-14 px-4 py-3 bg-zinc-800 rounded-tl-xl rounded-bl-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 flex justify-start items-center overflow-hidden"
+              className="Input w-[114px] h-14 px-4 py-3 bg-zinc-800 rounded-tl-xl rounded-bl-xl outline-1 -outline-offset-0.5 outline-zinc-700 flex justify-start items-center overflow-hidden"
             >
               <div className="justify-start text-neutral-50 text-base font-normal font-['Poppins'] leading-6">
                 Discount
@@ -746,7 +747,7 @@ export default function Hero({
             </div>
             <div
               data-layer="Input"
-              className="Input flex-1 h-14 px-4 py-3 bg-zinc-900 outline outline-1 outline-offset-[-0.50px] outline-zinc-700 flex justify-start items-center"
+              className="Input flex-1 h-14 px-4 py-3 bg-zinc-900 outline-1 -outline-offset-0.5 outline-zinc-700 flex justify-start items-center"
             >
               <input
                 type="number"
@@ -758,7 +759,7 @@ export default function Hero({
             </div>
             <div
               data-layer="Input"
-              className="Input w-[124px] h-14 px-4 py-3 bg-zinc-800 rounded-tr-xl rounded-br-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 flex justify-between items-center overflow-hidden"
+              className="Input w-[124px] h-14 px-4 py-3 bg-zinc-800 rounded-tr-xl rounded-br-xl outline-1 -outline-offset-0.5 outline-zinc-700 flex justify-between items-center overflow-hidden"
             >
               <select
                 name="discountUnit"
@@ -790,7 +791,7 @@ export default function Hero({
             </div>
             <div
               data-layer="Input"
-              className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+              className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
             >
               <input
                 type="text"
@@ -821,7 +822,7 @@ export default function Hero({
             </div>
             <div
               data-layer="Input"
-              className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+              className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
             >
               <input
                 type="url"
@@ -852,7 +853,7 @@ export default function Hero({
             </div>
             <div
               data-layer="Input"
-              className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+              className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
             >
               <input
                 type="text"
@@ -883,7 +884,7 @@ export default function Hero({
             </div>
             <div
               data-layer="Input"
-              className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+              className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
             >
               <input
                 type="url"

@@ -1,3 +1,4 @@
+import { type ReactElement } from "react";
 import React from "react";
 
 interface PickProps {
@@ -19,7 +20,7 @@ const Pick: React.FC<PickProps> = ({
   rating,
   verified = false,
 }) => {
-  const SlackIcon = () => (
+  const SlackIcon = (): ReactElement=> (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
       <rect width="32" height="32" rx="7" fill="#4A154B" />
       <path
@@ -41,7 +42,7 @@ const Pick: React.FC<PickProps> = ({
     </svg>
   );
 
-  const VerifyIcon = () => (
+  const VerifyIcon = (): ReactElement=> (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="24"
@@ -58,7 +59,7 @@ const Pick: React.FC<PickProps> = ({
     </svg>
   );
 
-  const StarIcon = () => (
+  const StarIcon = (): ReactElement=> (
     <svg width="18" height="17" viewBox="0 0 18 17" fill="none">
       <path
         d="M9 0L11.0206 6.21885H17.5595L12.2694 10.0623L14.2901 16.2812L9 12.4377L3.70993 16.2812L5.73056 10.0623L0.440492 6.21885H6.97938L9 0Z"
@@ -69,7 +70,7 @@ const Pick: React.FC<PickProps> = ({
 
   return (
     <div
-      className="flex flex-col items-center flex-shrink-0 w-full h-full"
+      className="flex flex-col items-center shrink-0 w-full h-full"
       style={{
         borderRadius: "24px",
         border: "1px solid rgba(255, 255, 255, 0.08)",
@@ -166,7 +167,7 @@ const Pick: React.FC<PickProps> = ({
 
         {/* Redeem Button */}
         <button
-          className="flex-1 flex items-center justify-center px-3 py-2 rounded-full text-[#09090B] hover:text-white text-base bg-[#FAFAFA] hover:bg-gradient-to-b hover:from-[#501BD6] hover:to-[#7F57E2] transition-all duration-200"
+          className="flex-1 flex items-center justify-center px-3 py-2 rounded-full text-[#09090B] hover:text-white text-base bg-[#FAFAFA] hover:bg-linear-to-b hover:from-[#501BD6] hover:to-[#7F57E2] transition-all duration-200"
           style={{
             fontFamily: "Poppins",
             lineHeight: "24px",

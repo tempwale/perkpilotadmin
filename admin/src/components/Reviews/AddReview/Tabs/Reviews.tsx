@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import {useState, type ReactElement} from "react";
 import { GripVertical, Trash2, Plus, Star, Camera } from "lucide-react";
 
 interface Review {
@@ -20,7 +20,7 @@ interface ReviewsProps {
 export default function Reviews({
   initialReviews,
   onReviewsChange,
-}: ReviewsProps) {
+}: ReviewsProps): ReactElement{
   const [isEnabled, setIsEnabled] = useState<boolean>(true);
   const [reviews, setReviews] = useState<Review[]>(
     initialReviews || [
@@ -55,7 +55,7 @@ export default function Reviews({
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onloadend = (): void => {
         const updatedReviews = reviews.map((review) =>
           review.id === id
             ? { ...review, profileImage: reader.result as string }
@@ -96,7 +96,7 @@ export default function Reviews({
   };
 
   const deleteReview = (id: number): void => {
-    const updatedReviews = reviews.filter((review) => review.id !== id);
+    const updatedReviews = reviews.filter((review): boolean => review.id !== id);
     updateReviews(updatedReviews);
   };
 
@@ -121,7 +121,7 @@ export default function Reviews({
   };
 
   return (
-    <div className="w-full max-w-[1068px] py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-700 flex flex-col gap-4">
+    <div className="w-full max-w-[1068px] py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 flex flex-col gap-4">
       {/* Header */}
       <div
         data-layer="Row"
@@ -151,7 +151,7 @@ export default function Reviews({
         >
           <button
             onClick={handleToggle}
-            className="Button w-[53.33px] h-7 relative bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline outline-1 outline-offset-[-1px] outline-[#501bd6] overflow-hidden transition-all"
+            className="Button w-[53.33px] h-7 relative bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden transition-all"
             aria-label={isEnabled ? "Disable reviews" : "Enable reviews"}
           >
             <div
@@ -161,7 +161,7 @@ export default function Reviews({
             />
           </button>
           <button
-            onClick={() => {}}
+            onClick={(): void => {}}
             className="hover:opacity-70 transition-opacity"
             aria-label="Delete section"
           >
@@ -175,7 +175,7 @@ export default function Reviews({
         {reviews.map((review) => (
           <div
             key={review.id}
-            className="w-full py-6 px-6 bg-zinc-800 rounded-2xl outline outline-1 outline-zinc-700 flex gap-6"
+            className="w-full py-6 px-6 bg-zinc-800 rounded-2xl outline-1 outline-zinc-700 flex gap-6"
           >
             {/* Drag Handle and Profile Avatar */}
             <div className="flex flex-col items-center gap-3">
@@ -236,7 +236,7 @@ export default function Reviews({
                       handleReviewerNameChange(review.id, e.target.value)
                     }
                     placeholder="Name"
-                    className="h-12 px-6 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-zinc-500"
+                    className="h-12 px-6 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-zinc-500"
                   />
                 </div>
 
@@ -255,7 +255,7 @@ export default function Reviews({
                       handleCompanyPositionChange(review.id, e.target.value)
                     }
                     placeholder="Occupation"
-                    className="h-12 px-6 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-zinc-500"
+                    className="h-12 px-6 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-zinc-500"
                   />
                 </div>
               </div>
@@ -266,7 +266,7 @@ export default function Reviews({
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       key={star}
-                      onClick={() => handleRatingChange(review.id, star)}
+                      onClick={(): void => handleRatingChange(review.id, star)}
                       className="hover:scale-110 transition-transform"
                       aria-label={`Rate ${star} stars`}
                     >
@@ -298,14 +298,14 @@ export default function Reviews({
                   }
                   placeholder="Review in Detail..."
                   rows={3}
-                  className="px-6 py-3 bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-zinc-500 resize-none"
+                  className="px-6 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-zinc-500 resize-none"
                 />
               </div>
             </div>
 
             {/* Delete Button */}
             <button
-              onClick={() => deleteReview(review.id)}
+              onClick={(): void => deleteReview(review.id)}
               className="self-start hover:opacity-70 transition-opacity"
               aria-label={`Delete review ${review.id}`}
             >

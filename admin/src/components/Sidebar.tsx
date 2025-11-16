@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactElement } from "react";
 import {
   Grid,
   Briefcase,
@@ -25,11 +25,11 @@ export default function Sidebar({
   onNavigate,
   onLogout,
   initialActive = "dashboard",
-}: SidebarProps) {
-  const [active, setActive] = useState(initialActive);
+}: SidebarProps): ReactElement {
+  const [active, setActive] = useState<string>(initialActive);
   const [darkMode, setDarkMode] = useState(true);
 
-  const handleNav = (key: string) => {
+  const handleNav = (key: string): void => {
     setActive(key);
     if (onNavigate) {
       onNavigate(key);
@@ -37,13 +37,13 @@ export default function Sidebar({
       // fallback navigation: update the hash so pages can respond
       try {
         window.location.hash = `#${key}`;
-      } catch (e) {
+      } catch {
         /* noop in non-browser envs */
       }
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     onLogout?.();
   };
 
@@ -62,7 +62,7 @@ export default function Sidebar({
           <div className="flex items-center gap-4">
             <div
               data-layer="Ellipse 6048"
-              className="Ellipse6048 w-10 h-10 bg-gradient-to-b from-[#501bd6] to-[#7f57e3] rounded-full flex items-center justify-center"
+              className="Ellipse6048 w-10 h-10 bg-linear-to-b from-[#501bd6] to-[#7f57e3] rounded-full flex items-center justify-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -93,10 +93,10 @@ export default function Sidebar({
         >
           <button
             data-layer="Side Menu"
-            onClick={() => handleNav("dashboard")}
+            onClick={(): void => handleNav("dashboard")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex justify-start items-center gap-3 ${
               active === "dashboard"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -113,10 +113,10 @@ export default function Sidebar({
 
           <button
             data-layer="Side Menu"
-            onClick={() => handleNav("site-management")}
+            onClick={(): void => handleNav("site-management")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "site-management"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -133,10 +133,10 @@ export default function Sidebar({
 
           <button
             data-layer="Side Menu"
-            onClick={() => handleNav("reviews")}
+            onClick={(): void => handleNav("reviews")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "reviews"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -153,10 +153,10 @@ export default function Sidebar({
 
           <button
             data-layer="Side Menu"
-            onClick={() => handleNav("comparisons")}
+            onClick={(): void => handleNav("comparisons")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "comparisons"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -173,10 +173,10 @@ export default function Sidebar({
 
           <button
             data-layer="Side Menu"
-            onClick={() => handleNav("blogs")}
+            onClick={(): void => handleNav("blogs")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "blogs"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -193,10 +193,10 @@ export default function Sidebar({
 
           <button
             data-layer="Side Menu"
-            onClick={() => handleNav("deals")}
+            onClick={(): void => handleNav("deals")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "deals"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -213,10 +213,10 @@ export default function Sidebar({
 
           <button
             data-layer="Side Menu"
-            onClick={() => handleNav("stacks")}
+            onClick={(): void => handleNav("stacks")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "stacks"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -233,10 +233,10 @@ export default function Sidebar({
 
           <button
             data-layer="Side Menu"
-            onClick={() => handleNav("analytics")}
+            onClick={(): void => handleNav("analytics")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "analytics"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -253,10 +253,10 @@ export default function Sidebar({
 
           <button
             data-layer="Side Menu"
-            onClick={() => handleNav("users")}
+            onClick={(): void => handleNav("users")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "users"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -273,7 +273,7 @@ export default function Sidebar({
 
           <div
             data-layer="Line 46"
-            className="Line46 self-stretch h-0 outline outline-1 outline-offset-[-0.50px] outline-[#ebeef4]/25"
+            className="Line46 self-stretch h-0 outline-1 -outline-offset-0.5 outline-[#ebeef4]/25"
           />
 
           <div
@@ -285,10 +285,10 @@ export default function Sidebar({
 
           <button
             data-layer="Side Menu"
-            onClick={() => handleNav("settings")}
+            onClick={(): void => handleNav("settings")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "settings"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -305,10 +305,10 @@ export default function Sidebar({
 
           <button
             data-layer="Side Menu"
-            onClick={() => handleNav("support")}
+            onClick={(): void => handleNav("support")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "support"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -325,10 +325,10 @@ export default function Sidebar({
 
           <button
             data-layer="Side Menu"
-            onClick={() => handleNav("admin-management")}
+            onClick={(): void => handleNav("admin-management")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "admin-management"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -362,8 +362,8 @@ export default function Sidebar({
             </div>
             <div
               data-layer="Button"
-              className="Button w-[53.33px] h-7 relative bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline outline-1 outline-offset-[-1px] outline-[#501bd6] overflow-hidden cursor-pointer"
-              onClick={() => setDarkMode((s) => !s)}
+              className="Button w-[53.33px] h-7 relative bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden cursor-pointer"
+              onClick={(): void => setDarkMode((s) => !s)}
               role="button"
               aria-pressed={darkMode}
             >
@@ -393,7 +393,7 @@ export default function Sidebar({
 
         <div
           data-layer="Line 46"
-          className="Line46 w-[228px] h-0 left-[24px] top-[83.53px] absolute outline outline-1 outline-offset-[-0.50px] outline-zinc-800"
+          className="Line46 w-[228px] h-0 left-[24px] top-[83.53px] absolute outline-1 -outline-offset-0.5 outline-zinc-800"
         />
         <div
           data-layer="Your Quick Tabs"

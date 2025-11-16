@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactElement } from "react";
 import { Plus, Trash2 } from "lucide-react";
 
 interface ProConItem {
@@ -7,15 +7,17 @@ interface ProConItem {
   con: string;
 }
 
+import type { ProsConsCardApiResponse } from "../../../types/api.types";
+
 type Props = {
   cardNumber?: number;
-  onProsConsChange?: (prosConsData: any) => void;
+  onProsConsChange?: (prosConsData: ProsConsCardApiResponse) => void;
 };
 
 export default function ProConCard({
   cardNumber = 1,
   onProsConsChange,
-}: Props) {
+}: Props): ReactElement {
   const [titlePros, setTitlePros] = useState<string>("");
   const [titleCons, setTitleCons] = useState<string>("");
   const [items, setItems] = useState<ProConItem[]>([
@@ -26,11 +28,11 @@ export default function ProConCard({
     { id: 5, pro: "", con: "" },
   ]);
 
-  useEffect(() => {
+  useEffect((): void => {
     // Transform items to prosConsPairs format (remove id property)
     const prosConsPairs = items.map(({ pro, con }) => ({ pro, con }));
 
-    const data = {
+    const data: ProsConsCardApiResponse = {
       cardNumber,
       titlePros,
       titleCons,
@@ -39,8 +41,8 @@ export default function ProConCard({
 
     console.log(`ProConCard ${cardNumber} sending data:`, data);
 
-    onProsConsChange?.([data]);
-  }, [titlePros, titleCons, items, cardNumber]);
+    onProsConsChange?.(data);
+  }, [titlePros, titleCons, items, cardNumber, onProsConsChange]);
 
   const addItem = (): void => {
     const newItem: ProConItem = {
@@ -53,7 +55,7 @@ export default function ProConCard({
 
   const removeItem = (id: number): void => {
     if (items.length > 1) {
-      setItems(items.filter((item) => item.id !== id));
+      setItems(items.filter((item): boolean => item.id !== id));
     }
   };
 
@@ -102,7 +104,7 @@ export default function ProConCard({
           </div>
 
           {/* Items List */}
-          {items.map((item, index) => (
+          {items.map((item, index): ReactElement => (
             <div
               key={item.id}
               className="flex justify-start items-start gap-6 group"
@@ -114,7 +116,7 @@ export default function ProConCard({
                   </div>
                   {index === 0 && items.length > 1 && (
                     <button
-                      onClick={() => removeItem(item.id)}
+                      onClick={(): void => removeItem(item.id)}
                       className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-zinc-700 rounded-lg transition-all"
                       aria-label="Remove pros and cons"
                     >
@@ -123,7 +125,7 @@ export default function ProConCard({
                   )}
                   {index > 0 && (
                     <button
-                      onClick={() => removeItem(item.id)}
+                      onClick={(): void => removeItem(item.id)}
                       className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-zinc-700 rounded-lg transition-all"
                       aria-label="Remove pros and cons"
                     >

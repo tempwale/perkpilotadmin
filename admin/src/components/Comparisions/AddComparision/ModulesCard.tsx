@@ -1,5 +1,5 @@
 import { GripVertical, PlusIcon } from "lucide-react";
-import { useState } from "react";
+import { useState , type ReactElement} from "react";
 
 type ModulesCardProps = {
   initialModules?: string[];
@@ -9,17 +9,17 @@ type ModulesCardProps = {
 export default function ModulesCard({
   initialModules = ["Module Name", "Module Name", "Module Name", "Module Name"],
   onModulesChange,
-}: ModulesCardProps) {
+}: ModulesCardProps): ReactElement{
   const [modules, setModules] = useState<string[]>(initialModules);
 
-  const handleModuleChange = (index: number, value: string) => {
+  const handleModuleChange = (index: number, value: string): void => {
     const updated = [...modules];
     updated[index] = value;
     setModules(updated);
     onModulesChange?.(updated);
   };
 
-  const handleAddModule = () => {
+  const handleAddModule = (): void => {
     const updated = [...modules, "Module Name"];
     setModules(updated);
     onModulesChange?.(updated);
@@ -36,7 +36,7 @@ export default function ModulesCard({
 
       <div
         data-layer="Row"
-        className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-700 inline-flex flex-col justify-center items-start gap-4 overflow-hidden"
+        className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 inline-flex flex-col justify-center items-start gap-4 overflow-hidden"
       >
         {/* Header */}
         <div
@@ -96,11 +96,11 @@ export default function ModulesCard({
                   Module {String(index + 1).padStart(2, "0")}
                 </div>
 
-                <div className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden">
+                <div className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden">
                   <input
                     type="text"
                     value={name}
-                    onChange={(e) => handleModuleChange(index, e.target.value)}
+                    onChange={(e): void => handleModuleChange(index, e.target.value)}
                     className="w-full bg-transparent text-zinc-400 text-base font-normal font-['Poppins'] leading-6 outline-none"
                   />
                 </div>
