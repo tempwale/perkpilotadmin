@@ -259,7 +259,7 @@ export default function DealCard({
         </button>
         <button
           onClick={onGetDeal}
-          className="group bg-white hover:bg-gradient-to-b hover:from-[#501BD6] hover:to-[#7F57E2] box-border content-stretch flex flex-[1_0_0] items-center justify-center min-h-px min-w-px px-[12px] py-[8px] relative rounded-[100px] shrink-0 transition-all duration-200"
+          className="group bg-white hover:bg-linear-to-b hover:from-[#501BD6] hover:to-[#7F57E2] box-border content-stretch flex flex-[1_0_0] items-center justify-center min-h-px min-w-px px-[12px] py-[8px] relative rounded-[100px] shrink-0 transition-all duration-200"
           data-name="All Assets"
           data-node-id="1:1691"
         >

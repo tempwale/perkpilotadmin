@@ -13,14 +13,14 @@ type Props = {
   onUseCasesChange?: (useCases: UseCase[]) => void;
 };
 
-export default function BestUseCase({ initialUseCases, onUseCasesChange }: Props = {}) {
+export default function BestUseCase({ initialUseCases, onUseCasesChange }: Props = {}): ReactElement {
   const [useCases, setUseCases] = useState<UseCase[]>(
     initialUseCases || [
       { id: 1, title: "", description: "" },
     ]
   );
 
-  const updateUseCasesState = (newUseCases: UseCase[]) => {
+  const updateUseCasesState = (newUseCases: UseCase[]): void => {
     setUseCases(newUseCases);
     onUseCasesChange?.(newUseCases);
   };
@@ -34,7 +34,7 @@ export default function BestUseCase({ initialUseCases, onUseCasesChange }: Props
     updateUseCasesState([...useCases, newUseCase]);
   };
 
-  const deleteUseCase = (id: number) => {
+  const deleteUseCase = (id: number): void => {
     updateUseCasesState(useCases.filter((useCase) => useCase.id !== id));
   };
 
@@ -42,7 +42,7 @@ export default function BestUseCase({ initialUseCases, onUseCasesChange }: Props
     id: number,
     field: keyof Omit<UseCase, "id">,
     value: string
-  ) => {
+  ): void => {
     updateUseCasesState(
       useCases.map((useCase) =>
         useCase.id === id ? { ...useCase, [field]: value } : useCase

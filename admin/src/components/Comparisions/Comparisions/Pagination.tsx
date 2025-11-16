@@ -84,7 +84,7 @@ export default function Pagination({
             onClick={(): void => onPageChange(pageNumber)}
             className={`box-border content-stretch flex flex-col items-center justify-center px-[12px] py-[8px] relative rounded-[8px] shrink-0 transition-colors hover:opacity-80 ${
               isCurrentPage
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : "bg-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.12)]"
             }`}
           >

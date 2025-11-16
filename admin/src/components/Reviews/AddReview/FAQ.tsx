@@ -14,7 +14,7 @@ type Props = {
   onFaqsChange?: (faqs: Array<{ question: string; answer: string }>) => void;
 };
 
-export default function FAQ({ initialFaqs, onFaqsChange }: Props = {}) {
+export default function FAQ({ initialFaqs, onFaqsChange }: Props = {}): ReactElement {
   const [faqs, setFaqs] = useState<FaqItem[]>(
     initialFaqs?.map((faq, idx) => ({
       id: idx + 1,
@@ -27,7 +27,7 @@ export default function FAQ({ initialFaqs, onFaqsChange }: Props = {}) {
     ]
   );
 
-  const updateFaqs = (newFaqs: FaqItem[]) => {
+  const updateFaqs = (newFaqs: FaqItem[]): void => {
     setFaqs(newFaqs);
     onFaqsChange?.(newFaqs.map(f => ({
       question: f.question,
@@ -35,19 +35,19 @@ export default function FAQ({ initialFaqs, onFaqsChange }: Props = {}) {
     })));
   };
 
-  const handleQuestionChange = (id: number, value: string) => {
+  const handleQuestionChange = (id: number, value: string): void => {
     updateFaqs(
       faqs.map((faq) => (faq.id === id ? { ...faq, question: value } : faq))
     );
   };
 
-  const handleAnswerChange = (id: number, value: string) => {
+  const handleAnswerChange = (id: number, value: string): void => {
     updateFaqs(
       faqs.map((faq) => (faq.id === id ? { ...faq, answer: value } : faq))
     );
   };
 
-  const deleteFaq = (id: number) => {
+  const deleteFaq = (id: number): void => {
     updateFaqs(faqs.filter((faq) => faq.id !== id));
   };
 

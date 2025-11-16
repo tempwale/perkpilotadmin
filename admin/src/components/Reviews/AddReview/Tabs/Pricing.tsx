@@ -157,7 +157,7 @@ export default function Pricing({
         >
           <button
             onClick={handleToggle}
-            className="Button w-[53.33px] h-7 relative bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden transition-all"
+            className="Button w-[53.33px] h-7 relative bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden transition-all"
             aria-label={isEnabled ? "Disable pricing" : "Enable pricing"}
           >
             <div

@@ -4,18 +4,20 @@ import {
   type ChangeEvent,
   type FormEvent,
   type KeyboardEvent,
+  type ReactElement,
 } from "react";
 import { fetchLogoByDomain } from "../../../utils/LogoFetch";
+import type { ReviewApiResponse } from "../../../types/api.types";
 
 type Props = {
-  reviewData?: any;
-  updateReviewData?: (updates: any) => void;
+  reviewData?: ReviewApiResponse;
+  updateReviewData?: (updates: Partial<ReviewApiResponse>) => void;
 };
 
 export default function ToolReviewForm({
   reviewData,
   updateReviewData,
-}: Props = {}) {
+}: Props = {}): ReactElement {
   type FormDataShape = {
     toolName: string;
     toolCategory: string;
@@ -82,9 +84,9 @@ export default function ToolReviewForm({
   const [logoFetchError, setLogoFetchError] = useState<string | null>(null);
 
   // Sync all form data to parent's reviewData
-  useEffect(() => {
+  useEffect((): void => {
     if (updateReviewData) {
-      const updates: any = {};
+      const updates: Partial<ReviewApiResponse> = {};
 
       // Basic product info
       if (formData.toolName) updates.productName = formData.toolName;
@@ -229,7 +231,7 @@ export default function ToolReviewForm({
   };
 
   // Handle logo fetch from domain
-  const handleFetchLogo = async () => {
+  const handleFetchLogo = async (): Promise<void> => {
     if (!logoFetchUrl.trim()) {
       setLogoFetchError("Please enter a domain or company name");
       return;
@@ -432,7 +434,7 @@ export default function ToolReviewForm({
               <div className="flex gap-2">
                 <div
                   data-layer="Input"
-                  className="Input flex-1 h-10 px-3 py-2 relative bg-zinc-800 rounded-lg outline outline-1 outline-offset-[-0.50px] outline-zinc-700 inline-flex justify-start items-center"
+                  className="Input flex-1 h-10 px-3 py-2 relative bg-zinc-800 rounded-lg outline-1 outline-offset-[-0.5px] outline-zinc-700 inline-flex justify-start items-center"
                 >
                   <input
                     type="text"

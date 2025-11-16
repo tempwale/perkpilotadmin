@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, type ReactElement } from "react";
+import type { ReviewApiResponse, UseCaseApiResponse } from "../../types/api.types";
 import Hero from "../../components/Reviews/AddReview/Hero";
 import Header from "../../components/Reviews/AddReview/Header";
 import Tabs from "../../components/Reviews/AddReview/Tabs";
@@ -10,9 +11,9 @@ import FAQ from "../../components/Reviews/AddReview/FAQ";
 import FooterActions from "../../components/Reviews/AddReview/FooterActions";
 import { REVIEWS_API } from "../../config/backend";
 
-export default function AddReviewPage() {
+export default function AddReviewPage(): ReactElement {
   // Main review state matching backend schema
-  const [reviewData, setReviewData] = useState({
+  const [reviewData, setReviewData] = useState<ReviewApiResponse>({
     // User/Author Info (with test data)
     userName: "John Smith",
     userTitle: "Senior Product Manager",
@@ -83,12 +84,12 @@ export default function AddReviewPage() {
   });
 
   // Handler for child components to update state
-  const updateReviewData = (updates: Partial<typeof reviewData>) => {
+  const updateReviewData = (updates: Partial<ReviewApiResponse>): void => {
     setReviewData((prev) => ({ ...prev, ...updates }));
   };
 
   // Submit handler
-  const handleSaveAndPublish = async () => {
+  const handleSaveAndPublish = async (): Promise<void> => {
     console.log("=== SAVING REVIEW ===");
     console.log("Review Data:", JSON.stringify(reviewData, null, 2));
 
@@ -118,24 +119,25 @@ export default function AddReviewPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = await response.json().catch(() => ({})) as { message?: string };
         throw new Error(
           errorData.message || `Server error: ${response.status}`
         );
       }
 
-      const result = await response.json();
+      const result = await response.json() as ReviewApiResponse;
       console.log("Review created successfully:", result);
       alert("Review published successfully!");
       // Navigate to reviews list or show success message
       // navigate("/reviews");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error saving review:", error);
-      alert(`Failed to save review: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      alert(`Failed to save review: ${errorMessage}`);
     }
   };
 
-  const handleSaveDraft = () => {
+  const handleSaveDraft = (): void => {
     console.log("Saving draft:", reviewData);
     alert("Draft saved locally (implement backend draft endpoint)");
   };
@@ -149,7 +151,11 @@ export default function AddReviewPage() {
       <Hero reviewData={reviewData} updateReviewData={updateReviewData} />
       <Tabs reviewData={reviewData} updateReviewData={updateReviewData} />
       <RatingBreakdown 
-        initialCategories={reviewData.ratingCategories}
+        initialCategories={reviewData.ratingCategories ? reviewData.ratingCategories.map((cat) => ({
+          category: cat.category,
+          value: cat.value,
+          outOf: cat.outOf ?? 5, // Default to 5 if undefined
+        })) : undefined}
         onCategoriesChange={(categories) => {
           updateReviewData({ ratingCategories: categories });
         }}
@@ -165,12 +171,12 @@ export default function AddReviewPage() {
         }}
       />
       <BestUseCase
-        initialUseCases={reviewData.useCases?.map((uc: any, idx: number) => ({
+        initialUseCases={reviewData.useCases ? reviewData.useCases.map((uc: UseCaseApiResponse, idx: number) => ({
           id: idx + 1,
           title: uc.title,
-          description: uc.description,
+          description: uc.description ?? "", // Default to empty string if undefined
           rating: uc.rating,
-        }))}
+        })) : undefined}
         onUseCasesChange={(useCases) => {
           updateReviewData({
             useCases: useCases.map((uc) => ({
@@ -196,7 +202,12 @@ export default function AddReviewPage() {
         placeholder="Search & Add Popular Integrations"
       />
       <FAQ 
-        initialFaqs={reviewData.faqs}
+        initialFaqs={reviewData.faqs ? reviewData.faqs.filter((faq) => 
+          typeof faq.question === "string" && typeof faq.answer === "string"
+        ).map((faq) => ({
+          question: faq.question ?? "",
+          answer: faq.answer ?? "",
+        })) : undefined}
         onFaqsChange={(faqs) => {
           updateReviewData({ faqs });
         }}

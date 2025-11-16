@@ -16,7 +16,7 @@ type Props = {
   onCategoriesChange?: (categories: Array<{ category: string; value: number; outOf: number }>) => void;
 };
 
-export default function RatingBreakdown({ initialCategories, onCategoriesChange }: Props = {}) {
+export default function RatingBreakdown({ initialCategories, onCategoriesChange }: Props = {}): ReactElement {
   const [isEnabled, setIsEnabled] = useState(true);
   const [title, setTitle] = useState("Rating Breakdown");
 
@@ -42,7 +42,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
     ]
   );
 
-  const updateFeatures = (newFeatures: Feature[]) => {
+  const updateFeatures = (newFeatures: Feature[]): void => {
     setFeatures(newFeatures);
     onCategoriesChange?.(newFeatures.map(f => ({
       category: f.name,
@@ -51,7 +51,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
     })));
   };
 
-  const handleFeatureNameChange = (id: number, value: string) => {
+  const handleFeatureNameChange = (id: number, value: string): void => {
     updateFeatures(
       features.map((feature) =>
         feature.id === id ? { ...feature, name: value } : feature
@@ -59,7 +59,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
     );
   };
 
-  const handleRatingChange = (id: number, rating: number) => {
+  const handleRatingChange = (id: number, rating: number): void => {
     updateFeatures(
       features.map((feature) =>
         feature.id === id ? { ...feature, rating } : feature
@@ -67,7 +67,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
     );
   };
 
-  const handleMinScoreChange = (id: number, value: string) => {
+  const handleMinScoreChange = (id: number, value: string): void => {
     updateFeatures(
       features.map((feature) =>
         feature.id === id ? { ...feature, minScore: value } : feature
@@ -75,7 +75,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
     );
   };
 
-  const handleMaxScoreChange = (id: number, value: string) => {
+  const handleMaxScoreChange = (id: number, value: string): void => {
     updateFeatures(
       features.map((feature) =>
         feature.id === id ? { ...feature, maxScore: value } : feature
@@ -83,7 +83,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
     );
   };
 
-  const deleteFeature = (id: number) => {
+  const deleteFeature = (id: number): void => {
     updateFeatures(features.filter((feature) => feature.id !== id));
   };
 
@@ -127,7 +127,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
         >
           <button
             onClick={(): void => setIsEnabled(!isEnabled)}
-            className="w-[53.33px] h-7 relative bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden transition-all"
+            className="w-[53.33px] h-7 relative bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden transition-all"
           >
             <div
               className={`w-[23.33px] h-[22.67px] absolute bg-white rounded-[66.67px] transition-all top-[2.67px] ${

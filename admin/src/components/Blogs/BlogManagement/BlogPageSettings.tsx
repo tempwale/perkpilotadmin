@@ -72,7 +72,7 @@ export default function BlogPageSettings({ status, onToggle }: Props): ReactElem
             <div
               className={`absolute inset-0 transition-colors duration-150 rounded-[66.67px] ${
                 isLive
-                  ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                  ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                   : "bg-zinc-700"
               }`}
             />

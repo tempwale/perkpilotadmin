@@ -10,42 +10,42 @@ type Props = {
   onConsChange?: (cons: string[]) => void;
 };
 
-export default function ProsCons({ initialPros, initialCons, onProsChange, onConsChange }: Props = {}) {
+export default function ProsCons({ initialPros, initialCons, onProsChange, onConsChange }: Props = {}): ReactElement {
   const [isEnabled, setIsEnabled] = useState(true);
   const [pros, setPros] = useState<string[]>(initialPros || [""]);
   const [cons, setCons] = useState<string[]>(initialCons || [""]);
 
-  const addPro = () => {
+  const addPro = (): void => {
     const newPros = [...pros, ""];
     setPros(newPros);
     onProsChange?.(newPros);
   };
 
-  const addCon = () => {
+  const addCon = (): void => {
     const newCons = [...cons, ""];
     setCons(newCons);
     onConsChange?.(newCons);
   };
 
-  const deletePro = (index: number) => {
+  const deletePro = (index: number): void => {
     const newPros = pros.filter((_, i) => i !== index);
     setPros(newPros);
     onProsChange?.(newPros);
   };
 
-  const deleteCon = (index: number) => {
+  const deleteCon = (index: number): void => {
     const newCons = cons.filter((_, i) => i !== index);
     setCons(newCons);
     onConsChange?.(newCons);
   };
 
-  const updatePro = (index: number, value: string) => {
+  const updatePro = (index: number, value: string): void => {
     const newPros = pros.map((pro, i) => (i === index ? value : pro));
     setPros(newPros);
     onProsChange?.(newPros);
   };
 
-  const updateCon = (index: number, value: string) => {
+  const updateCon = (index: number, value: string): void => {
     const newCons = cons.map((con, i) => (i === index ? value : con));
     setCons(newCons);
     onConsChange?.(newCons);
@@ -65,7 +65,7 @@ export default function ProsCons({ initialPros, initialCons, onProsChange, onCon
 
       <div
         data-layer="Row"
-        className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline outline-1 outline-offset-[-1px] outline-zinc-700 flex flex-col justify-center items-start gap-4 overflow-hidden"
+        className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 flex flex-col justify-center items-start gap-4 overflow-hidden"
       >
         {/* Header */}
         <div
@@ -96,7 +96,7 @@ export default function ProsCons({ initialPros, initialCons, onProsChange, onCon
             <button
               onClick={() => setIsEnabled(!isEnabled)}
               data-layer="Button"
-              className="Button w-[53.33px] h-7 relative bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline outline-1 outline-offset-[-1px] outline-[#501bd6] overflow-hidden"
+              className="Button w-[53.33px] h-7 relative bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden"
             >
               <div
                 data-layer="Button"
@@ -142,7 +142,7 @@ export default function ProsCons({ initialPros, initialCons, onProsChange, onCon
                   onChange={(e) => updatePro(index, e.target.value)}
                   placeholder={`Pro ${index + 1}`}
                   data-layer="Input"
-                  className="Input flex-1 h-12 pl-6 pr-4 py-3 bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-2 focus:outline-[#501bd6]"
+                  className="Input flex-1 h-12 pl-6 pr-4 py-3 bg-zinc-900 rounded-xl outline-1 outline-offset-[-0.5px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-2 focus:outline-[#501bd6]"
                 />
                 {pros.length > 1 && (
                   <button
@@ -186,7 +186,7 @@ export default function ProsCons({ initialPros, initialCons, onProsChange, onCon
                   onChange={(e) => updateCon(index, e.target.value)}
                   placeholder={`Con ${index + 1}`}
                   data-layer="Input"
-                  className="Input flex-1 h-12 pl-6 pr-4 py-3 bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-2 focus:outline-[#501bd6]"
+                  className="Input flex-1 h-12 pl-6 pr-4 py-3 bg-zinc-900 rounded-xl outline-1 outline-offset-[-0.5px] outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-2 focus:outline-[#501bd6]"
                 />
                 {cons.length > 1 && (
                   <button

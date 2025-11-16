@@ -244,7 +244,7 @@ export default function UploadIcon({ onImageChange }: Props): ReactElement{
               >
                 <div
                   data-layer="image icon"
-                  className="ImageIcon p-2 bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[100px] inline-flex flex-col justify-center items-center gap-2 overflow-hidden"
+                  className="ImageIcon p-2 bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[100px] inline-flex flex-col justify-center items-center gap-2 overflow-hidden"
                 >
                   <div
                     data-layer="Vector"
@@ -304,7 +304,7 @@ export default function UploadIcon({ onImageChange }: Props): ReactElement{
               <div className="Frame1171275749 flex-1 inline-flex flex-col justify-start items-start gap-1">
                 <div className="w-full bg-neutral-50 rounded h-1.5 overflow-hidden">
                   <div
-                    className="h-1.5 bg-gradient-to-b from-[#501bd6] to-[#7f57e2] transition-all"
+                    className="h-1.5 bg-linear-to-b from-[#501bd6] to-[#7f57e2] transition-all"
                     style={{
                       width:
                         progress != null

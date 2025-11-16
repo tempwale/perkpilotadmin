@@ -34,7 +34,7 @@ export default function DealManagementHeader({
             <button
               type="button"
               onClick={(): void => onSave && onSave()}
-              className="flex-1 h-12 px-3 py-2 bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-xl flex justify-center items-center text-neutral-50 text-base transition-transform duration-150 ease-in-out hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[#7f57e2] active:scale-100"
+              className="flex-1 h-12 px-3 py-2 bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-xl flex justify-center items-center text-neutral-50 text-base transition-transform duration-150 ease-in-out hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[#7f57e2] active:scale-100"
             >
               Save & Publish
             </button>

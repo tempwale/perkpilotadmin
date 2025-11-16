@@ -3,6 +3,7 @@ import ComparisionPageSettings from "../../components/Comparisions/ComparisionMa
 import HeroSectionManagement from "../../components/Comparisions/ComparisionManagement/HeroSectionManagement";
 import ArticleGrid from "../../components/Comparisions/ComparisionManagement/ArticleGrid";
 import FooterActions from "../../components/Comparisions/ComparisionManagement/FooterActions";
+import { type ReactElement } from "react";
 
 export default function ComparisionManagementPage(): ReactElement{
   return (

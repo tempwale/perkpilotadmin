@@ -69,10 +69,10 @@ export default function TagChips({
           {internalTags.map((t) => (
             <div
               key={t}
-              className="px-4 py-2 bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[100px] flex items-center gap-2.5"
+              className="px-4 py-2 bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[100px] flex items-center gap-2.5"
             >
               <div className="text-neutral-50 text-xs font-medium">{t}</div>
-              <div className="w-4 h-4 relative flex items-center justify-left">
+              <div className="w-4 h-4 relative flex items-center justify-start">
                 <button
                   type="button"
                   onClick={(): void => {

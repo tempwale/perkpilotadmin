@@ -1,6 +1,6 @@
 "use client";
 
-import {useState, useRef, type FormEvent, ReactElement} from "react";
+import {useState, useRef, type FormEvent, type ReactElement} from "react";
 import {
   GripVertical,
   Trash2,
@@ -28,7 +28,7 @@ type Props = {
   onOverviewChange?: (overview: string) => void;
 };
 
-export default function Overview({ initialOverview, onOverviewChange }: Props = {}) {
+export default function Overview({ initialOverview, onOverviewChange }: Props = {}): ReactElement {
   const [isEnabled, setIsEnabled] = useState(true);
   const [fontSize, setFontSize] = useState(16);
   const [content, setContent] = useState(
@@ -87,7 +87,7 @@ export default function Overview({ initialOverview, onOverviewChange }: Props = 
         <div className="Column self-stretch px-6 py-3 border-b border-zinc-700 flex justify-start items-center gap-4">
           <button
             onClick={handleToggle}
-            className="Button w-[53.33px] h-7 relative bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden cursor-pointer transition-opacity hover:opacity-90"
+            className="Button w-[53.33px] h-7 relative bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden cursor-pointer transition-opacity hover:opacity-90"
             aria-label="Toggle content"
           >
             <div

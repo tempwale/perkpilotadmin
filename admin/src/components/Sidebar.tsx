@@ -62,7 +62,7 @@ export default function Sidebar({
           <div className="flex items-center gap-4">
             <div
               data-layer="Ellipse 6048"
-              className="Ellipse6048 w-10 h-10 bg-gradient-to-b from-[#501bd6] to-[#7f57e3] rounded-full flex items-center justify-center"
+              className="Ellipse6048 w-10 h-10 bg-linear-to-b from-[#501bd6] to-[#7f57e3] rounded-full flex items-center justify-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -96,7 +96,7 @@ export default function Sidebar({
             onClick={(): void => handleNav("dashboard")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex justify-start items-center gap-3 ${
               active === "dashboard"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -116,7 +116,7 @@ export default function Sidebar({
             onClick={(): void => handleNav("site-management")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "site-management"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -136,7 +136,7 @@ export default function Sidebar({
             onClick={(): void => handleNav("reviews")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "reviews"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -156,7 +156,7 @@ export default function Sidebar({
             onClick={(): void => handleNav("comparisons")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "comparisons"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -176,7 +176,7 @@ export default function Sidebar({
             onClick={(): void => handleNav("blogs")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "blogs"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -196,7 +196,7 @@ export default function Sidebar({
             onClick={(): void => handleNav("deals")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "deals"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -216,7 +216,7 @@ export default function Sidebar({
             onClick={(): void => handleNav("stacks")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "stacks"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -236,7 +236,7 @@ export default function Sidebar({
             onClick={(): void => handleNav("analytics")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "analytics"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -256,7 +256,7 @@ export default function Sidebar({
             onClick={(): void => handleNav("users")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "users"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -288,7 +288,7 @@ export default function Sidebar({
             onClick={(): void => handleNav("settings")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "settings"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -308,7 +308,7 @@ export default function Sidebar({
             onClick={(): void => handleNav("support")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "support"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -328,7 +328,7 @@ export default function Sidebar({
             onClick={(): void => handleNav("admin-management")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
               active === "admin-management"
-                ? "bg-gradient-to-b from-[#501bd6] to-[#7f57e2]"
+                ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
@@ -362,7 +362,7 @@ export default function Sidebar({
             </div>
             <div
               data-layer="Button"
-              className="Button w-[53.33px] h-7 relative bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden cursor-pointer"
+              className="Button w-[53.33px] h-7 relative bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden cursor-pointer"
               onClick={(): void => setDarkMode((s) => !s)}
               role="button"
               aria-pressed={darkMode}

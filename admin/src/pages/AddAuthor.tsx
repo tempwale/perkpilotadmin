@@ -310,7 +310,7 @@ export default function AddAuthor(): ReactElement {
                 void handleSave();
               }}
               disabled={uploading || saving}
-              className="flex-1 h-12 px-3 py-2 bg-gradient-to-b from-[#501bd6] to-[#7f57e2] rounded-lg flex justify-center items-center transition-transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 h-12 px-3 py-2 bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-lg flex justify-center items-center transition-transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span className="text-white text-base font-normal font-['Poppins']">
                 {saving ? "Saving..." : "Save & Next"}
