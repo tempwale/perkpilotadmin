@@ -21,35 +21,40 @@ function AppContent(): ReactElement{
 
   return (
     <div className="flex min-h-screen bg-black">
-      {/* Sidebar on the left - pass navigation handler */}
+      {/* Sidebar on the left - fixed/sticky */}
       <Sidebar onNavigate={(key) => { void navigate(`/${key}`); }} />
 
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col">
-        <Header />
-        {/* You can add other content here */}
-        <div className="m-4">
-          <Routes>
-            <Route path="/addauthor" element={<AddAuthor />} />
-            <Route path="/blogs" element={<BlogManagementPage />} />
+      {/* Main content area - scrollable */}
+      <div className="flex-1 flex flex-col ml-[276px] min-h-screen">
+        {/* Sticky Header */}
+        <div className="sticky top-0 z-40">
+          <Header />
+        </div>
+        {/* Scrollable content area */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="m-4">
+            <Routes>
+              <Route path="/addauthor" element={<AddAuthor />} />
+              <Route path="/blogs" element={<BlogManagementPage />} />
 
-            <Route path="deals" element={<DealsPage />} />
-            <Route path="/dealsmanagement" element={<DealManagementPage />} />
-            <Route path="/adddeal" element={<AddDealPage />} />
-            <Route path="/updatedeal/:id" element={<UpdateDealPage />} />
+              <Route path="deals" element={<DealsPage />} />
+              <Route path="/dealsmanagement" element={<DealManagementPage />} />
+              <Route path="/adddeal" element={<AddDealPage />} />
+              <Route path="/updatedeal/:id" element={<UpdateDealPage />} />
 
-            <Route path="/comparisons" element={<ComparisionsPage />} />
-            <Route
-              path="/Comparisionsmanagement"
-              element={<ComparisionManagementPage />}
-            />
-            <Route path="/addcomparision" element={<AddComparisionPage />} />
-            <Route path="/home" element={<HomeManagementPage />} />
+              <Route path="/comparisons" element={<ComparisionsPage />} />
+              <Route
+                path="/Comparisionsmanagement"
+                element={<ComparisionManagementPage />}
+              />
+              <Route path="/addcomparision" element={<AddComparisionPage />} />
+              <Route path="/home" element={<HomeManagementPage />} />
 
-            <Route path="/addreview" element={<AddReviewPage />} />
+              <Route path="/addreview" element={<AddReviewPage />} />
 
-            <Route path="/reviews" element={<ReviewsPage />} />
-          </Routes>
+              <Route path="/reviews" element={<ReviewsPage />} />
+            </Routes>
+          </div>
         </div>
       </div>
     </div>

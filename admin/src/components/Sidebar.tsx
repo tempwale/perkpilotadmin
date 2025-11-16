@@ -50,10 +50,10 @@ export default function Sidebar({
   const iconClass = "w-5 h-5 text-[#ebeef4]";
 
   return (
-    <aside>
+    <aside className="fixed left-0 top-0 h-screen z-50">
       <div
         data-layer="Admin Side Bar"
-        className="AdminSideBar w-[276px] h-[5232px] relative bg-zinc-900 overflow-hidden"
+        className="AdminSideBar w-[276px] h-full relative bg-zinc-900 overflow-y-auto"
       >
         <div
           data-layer="Frame 2"
