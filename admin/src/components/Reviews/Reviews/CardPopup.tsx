@@ -10,7 +10,13 @@ export default function CardPopup({
 }: {
   onClose?: () => void;
   onDelete?: () => void;
-  deal?: ReviewApiResponse;
+  deal?: ReviewApiResponse & {
+    apiEndpoint?: string;
+    cardComponent?: ReactElement;
+    deleteTitle?: string;
+    deleteSubtitle?: string;
+    editPath?: string;
+  };
 }): ReactElement{
   const [confirmOpen, setConfirmOpen] = useState(false);
   const navigate = useNavigate();
@@ -37,17 +43,17 @@ export default function CardPopup({
           ✕
         </button>
         <div className="w-full flex items-center gap-4">
-          <div className="w-12 h-12 flex-shrink-0">
+          <div className="w-12 h-12 shrink-0">
             {deal?.logoComponent ?? (
               <div className="w-12 h-12 bg-gray-200 rounded-full" />
             )}
           </div>
           <div className="flex-1 text-left">
             <div className="text-white text-lg font-semibold">
-              {deal?.title ?? "Deal"}
+              {deal?.productName ?? "Deal"}
             </div>
             <div className="text-zinc-400 text-sm">
-              {deal?.category ?? deal?.dealType ?? ""}
+              {deal?.productType ?? deal?.dealType ?? ""}
             </div>
           </div>
         </div>
@@ -93,12 +99,14 @@ export default function CardPopup({
           >
             {confirmOpen ? (
               <DeletePopup
-                onClose={() => setConfirmOpen(false)}
-                onConfirm={() => {
+                onClose={(): void => {
+                  setConfirmOpen(false);
+                }}
+                onConfirm={(): void => {
                   onDelete?.();
                   onClose?.();
                 }}
-                deal={deal}
+                review={deal}
               />
             ) : (
               <>
@@ -125,7 +133,8 @@ export default function CardPopup({
                   className="ButtonsMain flex-1 px-10 py-4 bg-neutral-50 rounded-[100px] flex justify-center items-center gap-2"
                   onClick={(): void => {
                     if (id) {
-                      void Promise.resolve(navigate(`/updatedeal/${id}`));
+                      const editPath = deal?.editPath ?? `/updatedeal/${id}`;
+                      void Promise.resolve(navigate(editPath));
                     }
                   }}
                 >

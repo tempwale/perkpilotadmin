@@ -15,6 +15,8 @@ import UpdateDealPage from "./pages/Deal/UpdateDealPage";
 import ComparisionsPage from "./pages/Comparisions/ComparisionsPage";
 import AddAuthor from "./pages/AddAuthor";
 import ReviewsPage from "./pages/Reviews/ReviewsPage";
+import BlogsPage from "./pages/Blogs/BlogsPage";
+import AddBlogPage from "./pages/Blogs/AddBlogPage";
 
 function AppContent(): ReactElement{
   const navigate = useNavigate();
@@ -35,7 +37,10 @@ function AppContent(): ReactElement{
           <div className="m-4">
             <Routes>
               <Route path="/addauthor" element={<AddAuthor />} />
-              <Route path="/blogs" element={<BlogManagementPage />} />
+              <Route path="/blogs" element={<BlogsPage />} />
+              <Route path="/blogsmanagement" element={<BlogManagementPage />} />
+              <Route path="/addblog" element={<AddBlogPage />} />
+              <Route path="/addblog/:id" element={<AddBlogPage />} />
 
               <Route path="deals" element={<DealsPage />} />
               <Route path="/dealsmanagement" element={<DealManagementPage />} />

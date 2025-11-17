@@ -13,7 +13,7 @@ export default function AddAuthor(): ReactElement {
     authorIndustry: "",
     authorViewProfileURL: "",
     authorDescription: "",
-    authorImageURL: "", // Changed from authorImageUpload to match backend
+    authorImageURL: "",
     authorXAccount: "",
     authorIGAccount: "",
     authorLinkedinAccount: "",
@@ -42,14 +42,11 @@ export default function AddAuthor(): ReactElement {
 
     try {
       const imageUrl = await uploadToCloudinary(file);
-      console.log("✅ Cloudinary upload successful:", imageUrl);
       setFormData((prev) => ({
         ...prev,
-        authorImageURL: imageUrl, // Changed to authorImageURL to match backend
+        authorImageURL: imageUrl, 
       }));
-      console.log("✅ Author image URL saved to form data");
-    } catch (error) {
-      console.error("❌ Error uploading image:", error);
+    } catch {
       setUploadError("Failed to upload image. Please try again.");
     } finally {
       setUploading(false);
@@ -79,20 +76,8 @@ export default function AddAuthor(): ReactElement {
       return;
     }
 
-    console.log("=== SAVING AUTHOR ===");
-    console.log("Author Image URL:", formData.authorImageURL);
-    console.log("Full Form Data:", JSON.stringify(formData, null, 2));
-
     // Backend expects authorImageURL (all caps URL)
     const authorData: AuthorData = { ...formData };
-    
-    if (formData.authorImageURL && formData.authorImageURL.trim() !== '') {
-      console.log("✅ Image URL is present and will be sent:", formData.authorImageURL);
-    } else {
-      console.warn("⚠️ No image URL found in form data!");
-    }
-
-    console.log("Sending author data:", JSON.stringify(authorData, null, 2));
 
     try {
       const response = await fetch(AUTHORS_API, {
@@ -110,12 +95,10 @@ export default function AddAuthor(): ReactElement {
         );
       }
 
-      const result = await response.json() as unknown;
-      console.log("Author created successfully:", result);
+      await response.json();
       void Promise.resolve(navigate(-1));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to save author";
-      console.error("Error saving author:", error);
       setSaveError(errorMessage);
     } finally {
       setSaving(false);

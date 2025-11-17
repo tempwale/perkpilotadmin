@@ -1,4 +1,5 @@
-import { useState, type ReactElement } from "react";
+import { useState, useEffect, type ReactElement } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Grid,
   Briefcase,
@@ -21,13 +22,64 @@ type SidebarProps = {
   initialActive?: string;
 };
 
+// Map route paths to sidebar keys
+const getActiveKeyFromPath = (pathname: string): string => {
+  const path = pathname.toLowerCase();
+  
+  if (path.startsWith("/blogs") || path.startsWith("/addblog") || path.startsWith("/blogsmanagement")) {
+    return "blogs";
+  }
+  if (path.startsWith("/reviews") || path.startsWith("/addreview")) {
+    return "reviews";
+  }
+  if (path.startsWith("/comparisons") || path.startsWith("/addcomparison") || path.startsWith("/comparisonsmanagement")) {
+    return "comparisons";
+  }
+  if (path.startsWith("/deals") || path.startsWith("/adddeal") || path.startsWith("/updatedeal") || path.startsWith("/dealsmanagement")) {
+    return "deals";
+  }
+  if (path.startsWith("/home") || path.startsWith("/homemanagement")) {
+    return "site-management";
+  }
+  if (path.startsWith("/dashboard")) {
+    return "dashboard";
+  }
+  if (path.startsWith("/analytics")) {
+    return "analytics";
+  }
+  if (path.startsWith("/users")) {
+    return "users";
+  }
+  if (path.startsWith("/settings")) {
+    return "settings";
+  }
+  if (path.startsWith("/support")) {
+    return "support";
+  }
+  if (path.startsWith("/admin-management")) {
+    return "admin-management";
+  }
+  if (path.startsWith("/stacks")) {
+    return "stacks";
+  }
+  
+  return "dashboard"; 
+};
+
 export default function Sidebar({
   onNavigate,
   onLogout,
-  initialActive = "dashboard",
+  initialActive,
 }: SidebarProps): ReactElement {
-  const [active, setActive] = useState<string>(initialActive);
+  const location = useLocation();
+  const [active, setActive] = useState<string>(initialActive ?? getActiveKeyFromPath(location.pathname));
   const [darkMode, setDarkMode] = useState(true);
+
+  // Update active state when route changes
+  useEffect((): void => {
+    const newActive = getActiveKeyFromPath(location.pathname);
+    setActive(newActive);
+  }, [location.pathname]);
 
   const handleNav = (key: string): void => {
     setActive(key);
