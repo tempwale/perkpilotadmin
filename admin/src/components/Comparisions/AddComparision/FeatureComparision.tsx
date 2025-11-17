@@ -33,7 +33,6 @@ export default function FeatureComparison({ onFeaturesChange }: Props): ReactEle
   ]);
 
   useEffect((): void => {
-    // Transform features to match FeatureApiResponse type
     const transformedFeatures = features.map((f) => {
       return {
         featureName: f.name || "Untitled Feature",
