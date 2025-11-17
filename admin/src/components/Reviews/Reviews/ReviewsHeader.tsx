@@ -1,7 +1,6 @@
 import { ChevronDown, ChevronRight, Plus } from "lucide-react";
 import { useState, type ReactElement } from "react";
 
-// Type definitions
 type SortOption =
   | "newly-published"
   | "oldest"
@@ -27,7 +26,6 @@ export default function ReviewsHeader({
 }: ReviewsHeaderProps): ReactElement{
   const [sortBy, setSortBy] = useState<SortOption>("newly-published");
   const [showSortDropdown, setShowSortDropdown] = useState<boolean>(false);
-  // Sort options with proper typing
   const sortOptions: SortOptionItem[] = [
     { value: "newly-published", label: "Newly Published First" },
     { value: "oldest", label: "Oldest First" },

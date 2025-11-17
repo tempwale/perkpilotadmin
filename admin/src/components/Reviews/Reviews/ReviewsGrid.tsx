@@ -29,9 +29,6 @@ interface DealGridProps {
 
 // Helper to safely extract title string
 const getTitleString = (deal: UIDeal): string => {
-  if (typeof deal.title === "string") {
-    return String(deal.title);
-  }
   if (typeof deal.productName === "string") {
     return String(deal.productName);
   }
@@ -64,7 +61,7 @@ export default function DealGrid({
   const [query, setQuery] = useState("");
 
   // Check if mobile on mount and window resize
-  useEffect((): void => {
+  useEffect(() => {
     const checkMobile = (): void => {
       setIsMobile(window.innerWidth < 768); // md breakpoint
     };
@@ -72,7 +69,9 @@ export default function DealGrid({
     checkMobile();
     window.addEventListener("resize", checkMobile);
 
-    return (): void => window.removeEventListener("resize", checkMobile);
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+    };
   }, []);
 
   // Reset to page 1 when switching between mobile/desktop
@@ -81,7 +80,7 @@ export default function DealGrid({
   }, [isMobile]);
 
   // Fetch deals from API on mount (if no `deals` prop provided)
-  useEffect((): void => {
+  useEffect(() => {
     if (deals && deals.length) return; // caller provided deals
 
     let mounted = true;
@@ -116,7 +115,7 @@ export default function DealGrid({
         setLoading(false);
       }
     });
-    return (): void => {
+    return () => {
       mounted = false;
     };
   }, [deals]);
