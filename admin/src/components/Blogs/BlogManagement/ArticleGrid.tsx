@@ -3,21 +3,7 @@ import BlogsCard from "./BlogCard";
 import { ChevronDown } from "lucide-react";
 import { BLOGS_API } from "../../../config/backend";
 import type { BlogApiResponse, UIBlog } from "../../../types/blog.types";
-
-// Helper to format date
-const formatDate = (date?: string | Date): string => {
-  if (!date) return "";
-  try {
-    const d = typeof date === "string" ? new Date(date) : date;
-    return d.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  } catch {
-    return "";
-  }
-};
+import { formatDate } from "../../../utils/helpers";
 
 export default function ArticleGrid(): ReactElement{
   const [query, setQuery] = useState("");

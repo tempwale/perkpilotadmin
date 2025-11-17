@@ -3,6 +3,7 @@ import { ChevronDown, Trash, X } from "lucide-react";
 import { BLOGS_API } from "../../../config/backend";
 import BlogsCard from "../BlogManagement/BlogCard";
 import type { BlogItem, SimilarBlogsProps } from "../../../types/blog.types";
+import { formatDate } from "../../../utils/helpers";
 
 export default function SimilarBlogs({
   sectionTitle = "Similar Posts",
@@ -102,7 +103,7 @@ export default function SimilarBlogs({
       readingTime: blog.blogReadingTime || blog.readingTime,
       viewCount: blog.blogViewCount || blog.viewCount,
       date: blog.createdAt
-        ? new Date(blog.createdAt).toLocaleDateString("en-GB")
+        ? formatDate(blog.createdAt)
         : blog.date,
     };
 

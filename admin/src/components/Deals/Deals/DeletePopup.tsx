@@ -2,6 +2,7 @@ import {useState, type ReactElement} from "react";
 import DealCard from "./DealsCard";
 import { DEALS_API } from "../../../config/backend";
 import type { DealApiResponse, ApiError } from "../../../types/api.types";
+import { safeJsonParse } from "../../../utils/helpers";
 
 export default function DeletePopup({
   onClose,
@@ -31,7 +32,7 @@ export default function DeletePopup({
       });
 
       if (!res.ok) {
-        const body = (await res.json().catch(() => ({}))) as ApiError | { message?: string };
+        const body = await safeJsonParse<ApiError | { message?: string }>(res);
         throw new Error(body.message || `Server returned ${res.status}`);
       }
 
