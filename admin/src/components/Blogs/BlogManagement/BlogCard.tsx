@@ -1,8 +1,30 @@
 import { type ReactElement } from "react";
 import React from "react";
-import { Link } from "react-router-dom";
+import type { BlogsCardProps } from "../../../types/blog.types";
 
-// Eye Icon SVG
+const sanitizeImageUrl = (url: string): string | null => {
+  if (!url || typeof url !== "string") return null;
+  
+  try {
+    const parsed = new URL(url, window.location.href);
+    const protocol = parsed.protocol.toLowerCase();
+    
+    if (protocol === "http:" || protocol === "https:") {
+      return parsed.href;
+    }
+    
+    if (protocol === "data:") {
+      const dataUrl = url.toLowerCase();
+      if (dataUrl.startsWith("data:image/")) {
+        return url;
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  }
+};
+
 const EyeIcon = (): ReactElement=> (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -12,15 +34,14 @@ const EyeIcon = (): ReactElement=> (
     fill="none"
   >
     <path
-      fill-rule="evenodd"
-      clip-rule="evenodd"
+      fillRule="evenodd"
+      clipRule="evenodd"
       d="M12 17.8C16.034 17.8 19.686 15.55 21.648 12C19.686 8.45 16.034 6.2 12 6.2C7.966 6.2 4.314 8.45 2.352 12C4.314 15.55 7.966 17.8 12 17.8ZM12 5C16.808 5 20.972 7.848 23 12C20.972 16.152 16.808 19 12 19C7.192 19 3.028 16.152 1 12C3.028 7.848 7.192 5 12 5ZM12 14.8C12.7426 14.8 13.4548 14.505 13.9799 13.9799C14.505 13.4548 14.8 12.7426 14.8 12C14.8 11.2574 14.505 10.5452 13.9799 10.0201C13.4548 9.495 12.7426 9.2 12 9.2C11.2574 9.2 10.5452 9.495 10.0201 10.0201C9.495 10.5452 9.2 11.2574 9.2 12C9.2 12.7426 9.495 13.4548 10.0201 13.9799C10.5452 14.505 11.2574 14.8 12 14.8ZM12 16C10.9391 16 9.92172 15.5786 9.17157 14.8284C8.42143 14.0783 8 13.0609 8 12C8 10.9391 8.42143 9.92172 9.17157 9.17157C9.92172 8.42143 10.9391 8 12 8C13.0609 8 14.0783 8.42143 14.8284 9.17157C15.5786 9.92172 16 10.9391 16 12C16 13.0609 15.5786 14.0783 14.8284 14.8284C14.0783 15.5786 13.0609 16 12 16Z"
       fill="#FAFAFA"
     />
   </svg>
 );
 
-// Arrow Up Icon SVG (rotated)
 const ArrowUpIcon = (): ReactElement=> (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -36,18 +57,6 @@ const ArrowUpIcon = (): ReactElement=> (
   </svg>
 );
 
-interface BlogsCardProps {
-  id?: string;
-  imageUrl?: string;
-  featured?: boolean;
-  views?: number | string;
-  title?: string;
-  description?: string;
-  tags?: string[];
-  readTime?: string;
-  date?: string;
-}
-
 const BlogsCard: React.FC<BlogsCardProps> = ({
   id = "blog-1",
   imageUrl = "",
@@ -58,85 +67,121 @@ const BlogsCard: React.FC<BlogsCardProps> = ({
   tags = ["SaaS", "Founders", "Marketplace"],
   readTime = "2 Minute Read",
   date = "27/06/2004",
+  onClick,
+  variant = "default",
 }) => {
+  const isCompact = variant === "compact";
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>): void => {
+    if (onClick && (e.key === "Enter" || e.key === " ")) {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
+  const ariaLabel = title
+    ? `Blog post: ${title}. ${onClick ? "Press Enter or Space to open." : ""}`
+    : "Blog post";
+
+  const baseClasses = `flex flex-col items-center justify-start w-full ${
+    isCompact ? "min-h-[560px]" : "max-w-[522px] min-h-[627px]"
+  } bg-white/5 rounded-3xl shadow-[0px_1px_4px_0px_rgba(12,12,13,0.05)] outline outline-1 -outline-offset-1 outline-white/10 transition-colors`;
+  const innerPaddingClass = isCompact ? "p-4" : "p-6";
+  const imageHeightClass = isCompact ? "h-[200px]" : "h-[238px]";
+  const interactiveClasses = onClick
+    ? "cursor-pointer hover:bg-[rgba(255,255,255,0.06)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
+    : "";
+
   return (
-    <Link
-      to={`/blog/${id}`}
-      className="w-[466px] p-6 bg-white/5 rounded-3xl shadow-[0px_1px_4px_0px_rgba(12,12,13,0.05)] outline-1 -outline-offset-1 outline-white/10 inline-flex flex-col justify-center items-start gap-6"
+    <div
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      aria-label={ariaLabel}
+      data-id={id}
+      className={`${baseClasses} ${interactiveClasses}`.trim()}
     >
-      {/* Image Section */}
-      <div className="self-stretch h-[238px] bg-white/10 rounded-2xl flex flex-col justify-center items-start gap-3 overflow-hidden">
-        <div className="self-stretch flex-1 rounded-2xl">
-          {imageUrl ? (
+      <div
+        className={`flex flex-col justify-center items-start ${innerPaddingClass} gap-6 w-full h-full`}
+      >
+        {/* Image Section */}
+        <div
+          className={`self-stretch ${imageHeightClass} bg-white/10 rounded-2xl flex flex-col justify-center items-start gap-3 overflow-hidden`}
+        >
+          {imageUrl && sanitizeImageUrl(imageUrl) ? (
             <img
-              src={imageUrl}
+              src={sanitizeImageUrl(imageUrl) || ""}
               alt={title}
-              className="w-full h-full object-cover rounded-2xl"
+              className={`w-full ${imageHeightClass} object-cover rounded-2xl`}
             />
-          ) : null}
+          ) : (
+            <div className={`w-full ${imageHeightClass} rounded-2xl`} />
+          )}
         </div>
-      </div>
-      {/* Content Section */}
-      <div className="self-stretch flex flex-col justify-start items-start gap-6">
-        <div className="self-stretch flex flex-col justify-start items-start gap-4">
-          {/* Top Row: Featured + Views */}
-          <div className="self-stretch inline-flex justify-between items-center">
-            <div className="flex justify-center items-center gap-3">
-              {featured && (
-                <div className="px-2 py-1 bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[100px] flex justify-center items-center gap-2.5">
-                  <div className="justify-start text-neutral-50 text-xs font-medium font-['Poppins']">
-                    Featured Article
+        {/* Content Section */}
+        <div className="self-stretch flex flex-col justify-start items-start gap-6">
+          <div className="self-stretch flex flex-col justify-start items-start gap-4">
+            {/* Top Row: Featured + Views */}
+            <div className="self-stretch inline-flex justify-between items-center">
+              <div className="flex justify-center items-center gap-3">
+                {featured && (
+                  <div className="px-2 py-1 bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[100px] flex justify-center items-center gap-2.5">
+                    <div className="text-neutral-50 text-xs font-medium font-['Poppins']">
+                      Featured Article
+                    </div>
                   </div>
+                )}
+              </div>
+              <div className="flex justify-start items-center gap-2">
+                <span className="w-6 h-6 relative flex items-center justify-center">
+                  <EyeIcon />
+                </span>
+                <div className="justify-start text-neutral-50 text-sm font-medium font-['Poppins']">
+                  {views}
                 </div>
+              </div>
+            </div>
+            {/* Title */}
+            <div className="self-stretch justify-start text-neutral-50 text-2xl font-medium font-['Plus_Jakarta_Sans'] leading-loose">
+              {title}
+            </div>
+            {/* Description */}
+            <div className="self-stretch h-[45px] justify-start text-zinc-200 text-sm font-normal font-['Poppins'] overflow-hidden text-ellipsis">
+              {description}
+            </div>
+            {/* Tags */}
+            <div className="inline-flex justify-center items-center gap-3 flex-wrap">
+              {tags.map(
+                (tag, idx): ReactElement => (
+                  <div
+                    key={idx}
+                    className="px-2 py-1 bg-white/10 rounded-[100px] flex justify-center items-center gap-2.5"
+                  >
+                    <div className="justify-start text-zinc-200 text-xs font-medium font-['Poppins']">
+                      {tag}
+                    </div>
+                  </div>
+                )
               )}
             </div>
-            <div className="flex justify-start items-center gap-2">
+          </div>
+          {/* Bottom Row: Read Time + Date */}
+          <div className="self-stretch inline-flex justify-between items-center">
+            <div className="py-2 rounded flex justify-center items-center gap-2">
+              <div className="text-center justify-start text-neutral-50 text-base font-medium font-['Inter'] leading-normal">
+                {readTime}
+              </div>
               <span className="w-6 h-6 relative flex items-center justify-center">
-                <EyeIcon />
+                <ArrowUpIcon />
               </span>
-              <div className="justify-start text-neutral-50 text-sm font-medium font-['Poppins']">
-                {views}
-              </div>
             </div>
-          </div>
-          {/* Title */}
-          <div className="self-stretch justify-start text-neutral-50 text-2xl font-medium font-['Plus_Jakarta_Sans'] leading-loose">
-            {title}
-          </div>
-          {/* Description */}
-          <div className="self-stretch h-[45px] justify-start text-zinc-200 text-sm font-normal font-['Poppins'] overflow-hidden text-ellipsis">
-            {description}
-          </div>
-          {/* Tags */}
-          <div className="inline-flex justify-center items-center gap-3">
-            {tags.map((tag, idx): ReactElement=> (
-              <div
-                key={idx}
-                className="px-2 py-1 bg-white/10 rounded-[100px] flex justify-center items-center gap-2.5"
-              >
-                <div className="justify-start text-zinc-200 text-xs font-medium font-['Poppins']">
-                  {tag}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        {/* Bottom Row: Read Time + Date */}
-        <div className="self-stretch inline-flex justify-between items-center">
-          <div className="py-2 rounded flex justify-center items-center gap-2">
-            <div className="text-center justify-start text-neutral-50 text-base font-medium font-['Inter'] leading-normal">
-              {readTime}
+            <div className="justify-start text-zinc-300 text-sm font-medium font-['Poppins']">
+              {date}
             </div>
-            <span className="w-6 h-6 relative flex items-center justify-center">
-              <ArrowUpIcon />
-            </span>
-          </div>
-          <div className="justify-start text-zinc-300 text-sm font-medium font-['Poppins']">
-            {date}
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 
