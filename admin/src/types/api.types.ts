@@ -5,7 +5,6 @@ export interface ApiError {
   error?: string;
 }
 
-// Author Types (from backend/src/models/author.model.ts)
 export interface AuthorApiResponse {
   _id: string;
   authorTitle: string;
@@ -114,6 +113,8 @@ export interface BlogSectionApiResponse {
   sectionNumber: number;
   blogTitle: string;
   blogBody: string;
+  blogImage?: string;
+  dealsMentioned?: DealApiResponse[];
   additionalNote?: string;
 }
 

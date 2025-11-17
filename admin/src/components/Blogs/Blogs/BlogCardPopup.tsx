@@ -1,26 +1,48 @@
-import {useState, type ReactElement} from "react";
+import { useState, type ReactElement, type KeyboardEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import DeletePopup from "./DeletePopup";
-import type { ReviewApiResponse } from "../../../types/api.types";
+import BlogDeletePopup from "./BlogDeletePopup";
+import type { BlogForPopup } from "../../../types/blog.types";
 
-export default function CardPopup({
+export default function BlogCardPopup({
   onClose,
   onDelete,
-  deal,
+  blog,
 }: {
   onClose?: () => void;
   onDelete?: () => void;
-  deal?: ReviewApiResponse & {
-    apiEndpoint?: string;
-    cardComponent?: ReactElement;
-    deleteTitle?: string;
-    deleteSubtitle?: string;
-    editPath?: string;
-  };
-}): ReactElement{
+  blog?: BlogForPopup;
+}): ReactElement {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const navigate = useNavigate();
-  const id = String(deal?.id ?? deal?._id ?? "");
+  const id = String(blog?.id ?? blog?._id ?? "");
+
+  const handleOverlayKeyDown = (e: KeyboardEvent<HTMLDivElement>): void => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onClose?.();
+    }
+  };
+
+  const handleEditClick = (): void => {
+    if (id) {
+      const editPath = blog?.editPath ?? `/addblog/${id}`;
+      void Promise.resolve(navigate(editPath));
+    }
+  };
+
+  const handleEditKeyDown = (e: KeyboardEvent<HTMLDivElement>): void => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleEditClick();
+    }
+  };
+
+  const handleDeleteKeyDown = (e: KeyboardEvent<HTMLDivElement>): void => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      setConfirmOpen(true);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -28,7 +50,10 @@ export default function CardPopup({
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={(): void => onClose?.()}
-        aria-hidden
+        onKeyDown={handleOverlayKeyDown}
+        role="button"
+        tabIndex={0}
+        aria-label="Close popup"
       />
 
       <div
@@ -43,22 +68,26 @@ export default function CardPopup({
           ✕
         </button>
         <div className="w-full flex items-center gap-4">
-          <div className="w-12 h-12 shrink-0">
-            {deal?.logoComponent ?? (
-              <div className="w-12 h-12 bg-gray-200 rounded-full" />
-            )}
-          </div>
+          {blog?.imageUrl && (
+            <div className="w-12 h-12 shrink-0 rounded-full overflow-hidden">
+              <img
+                src={blog.imageUrl}
+                alt={blog.title || "Blog"}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
           <div className="flex-1 text-left">
             <div className="text-white text-lg font-semibold">
-              {deal?.productName ?? "Deal"}
+              {blog?.title ?? "Blog"}
             </div>
             <div className="text-zinc-400 text-sm">
-              {deal?.productType ?? deal?.dealType ?? ""}
+              {blog?.tags?.[0] ?? ""}
             </div>
           </div>
         </div>
         <div className="mt-2 w-full text-zinc-300 text-sm">
-          {deal?.description}
+          {blog?.description}
         </div>
         <div
           data-layer="Frame 1321315044"
@@ -85,11 +114,11 @@ export default function CardPopup({
                 />
               </svg>
               <div
-                data-layer="Note: Can’t be undone later! and you are free to edit this deal stack instead of deleting it full."
-                className="NoteCanTBeUndoneLaterAndYouAreFreeToEditThisDealStackInsteadOfDeletingItFull flex-1 justify-start text-neutral-50 text-sm font-normal font-['Poppins']"
+                data-layer="Note: This action will soft-delete the blog; it can be recovered from the trash, so be careful before deleting."
+                className="NoteThisActionWillSoftDeleteTheBlogItCanBeRecoveredFromTheTrashSoBeCarefulBeforeDeleting flex-1 justify-start text-neutral-50 text-sm font-normal font-['Poppins']"
               >
-                Note: Can’t be undone later! and you are free to edit this deal
-                stack instead of deleting it full.
+                Note: This action will soft-delete the blog; it can be recovered from
+                the trash, so be careful before deleting.
               </div>
             </div>
           </div>
@@ -98,7 +127,7 @@ export default function CardPopup({
             className="Frame2147205573 self-stretch inline-flex justify-center items-start gap-6"
           >
             {confirmOpen ? (
-              <DeletePopup
+              <BlogDeletePopup
                 onClose={(): void => {
                   setConfirmOpen(false);
                 }}
@@ -106,7 +135,9 @@ export default function CardPopup({
                   onDelete?.();
                   onClose?.();
                 }}
-                review={deal}
+                blog={blog}
+                title={blog?.deleteTitle || "Want to delete this blog card?"}
+                subtitle={blog?.deleteSubtitle || "This action will soft-delete the blog; it can be recovered from the trash, so be careful before deleting."}
               />
             ) : (
               <>
@@ -116,6 +147,7 @@ export default function CardPopup({
                   data-size="Large"
                   className="ButtonsMain flex-1 h-14 px-10 py-4 rounded-[100px] outline-1 -outline-offset-1 outline-[#ebeef4] flex justify-center items-center gap-2 cursor-pointer"
                   onClick={(): void => setConfirmOpen(true)}
+                  onKeyDown={handleDeleteKeyDown}
                   role="button"
                   tabIndex={0}
                 >
@@ -130,13 +162,11 @@ export default function CardPopup({
                   data-layer="Buttons/main"
                   data-button="on"
                   data-size="Large"
-                  className="ButtonsMain flex-1 px-10 py-4 bg-neutral-50 rounded-[100px] flex justify-center items-center gap-2"
-                  onClick={(): void => {
-                    if (id) {
-                      const editPath = deal?.editPath ?? `/updatedeal/${id}`;
-                      void Promise.resolve(navigate(editPath));
-                    }
-                  }}
+                  className="ButtonsMain flex-1 px-10 py-4 bg-neutral-50 rounded-[100px] flex justify-center items-center gap-2 cursor-pointer"
+                  onClick={handleEditClick}
+                  onKeyDown={handleEditKeyDown}
+                  role="button"
+                  tabIndex={0}
                 >
                   <div
                     data-layer="Button"
@@ -153,3 +183,4 @@ export default function CardPopup({
     </div>
   );
 }
+

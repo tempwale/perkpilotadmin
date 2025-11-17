@@ -1,19 +1,20 @@
-import { useEffect, useState, type ReactElement } from "react";
-import { uploadToCloudinary } from "../../../config/cloudinary";
+import { useState, type ReactElement } from "react";
+import { uploadToCloudinary } from "../../config/cloudinary";
 
 type Props = {
   heading?: string;
   body?: string;
+  image?: string;
   onHeadingChange?: (value: string) => void;
   onBodyChange?: (value: string) => void;
   onImageChange?: (value: string) => void;
-  showInputs?: boolean;
   className?: string;
 };
 
 export default function Hero({
   heading = "Hero Heading",
   body = "Hero Body",
+  image: initialImage,
   onHeadingChange,
   onBodyChange,
   onImageChange,
@@ -21,12 +22,9 @@ export default function Hero({
 }: Props): ReactElement {
   const [localHeading, setLocalHeading] = useState<string>(heading);
   const [localBody, setLocalBody] = useState<string>(body);
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setImage] = useState<string | null>(initialImage || null);
   const [uploading, setUploading] = useState<boolean>(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-
-  useEffect((): void => setLocalHeading(heading), [heading]);
-  useEffect((): void => setLocalBody(body), [body]);
 
   const handleHeadingChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const v = e.target.value;
@@ -47,23 +45,30 @@ export default function Hero({
     setUploading(true);
     setUploadError(null);
 
+    // Create instant local preview using FileReader
+    const reader = new FileReader();
+    reader.onload = (event): void => {
+      const imageData = event.target?.result as string;
+      setImage(imageData); // For instant local preview
+    };
+    reader.readAsDataURL(file);
+
     try {
       // Upload to Cloudinary and get the URL
       const cloudinaryUrl = await uploadToCloudinary(file);
 
-      // Create a local preview
-      const reader = new FileReader();
-      reader.onload = (event): void => {
-        const imageData = event.target?.result as string;
-        setImage(imageData); // For local preview
-      };
-      reader.readAsDataURL(file);
-
-      // Send Cloudinary URL to parent component
+      // Update preview with Cloudinary URL and notify parent
+      setImage(cloudinaryUrl);
       onImageChange?.(cloudinaryUrl);
     } catch (error) {
       console.error("Error uploading image:", error);
-      setUploadError("Failed to upload image. Please try again.");
+      // Show more detailed error message
+      const errorMessage = error instanceof Error
+        ? error.message
+        : "Failed to upload image. Please check your Cloudinary configuration and try again.";
+      setUploadError(errorMessage);
+      // Clear the preview on error
+      setImage(null);
     } finally {
       setUploading(false);
     }
@@ -79,7 +84,7 @@ export default function Hero({
           data-layer="Hero Section"
           className="HeroSection flex-1 justify-start text-neutral-50 text-xl font-medium font-['Poppins'] leading-8"
         >
-          Hero Section
+          Blog Hero Section
         </div>
       </div>
 
@@ -106,7 +111,7 @@ export default function Hero({
                 value={localHeading}
                 onChange={handleHeadingChange}
                 className="w-full h-14 px-4 py-3 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-zinc-400 text-base font-['Poppins'] leading-6 outline-none"
-                placeholder="Enter heading"
+                placeholder="Hero heading"
               />
             </div>
 
@@ -120,7 +125,7 @@ export default function Hero({
                 value={localBody}
                 onChange={handleBodyChange}
                 className="w-full h-14 px-4 py-3 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-zinc-400 text-base font-['Poppins'] leading-6 outline-none"
-                placeholder="Enter body text"
+                placeholder="Hero Body"
               />
             </div>
           </div>
@@ -130,7 +135,7 @@ export default function Hero({
       {/* Upload Section */}
       <div className="self-stretch flex flex-col gap-3 mt-6">
         <div className="text-neutral-50 text-sm font-medium font-['Poppins']">
-          Hero Image
+          Hero Image Upload
         </div>
 
         <label className="flex flex-row gap-2 items-center justify-center h-14 px-4 py-2 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 cursor-pointer hover:bg-zinc-700 transition">
@@ -150,8 +155,8 @@ export default function Hero({
             {uploading
               ? "Uploading..."
               : image
-              ? "Change Image"
-              : "Upload Image"}
+              ? "Change Hero Image"
+              : "Upload Hero Card Icon"}
           </span>
           <input
             type="file"
@@ -159,6 +164,7 @@ export default function Hero({
             className="hidden"
             onChange={handleImageUpload}
             disabled={uploading}
+            aria-label="Upload image"
           />
         </label>
 

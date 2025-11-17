@@ -1,11 +1,11 @@
 import { useState, type ReactElement } from "react";
 import { useNavigate } from "react-router-dom";
-import Author from "../../components/Comparisions/AddComparision/Author";
+import Author from "../../components/Shared/Author";
 import Header from "../../components/Comparisions/AddComparision/Header";
-import Hero from "../../components/Comparisions/AddComparision/Hero";
-import ToolsMentioned from "../../components/Comparisions/AddComparision/ToolsMentioned";
-import ModulesCard from "../../components/Comparisions/AddComparision/ModulesCard";
-import ToolBlogCard from "../../components/Comparisions/AddComparision/ToolBlogCard";
+import Hero from "../../components/Shared/Hero";
+import ToolsMentioned from "../../components/Shared/ToolsMentioned";
+import ModulesCard from "../../components/Shared/ModulesCard";
+import ToolBlogCard from "../../components/Shared/ToolBlogCard";
 import FeatureComparision from "../../components/Comparisions/AddComparision/FeatureComparision";
 import ProConGrid from "../../components/Comparisions/AddComparision/ProConGrid";
 import MoreComparisions from "../../components/Comparisions/AddComparision/MoreComparisions";
@@ -96,10 +96,10 @@ export default function AddComparisionPage(): ReactElement {
     }));
   };
 
-  const handleAuthorChange = (authorId: string): void => {
+  const handleAuthorChange = (authorId: string | undefined): void => {
     setComparisonData((prev) => ({
       ...prev,
-      authorId, // Changed from 'author' to 'authorId'
+      authorId: authorId || "", // Changed from 'author' to 'authorId'
     }));
   };
 

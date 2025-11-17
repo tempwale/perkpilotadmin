@@ -1,38 +1,50 @@
 import { ChevronDown, ChevronRight, Plus } from "lucide-react";
-import { useState, type ReactElement } from "react";
+import { useState, useEffect, useRef, type ReactElement } from "react";
+import { useNavigate } from "react-router-dom";
+import type { SortOption, SortOptionItem, BlogsHeaderProps } from "../../../types/blog.types";
 
-type SortOption =
-  | "newly-published"
-  | "oldest"
-  | "price-high"
-  | "price-low"
-  | "name-az";
-type FilterOption = "all" | "active" | "expired" | "pending" | "draft";
-
-interface SortOptionItem {
-  value: SortOption;
-  label: string;
-}
-
-interface ReviewsHeaderProps {
-  onSortChange?: (value: SortOption) => void;
-  onFilterChange?: (value: FilterOption) => void;
-  onAddReview?: () => void;
-}
-
-export default function ReviewsHeader({
+export default function BlogsHeader({
   onSortChange,
-  onAddReview,
-}: ReviewsHeaderProps): ReactElement{
+  onAddBlog,
+}: BlogsHeaderProps): ReactElement {
+  const navigate = useNavigate();
   const [sortBy, setSortBy] = useState<SortOption>("newly-published");
   const [showSortDropdown, setShowSortDropdown] = useState<boolean>(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Sort options with proper typing
   const sortOptions: SortOptionItem[] = [
-    { value: "newly-published", label: "Newly Published First" },
+    { value: "newly-published", label: "Newly First" },
     { value: "oldest", label: "Oldest First" },
-    { value: "price-high", label: "Price: High to Low" },
-    { value: "price-low", label: "Price: Low to High" },
+    { value: "views-high", label: "Views: High to Low" },
+    { value: "views-low", label: "Views: Low to High" },
     { value: "name-az", label: "Name: A to Z" },
   ];
+
+  // Click outside handler for dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent): void => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowSortDropdown(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent): void => {
+      if (event.key === "Escape") {
+        setShowSortDropdown(false);
+      }
+    };
+
+    if (showSortDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [showSortDropdown]);
 
   const handleSortChange = (value: SortOption): void => {
     setSortBy(value);
@@ -40,16 +52,17 @@ export default function ReviewsHeader({
     onSortChange?.(value);
   };
 
-  const handleAddNewReview = (): void => {
-    onAddReview?.();
-    // Navigate to the add Review page. Use window.location so this works
-    // whether or not a client router is configured.
-    window.location.assign("/addreview");
+  const handleAddNewBlog = (): void => {
+    if (onAddBlog) {
+      onAddBlog();
+    } else {
+      void navigate("/addblog");
+    }
   };
 
   const selectedSortLabel: string =
     sortOptions.find((opt) => opt.value === sortBy)?.label ??
-    "Newly Published First";
+    "Newly First";
 
   return (
     <div
@@ -57,17 +70,17 @@ export default function ReviewsHeader({
       className="Frame2147205542 self-stretch inline-flex justify-between items-center"
     >
       <div
-        data-layer="Manage All Reviews Page"
-        className="ManageAllReviewsPage justify-start text-neutral-50 text-xl font-medium font-['Poppins'] leading-8"
+        data-layer="Manage All Blogs"
+        className="ManageAllBlogs justify-start text-neutral-50 text-xl font-medium font-['Poppins'] leading-8"
       >
-        Manage All Reviews Page
+        Manage All Blogs
       </div>
       <div
         data-layer="Frame 2147223652"
         className="Frame2147223652 flex justify-start items-center gap-6"
       >
         {/* Sort Dropdown */}
-        <div className="relative">
+        <div className="relative" ref={dropdownRef}>
           <button
             onClick={(): void => setShowSortDropdown(!showSortDropdown)}
             type="button"
@@ -103,10 +116,18 @@ export default function ReviewsHeader({
             </div>
           )}
         </div>
+
+        {/* Manage Blog Page Content Button */}
         <div
           data-layer="Button"
           className="Button pl-3 pr-2 py-2 bg-neutral-50 rounded-lg inline-flex justify-start items-center gap-2"
-          onClick={(): void => window.location.assign("/Reviewsmanagement")}
+          onClick={(): void => {
+            if (onAddBlog) {
+              onAddBlog();
+            } else {
+              void navigate("/blogsmanagement");
+            }
+          }}
         >
           <div
             data-layer="Horizontal container"
@@ -116,22 +137,22 @@ export default function ReviewsHeader({
               data-layer="Manage Blog Page Content"
               className="ManageBlogPageContent justify-start text-zinc-950 text-base font-normal font-['Poppins'] leading-6"
             >
-              Manage Review Page Content
+              Manage Blog Page Content
             </div>
           </div>
           <ChevronRight className="w-5 h-5 text-zinc-950" />
         </div>
 
-        {/* Add New Review Button */}
+        {/* Add New Blog Button */}
         <button
-          onClick={handleAddNewReview}
+          onClick={handleAddNewBlog}
           type="button"
           data-layer="Button"
           className="Button pl-3 pr-2 py-2 bg-neutral-50 rounded-lg flex justify-start items-center gap-2 hover:bg-neutral-200 transition-colors"
         >
           <div className="HorizontalContainer flex justify-start items-center gap-2">
-            <div className="AddNewReview justify-start text-zinc-950 text-base font-normal font-['Poppins'] leading-6">
-              Add New Review
+            <div className="AddNewBlog justify-start text-zinc-950 text-base font-normal font-['Poppins'] leading-6">
+              Add New Blog
             </div>
           </div>
           <div data-layer="Icon/Plus" className="IconPlus w-5 h-5 relative">
@@ -142,3 +163,4 @@ export default function ReviewsHeader({
     </div>
   );
 }
+
