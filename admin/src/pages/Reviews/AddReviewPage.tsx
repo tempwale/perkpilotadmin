@@ -10,6 +10,7 @@ import TagChips from "../../components/Reviews/AddReview/TagChips";
 import FAQ from "../../components/Reviews/AddReview/FAQ";
 import FooterActions from "../../components/Reviews/AddReview/FooterActions";
 import { REVIEWS_API } from "../../config/backend";
+import { formatDateISO } from "../../utils/helpers";
 
 export default function AddReviewPage(): ReactElement {
   // Main review state matching backend schema
@@ -18,7 +19,7 @@ export default function AddReviewPage(): ReactElement {
     userName: "John Smith",
     userTitle: "Senior Product Manager",
     userAvatar: "https://i.pravatar.cc/150?img=1",
-    date: new Date().toISOString().split("T")[0],
+    date: formatDateISO(),
     verified: true,
     reviewText:
       "Excellent product that has transformed our workflow. Highly recommend for teams of all sizes.",
@@ -52,7 +53,7 @@ export default function AddReviewPage(): ReactElement {
     foundedYear: 0,
     employeeRange: "",
     headquarters: "",
-    lastUpdated: new Date().toISOString().split("T")[0],
+    lastUpdated: formatDateISO(),
     upvotes: 0,
     shareCount: 0,
 

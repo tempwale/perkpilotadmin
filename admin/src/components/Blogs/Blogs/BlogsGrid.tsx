@@ -4,6 +4,7 @@ import Pagination from "../../Reviews/Reviews/Pagination";
 import { BLOGS_API } from "../../../config/backend";
 import BlogCardPopup from "./BlogCardPopup";
 import type { BlogApiResponse, UIBlog, BlogsGridProps } from "../../../types/blog.types";
+import { formatDate } from "../../../utils/helpers";
 
 // Helper to safely extract title string
 const getTitleString = (blog: UIBlog): string => {
@@ -25,21 +26,6 @@ const getDescriptionString = (blog: UIBlog): string => {
     return String(blog.blogBody);
   }
   return "";
-};
-
-// Helper to format date
-const formatDate = (date?: string | Date): string => {
-  if (!date) return "";
-  try {
-    const d = typeof date === "string" ? new Date(date) : date;
-    return d.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  } catch {
-    return "";
-  }
 };
 
 export default function BlogsGrid({
