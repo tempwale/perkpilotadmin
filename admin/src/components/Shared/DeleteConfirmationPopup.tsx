@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, type ReactElement, type ReactNode } from "react";
+import { safeJsonParse } from "../../utils/helpers";
 
 export interface DeleteConfirmationPopupProps {
   onClose?: () => void;
@@ -46,7 +47,7 @@ export default function DeleteConfirmationPopup({
         });
 
         if (!res.ok) {
-          const body = (await res.json().catch(() => ({}))) as { message?: string };
+          const body = await safeJsonParse<{ message?: string }>(res);
           throw new Error(body.message || `Server returned ${res.status}`);
         }
 

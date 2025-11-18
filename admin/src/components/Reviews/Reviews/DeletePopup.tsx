@@ -2,6 +2,7 @@ import {useState, type ReactElement} from "react";
 import DealCard from "./ReviewsCard";
 import { DEALS_API } from "../../../config/backend";
 import type { ReviewApiResponse, ApiError } from "../../../types/api.types";
+import { safeJsonParse } from "../../../utils/helpers";
 
 export default function DeletePopup({
   onClose,
@@ -31,7 +32,7 @@ export default function DeletePopup({
       });
 
       if (!res.ok) {
-        const body = (await res.json().catch(() => ({}))) as ApiError | { message?: string };
+        const body = await safeJsonParse<ApiError | { message?: string }>(res);
         throw new Error(body.message || `Server returned ${res.status}`);
       }
 
@@ -96,7 +97,7 @@ export default function DeletePopup({
               logoComponent={review?.logoComponent ?? undefined}
               verified={review?.verified ?? undefined}
               dealType={review?.dealType ?? undefined}
-              features={review?.features ?? undefined}
+              features={review?.features?.map((f) => f.title) ?? undefined}
             />
           </div>
         </div>
@@ -149,7 +150,11 @@ export default function DeletePopup({
               className={`ButtonsMain flex-1 h-10 px-4 py-2 rounded-full outline-1 -outline-offset-1 outline-[#ebeef4] flex justify-center items-center gap-2 ${
                 loading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
               }`}
-              onClick={(): void => !loading && onClose?.()}
+              onClick={(): void => {
+                if (!loading) {
+                  onClose?.();
+                }
+              }}
               role="button"
               tabIndex={0}
               aria-disabled={loading}
@@ -168,7 +173,11 @@ export default function DeletePopup({
               className={`ButtonsMain flex-1 px-4 py-2 bg-neutral-50 rounded-full flex justify-center items-center gap-2 ${
                 loading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
               }`}
-              onClick={(): void => !loading && handleConfirm()}
+              onClick={(): void => {
+                if (!loading) {
+                  void handleConfirm();
+                }
+              }}
               role="button"
               tabIndex={0}
               aria-disabled={loading}

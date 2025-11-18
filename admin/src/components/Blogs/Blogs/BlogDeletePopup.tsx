@@ -3,6 +3,7 @@ import BlogsCard from "../BlogManagement/BlogCard";
 import { BLOGS_API } from "../../../config/backend";
 import type { ApiError } from "../../../types/api.types";
 import type { BlogForDelete } from "../../../types/blog.types";
+import { safeJsonParse } from "../../../utils/helpers";
 
 export default function BlogDeletePopup({
   onClose,
@@ -55,7 +56,7 @@ export default function BlogDeletePopup({
       });
 
       if (!res.ok) {
-        const body = (await res.json().catch(() => ({}))) as ApiError | { message?: string };
+        const body = await safeJsonParse<ApiError | { message?: string }>(res);
         throw new Error(body.message || `Server returned ${res.status}`);
       }
 
