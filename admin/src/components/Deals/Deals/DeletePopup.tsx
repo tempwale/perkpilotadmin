@@ -91,6 +91,7 @@ export default function DeletePopup({
           <div className="w-[420px]">
             <DealCard
               id={String(deal?.id ?? deal?._id ?? "preview")}
+              showCustomizeHeader={false}
               title={deal?.title ?? undefined}
               category={(deal?.category ?? deal?.dealType) ?? undefined}
               description={deal?.description ?? undefined}
@@ -128,10 +129,10 @@ export default function DeletePopup({
                 />
               </svg>
               <div
-                data-layer="Note: Can’t be undone later! and you are free to edit this deal stack instead of deleting it full."
+                data-layer="Note: Can&apos;t be undone later! and you are free to edit this deal stack instead of deleting it full."
                 className="NoteCanTBeUndoneLaterAndYouAreFreeToEditThisDealStackInsteadOfDeletingItFull flex-1 justify-start text-neutral-50 text-xs font-normal font-['Poppins']"
               >
-                Note: Can’t be undone later! and you are free to edit this deal
+                Note: Can&apos;t be undone later! and you are free to edit this deal
                 stack instead of deleting it full.
               </div>
             </div>
@@ -152,7 +153,9 @@ export default function DeletePopup({
               className={`ButtonsMain flex-1 h-10 px-4 py-2 rounded-full outline-1 -outline-offset-1 outline-[#ebeef4] flex justify-center items-center gap-2 ${
                 loading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
               }`}
-              onClick={(): void => !loading && onClose?.()}
+              onClick={(): void => {
+                if (!loading) onClose?.();
+              }}
               role="button"
               tabIndex={0}
               aria-disabled={loading}
@@ -171,7 +174,9 @@ export default function DeletePopup({
               className={`ButtonsMain flex-1 px-4 py-2 bg-neutral-50 rounded-full flex justify-center items-center gap-2 ${
                 loading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
               }`}
-              onClick={(): void => !loading && handleConfirm()}
+              onClick={(): void => {
+                if (!loading) void handleConfirm();
+              }}
               role="button"
               tabIndex={0}
               aria-disabled={loading}

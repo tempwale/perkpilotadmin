@@ -330,7 +330,7 @@ export default function ToolReviewForm({
                   name="toolCategory"
                   value={formData.toolCategory}
                   onChange={handleInputChange}
-                  className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Poppins'] leading-6"
+                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
                 >
                   <option value="">Select Category</option>
                   <option value="productivity">Productivity</option>
@@ -369,7 +369,7 @@ export default function ToolReviewForm({
                 value={formData.toolDescription}
                 onChange={handleInputChange}
                 placeholder="E.g. The collaborative user interface design tool."
-                className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Plus_Jakarta_Sans'] leading-6"
+                className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Plus_Jakarta_Sans'] leading-6 placeholder:text-zinc-500"
               />
             </div>
             <div
@@ -441,7 +441,7 @@ export default function ToolReviewForm({
                     value={logoFetchUrl}
                     onChange={(e) => setLogoFetchUrl(e.target.value)}
                     placeholder="e.g., google.com"
-                    className="w-full bg-transparent outline-none text-zinc-400 text-sm font-normal font-['Poppins']"
+                    className="w-full bg-transparent outline-none text-neutral-50 text-sm font-normal font-['Poppins'] placeholder:text-zinc-500"
                   />
                 </div>
                 <button
@@ -536,7 +536,7 @@ export default function ToolReviewForm({
                   onChange={handleInputChange}
                   placeholder="4.9 / 5 ( 24 )"
                   disabled={!formData.showAverageRating}
-                  className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Poppins'] leading-6 disabled:opacity-50"
+                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500 disabled:opacity-50"
                 />
               </div>
             </div>
@@ -571,7 +571,7 @@ export default function ToolReviewForm({
                     onChange={handleInputChange}
                     placeholder="Redeemed By 100+ People"
                     disabled={!formData.showProductUsedBy}
-                    className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Poppins'] leading-6 disabled:opacity-50"
+                    className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500 disabled:opacity-50"
                   />
                 </div>
               </div>
@@ -606,7 +606,7 @@ export default function ToolReviewForm({
                   onChange={handleInputChange}
                   placeholder="4.9 / 5 ( 24 )"
                   disabled={!formData.showAverageRating}
-                  className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Poppins'] leading-6 disabled:opacity-50"
+                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500 disabled:opacity-50"
                 />
               </div>
             </div>
@@ -648,7 +648,7 @@ export default function ToolReviewForm({
                   value={formData.totalUsers}
                   onChange={handleInputChange}
                   placeholder="e.g. 5M"
-                  className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Poppins'] leading-6"
+                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
                 />
               </div>
             </div>
@@ -673,7 +673,7 @@ export default function ToolReviewForm({
                   value={formData.founded}
                   onChange={handleInputChange}
                   placeholder="E.g. 2015"
-                  className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Poppins'] leading-6"
+                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
                 />
               </div>
             </div>
@@ -698,7 +698,7 @@ export default function ToolReviewForm({
                   value={formData.employees}
                   onChange={handleInputChange}
                   placeholder="1000+"
-                  className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Poppins'] leading-6"
+                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
                 />
               </div>
             </div>
@@ -723,7 +723,7 @@ export default function ToolReviewForm({
                   value={formData.headquarters}
                   onChange={handleInputChange}
                   placeholder="San Francisco"
-                  className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Poppins'] leading-6"
+                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
                 />
               </div>
             </div>

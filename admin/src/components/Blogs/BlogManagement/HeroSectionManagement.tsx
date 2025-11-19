@@ -160,7 +160,7 @@ export default function HeroSectionManagement({
               Top Tagline
             </label>
             <input
-              className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-200 placeholder:text-zinc-400"
+              className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 placeholder:text-zinc-400"
               value={internalTop}
               onChange={(e): void => setInternalTop(e.target.value)}
               placeholder="Enter a top tagline (e.g., For Expert Insights)"
@@ -172,7 +172,7 @@ export default function HeroSectionManagement({
               Main Headline
             </label>
             <input
-              className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-200 placeholder:text-zinc-400"
+              className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 placeholder:text-zinc-400"
               value={internalMain}
               onChange={(e): void => setInternalMain(e.target.value)}
               placeholder="Enter the main headline (e.g., Software Blogs)"
@@ -184,7 +184,7 @@ export default function HeroSectionManagement({
               Sub-Headline ( Body )
             </label>
             <textarea
-              className="self-stretch h-24 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-200 placeholder:text-zinc-400"
+              className="self-stretch h-24 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 placeholder:text-zinc-400"
               value={internalSub}
               onChange={(e): void => setInternalSub(e.target.value)}
               placeholder="Describe the section (e.g., In-depth reviews and comparisons of the latest tools...)"

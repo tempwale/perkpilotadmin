@@ -1,5 +1,5 @@
-// SVG Components
-import { type ReactElement } from "react";
+
+import { type ReactElement, type CSSProperties } from "react";
 function DefaultLogo(): ReactElement{
   return (
     <svg
@@ -101,12 +101,12 @@ export default function DealCard({
 }: DealCardProps): ReactElement{
   return (
     <div
-      className="backdrop-blur-md backdrop-filter bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.08)] border-solid box-border content-stretch flex flex-col gap-[16px] items-center pb-[16px] pt-0 px-[16px] relative rounded-[24px] size-full"
+      className="backdrop-blur-md backdrop-filter bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.08)] border-solid box-border content-stretch flex flex-col gap-[16px] items-center pb-[16px] pt-0 px-[16px] relative rounded-[24px] w-full h-auto min-h-0 overflow-hidden"
       data-name="Card"
       data-node-id="1:1652"
     >
       <div
-        className="border-[rgba(235,239,245,0.12)] border-b border-l-0 border-r-0 border-solid border-t-0 box-border content-stretch flex flex-col gap-[16px] items-start px-0 py-[16px] relative shrink-0 w-full"
+        className="border-[rgba(235,239,245,0.12)] border-b border-l-0 border-r-0 border-solid border-t-0 box-border content-stretch flex flex-col gap-[16px] items-start px-0 py-[16px] relative shrink-0 w-full min-w-0 overflow-hidden"
         data-node-id="1:1653"
       >
         <div
@@ -118,11 +118,11 @@ export default function DealCard({
             data-node-id="1:1655"
           >
             <div
-              className="bg-gray-50 border-2 border-[rgba(255,255,255,0.08)] border-solid box-border content-stretch flex gap-[10px] items-center justify-center p-[10px] relative rounded-[100px] shrink-0 size-[56px]"
+              className="bg-gray-50 border-2 border-[rgba(255,255,255,0.08)] border-solid box-border content-stretch flex gap-[10px] items-center justify-center p-[10px] relative rounded-[100px] shrink-0 w-14 h-14 min-w-[56px] min-h-[56px]"
               data-node-id="1:1656"
             >
               <div
-                className="h-[32px] relative shrink-0 w-[21px]"
+                className="w-full h-full flex items-center justify-center overflow-hidden"
                 data-name="logo"
                 data-node-id="1:1657"
               >
@@ -134,18 +134,19 @@ export default function DealCard({
               data-node-id="1:1659"
             >
               <div
-                className="content-stretch flex gap-[8px] items-center relative shrink-0"
+                className="content-stretch flex gap-[8px] items-center relative shrink-0 min-w-0 flex-1"
                 data-node-id="1:1660"
               >
                 <p
-                  className="font-medium leading-[normal] relative shrink-0 text-[20px] text-white"
+                  className="font-medium leading-[normal] relative shrink-0 text-[18px] sm:text-[20px] text-white truncate"
                   data-node-id="1:1661"
+                  title={title}
                 >
                   {title}
                 </p>
                 {verified && (
                   <div
-                    className="relative shrink-0 size-[24px]"
+                    className="relative size-[24px] shrink-0"
                     data-name="verification-icon"
                     data-node-id="1:1662"
                   >
@@ -175,12 +176,13 @@ export default function DealCard({
           </div>
         </div>
         <div
-          className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full"
+          className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full min-w-0 overflow-hidden"
           data-node-id="1:1667"
         >
           <p
-            className="leading-[normal] not-italic relative shrink-0 text-[#cbd2da] text-[12px] w-full whitespace-pre-wrap"
+            className="leading-[normal] not-italic relative shrink-0 text-[#cbd2da] text-[12px] w-full line-clamp-3"
             data-node-id="1:1668"
+            title={description}
           >
             {description}
           </p>
@@ -195,19 +197,24 @@ export default function DealCard({
               What's Included
             </p>
             <div
-              className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0"
+              className="content-stretch flex flex-col gap-[8px] items-start relative w-full min-w-0"
               data-node-id="1:1671"
             >
               {features.map((feature, index) => (
                 <div
                   key={index}
-                  className="content-stretch flex gap-[8px] items-center relative shrink-0"
+                  className="content-stretch flex gap-[8px] items-start relative w-full min-w-0 max-w-full"
                   data-node-id="1:1672"
                 >
-                  <CheckCircle className="overflow-clip relative shrink-0 size-[20px]" />
+                  <CheckCircle className="overflow-clip relative shrink-0 size-[20px] mt-0.5" />
                   <p
-                    className="font-normal leading-[21px] relative shrink-0 text-[14px] text-white"
+                    className="font-normal leading-[21px] relative flex-1 min-w-0 max-w-full text-[14px] text-white overflow-hidden text-ellipsis line-clamp-2"
                     data-node-id="1:1674"
+                    title={feature}
+                    style={{
+                      wordBreak: 'break-word',
+                      overflowWrap: 'anywhere'
+                    } satisfies CSSProperties}
                   >
                     {feature}
                   </p>
@@ -240,7 +247,7 @@ export default function DealCard({
         </div>
       </div>
       <div
-        className="content-stretch flex gap-[24px] items-center relative shrink-0 w-full"
+        className="content-stretch flex flex-col sm:flex-row gap-3 sm:gap-[24px] items-stretch sm:items-center relative shrink-0 w-full"
         data-name="Filter"
         data-node-id="1:1688"
       >
@@ -251,7 +258,7 @@ export default function DealCard({
           data-node-id="1:1689"
         >
           <p
-            className="leading-[24px] not-italic relative shrink-0 text-[16px] text-neutral-50"
+            className="leading-[24px] not-italic relative shrink-0 text-[14px] sm:text-[16px] text-neutral-50"
             data-node-id="1:1690"
           >
             View Details
@@ -264,7 +271,7 @@ export default function DealCard({
           data-node-id="1:1691"
         >
           <p
-            className="leading-[24px] not-italic relative shrink-0 text-[16px] text-zinc-950 group-hover:text-white transition-colors duration-200"
+            className="leading-[24px] not-italic relative shrink-0 text-[14px] sm:text-[16px] text-zinc-950 group-hover:text-white transition-colors duration-200"
             data-node-id="1:1692"
           >
             Get This Deal

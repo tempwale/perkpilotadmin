@@ -282,7 +282,7 @@ export default function ToolsMentioned({
                         setHeadlineState(e.target.value);
                         onHeadlineChange?.(e.target.value);
                       }}
-                      className="w-full bg-transparent text-zinc-400 text-base font-normal font-['Poppins'] leading-6 outline-none"
+                      className="w-full bg-transparent text-neutral-50 text-base font-normal font-['Poppins'] leading-6 outline-none placeholder:text-zinc-500"
                     />
                   </div>
                 </div>
@@ -318,7 +318,7 @@ export default function ToolsMentioned({
                         setTipState(e.target.value);
                         onTipChange?.(e.target.value);
                       }}
-                      className="w-full bg-transparent text-zinc-400 text-base font-normal font-['Poppins'] leading-6 outline-none"
+                      className="w-full bg-transparent text-neutral-50 text-base font-normal font-['Poppins'] leading-6 outline-none placeholder:text-zinc-500"
                     />
                   </div>
                 </div>
@@ -369,7 +369,7 @@ export default function ToolsMentioned({
                     onChange={(e): void => setQuery(e.target.value)}
                     onKeyDown={onKey}
                     placeholder={searchPlaceholder}
-                    className="bg-transparent outline-none text-zinc-400 placeholder:text-zinc-500 w-full"
+                    className="bg-transparent outline-none text-neutral-50 placeholder:text-zinc-500 w-full"
                     aria-label={searchPlaceholder}
                   />
                   {loading && (
@@ -491,7 +491,7 @@ export default function ToolsMentioned({
                     value={tool.logo || ""}
                     onChange={(e): void => updateToolLogo(tool.id, e.target.value)}
                     placeholder="Logo URL"
-                    className="h-8 px-2 py-1 bg-zinc-700 rounded text-xs text-zinc-400 placeholder:text-zinc-500 outline-none"
+                    className="h-8 px-2 py-1 bg-zinc-700 rounded text-xs text-neutral-50 placeholder:text-zinc-500 outline-none"
                   />
                   <input
                     type="text"
@@ -500,7 +500,7 @@ export default function ToolsMentioned({
                       updateToolCategory(tool.id, e.target.value)
                     }
                     placeholder="Category"
-                    className="h-8 px-2 py-1 bg-zinc-700 rounded text-xs text-zinc-400 placeholder:text-zinc-500 outline-none"
+                    className="h-8 px-2 py-1 bg-zinc-700 rounded text-xs text-neutral-50 placeholder:text-zinc-500 outline-none"
                   />
                 </div>
               

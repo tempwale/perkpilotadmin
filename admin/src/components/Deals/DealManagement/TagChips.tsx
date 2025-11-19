@@ -51,7 +51,7 @@ export default function TagChips({
       <div className="self-stretch h-14 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700">
         <div className="left-[16px] top-[16px] absolute flex items-center gap-3">
           <input
-            className="bg-transparent text-zinc-400 placeholder:text-zinc-500 outline-none w-[260px]"
+            className="bg-transparent text-neutral-50 placeholder:text-zinc-500 outline-none w-[260px]"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {

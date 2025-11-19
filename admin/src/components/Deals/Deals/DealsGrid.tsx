@@ -243,7 +243,7 @@ export default function DealGrid({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search deals"
-              className="bg-transparent outline-none text-zinc-400 placeholder:text-zinc-500 w-full"
+              className="bg-transparent outline-none text-neutral-50 placeholder:text-zinc-500 w-full"
               aria-label="Search deals"
             />
           </div>
@@ -268,7 +268,7 @@ export default function DealGrid({
               <img
                 src={deal.logoUri}
                 alt={deal.title ?? "logo"}
-                className="w-12 h-12 object-contain"
+                className="w-14 h-14 object-contain"
               />
             ) : null);
 

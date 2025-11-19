@@ -19,6 +19,10 @@ function normalizeBackendUrl(url?: string): string {
 
 export const BACKEND_URL: string = normalizeBackendUrl(rawEnv.VITE_BACKEND_URL);
 export const DEALS_API = `${BACKEND_URL}/api/deals`;
+// Deal page settings API endpoint (using query parameter)
+export const DEALPAGE_API = `${DEALS_API}?page=true`;
+// Stats API endpoint
+export const STATS_API = `${DEALS_API}/stats`;
 // Comparisions API endpoint (singular `comparision` to match backend route)
 export const COMPARISIONS_API = `${BACKEND_URL}/api/comparisons`;
 // Reviews API endpoint

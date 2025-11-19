@@ -1,8 +1,12 @@
 import { ChevronDown } from "lucide-react";
 import {useState, type ReactElement} from "react";
-import StatsGrid from "./StatsGrid";
+import StatsGrid from "../Shared/Stats/StatsGrid";
 
-export default function Stats(): ReactElement{
+interface StatsProps {
+  onStatsChange?: (stats: Array<{ numberValue: string; message: string }>) => void;
+}
+
+export default function Stats({ onStatsChange }: StatsProps): ReactElement{
   const [open, setOpen] = useState(true);
 
   return (
@@ -31,7 +35,7 @@ export default function Stats(): ReactElement{
       {open && (
         <div className="self-stretch inline-flex justify-start items-center gap-3">
           <div className="flex-1 inline-flex flex-col justify-start items-start gap-3">
-            <StatsGrid />
+            <StatsGrid onStatsChange={onStatsChange} />
           </div>
         </div>
       )}

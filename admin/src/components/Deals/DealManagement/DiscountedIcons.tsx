@@ -139,7 +139,7 @@ export default function DiscountedIcons({
           </div>
 
           <div className="self-stretch flex flex-col justify-center items-start gap-3">
-            <label className="text-neutral-50 text-sm font-medium">
+            <label className="text-neutral-50 text-sm font-medium placeholder:text-zinc-500">
               Main Headline
             </label>
             <input
@@ -150,7 +150,7 @@ export default function DiscountedIcons({
           </div>
 
           <div className="self-stretch flex flex-col justify-center items-start gap-3">
-            <label className="text-neutral-50 text-sm font-medium">
+            <label className="text-neutral-50 text-sm font-medium placeholder:text-zinc-500">
               Sub-Headline ( Body )
             </label>
             <textarea
@@ -161,11 +161,11 @@ export default function DiscountedIcons({
           </div>
           <div className="flex flex-row w-full justify-between gap-6">
             <div className="self-stretch w-full flex flex-col gap-3">
-              <label className="text-neutral-50 text-sm font-medium">
+              <label className="text-neutral-50 text-sm font-medium ">
                 Primary CTA Button Text
               </label>
               <input
-                className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-200"
+                className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-200 placeholder:text-zinc-500"
                 value={internalCtaText}
                 onChange={(e) => setInternalCtaText(e.target.value)}
               />
@@ -175,7 +175,7 @@ export default function DiscountedIcons({
                 Primary CTA Button Link
               </label>
               <input
-                className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-200"
+                className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-200 placeholder:text-zinc-500"
                 value={internalCtaLink}
                 onChange={(e) => setInternalCtaLink(e.target.value)}
               />
