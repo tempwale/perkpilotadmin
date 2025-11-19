@@ -1,4 +1,5 @@
 import { useState, useEffect, type ChangeEvent, type FormEvent, type ReactElement } from "react";
+import { useNavigate } from "react-router-dom";
 import FooterActions from "./FooterActions";
 import { Plus } from "lucide-react";
 import { DEALS_API } from "../../../config/backend";
@@ -13,6 +14,7 @@ export default function ToolComparisonForm({
   create?: boolean;
   initialDeal?: DealApiResponse;
 }): ReactElement {
+  const navigate = useNavigate();
   const [loadingDeal, setLoadingDeal] = useState(false);
 
   useEffect(() => {
@@ -354,10 +356,10 @@ export default function ToolComparisonForm({
 
         const data = await res.json() as DealApiResponse;
         if (editId) {
-          setSuccessMessage("Deal updated successfully.");
+          setSuccessMessage("Deal updated successfully. Redirecting...");
           console.log("Updated deal:", data);
         } else {
-          setSuccessMessage("Deal created successfully.");
+          setSuccessMessage("Deal created successfully. Redirecting...");
           console.log("Created deal:", data);
           // reset basic fields only after create
           setFormData((prev) => ({
@@ -370,6 +372,11 @@ export default function ToolComparisonForm({
           }));
           setLogoFiles([null, null, null]);
         }
+        
+        // Redirect to deals page after successful save
+        setTimeout(() => {
+          void navigate("/deals");
+        }, 1500);
       } catch (err) {
         console.error(err);
         const errorMessage = err instanceof Error ? err.message : (initialDeal ? "Failed to update deal" : "Failed to create deal");
@@ -449,7 +456,7 @@ export default function ToolComparisonForm({
                       }));
                     }
                   }}
-                  className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Poppins'] leading-6"
+                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
                 >
                   <option value="">Select Category</option>
                   <option value="productivity">Productivity</option>
@@ -510,7 +517,7 @@ export default function ToolComparisonForm({
                 value={formData.toolDescription}
                 onChange={handleInputChange}
                 placeholder="E.g. The collaborative user interface design tool."
-                className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Plus_Jakarta_Sans'] leading-6"
+                className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Plus_Jakarta_Sans'] leading-6 placeholder:text-zinc-500"
               />
             </div>
             <div
@@ -582,7 +589,7 @@ export default function ToolComparisonForm({
                     value={logoFetchUrl}
                     onChange={(e) => setLogoFetchUrl(e.target.value)}
                     placeholder="e.g., google.com"
-                    className="w-full bg-transparent outline-none text-zinc-400 text-sm font-normal font-['Poppins']"
+                    className="w-full bg-transparent outline-none text-neutral-50 text-sm font-normal font-['Poppins'] placeholder:text-zinc-500"
                   />
                 </div>
                 <button
@@ -632,7 +639,7 @@ export default function ToolComparisonForm({
                   value={formData.dealBadge}
                   onChange={handleInputChange}
                   placeholder="E.g. Hot Deals"
-                  className="w-full bg-transparent outline-none text-zinc-500 text-base font-normal font-['Poppins'] leading-6"
+                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
                 />
               </div>
             </div>
@@ -660,7 +667,7 @@ export default function ToolComparisonForm({
               value={formData.whatsIncludedTitle}
               onChange={handleInputChange}
               placeholder="Whats Included?"
-              className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Poppins'] leading-6"
+              className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
             />
           </div>
         </div>
@@ -682,7 +689,7 @@ export default function ToolComparisonForm({
                   value={feature}
                   onChange={(e) => handleFeatureChange(index, e.target.value)}
                   placeholder={`Feature ${index + 1}`}
-                  className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Poppins'] leading-6"
+                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
                 />
               </div>
               {formData.features.length > 1 && (
@@ -847,7 +854,7 @@ export default function ToolComparisonForm({
                 value={formData.primaryCtaText}
                 onChange={handleInputChange}
                 placeholder="e.g., Get Notion"
-                className="w-full bg-transparent outline-none text-zinc-500 text-base font-normal font-['Poppins'] leading-6"
+                className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
               />
             </div>
             <div
@@ -864,7 +871,7 @@ export default function ToolComparisonForm({
           >
             <div
               data-layer="Primary CTA Button Link"
-              className="PrimaryCtaButtonLink justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
+              className="PrimaryCtaButtonLink justify-start text-neutral-50 text-sm font-medium font-['Poppins'] placeholder:text-zinc-500"
             >
               Primary CTA Button Link
             </div>
@@ -878,7 +885,7 @@ export default function ToolComparisonForm({
                 value={formData.primaryCtaLink}
                 onChange={handleInputChange}
                 placeholder="https://..."
-                className="w-full bg-transparent outline-none text-zinc-500 text-base font-normal font-['Poppins'] leading-6"
+                className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
               />
             </div>
           </div>
@@ -909,7 +916,7 @@ export default function ToolComparisonForm({
                 value={formData.secondaryCtaText}
                 onChange={handleInputChange}
                 placeholder="e.g., Get Motion"
-                className="w-full bg-transparent outline-none text-zinc-500 text-base font-normal font-['Poppins'] leading-6"
+                className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
               />
             </div>
             <div
@@ -940,7 +947,7 @@ export default function ToolComparisonForm({
                 value={formData.secondaryCtaLink}
                 onChange={handleInputChange}
                 placeholder="https://..."
-                className="w-full bg-transparent outline-none text-zinc-500 text-base font-normal font-['Poppins'] leading-6"
+                className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
               />
             </div>
           </div>

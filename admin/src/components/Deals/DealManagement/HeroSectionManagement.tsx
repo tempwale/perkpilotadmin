@@ -7,7 +7,6 @@ type Props = {
   subHeadline?: string;
   ctaText?: string;
   ctaLink?: string;
-  // image upload removed — keep props minimal
   tags?: string[];
   onChange?: (fields: {
     topTagline: string;

@@ -1,6 +1,7 @@
 import {useMemo, useState, type ReactElement} from "react";
 import DealsCard from "./DealCard";
 import { ChevronDown } from "lucide-react";
+import type { DealApiResponse } from "../../../types/api.types";
 function FramerLogo(): ReactElement{
   return (
     <svg
@@ -25,244 +26,40 @@ function FramerLogo(): ReactElement{
   );
 }
 
-function FigmaLogo(): ReactElement{
-  return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M12 12C12 10.34 13.34 9 15 9C16.66 9 18 10.34 18 12C18 13.66 16.66 15 15 15C13.34 15 12 13.66 12 12Z"
-        fill="#1ABCFE"
-      />
-      <path
-        d="M6 21C6 19.34 7.34 18 9 18H12V21C12 22.66 10.66 24 9 24C7.34 24 6 22.66 6 21Z"
-        fill="#0ACF83"
-      />
-      <path
-        d="M12 0V9H15C16.66 9 18 7.66 18 6C18 4.34 16.66 3 15 3H12V0Z"
-        fill="#FF7262"
-      />
-      <path
-        d="M6 6C6 7.66 7.34 9 9 9H12V3H9C7.34 3 6 4.34 6 6Z"
-        fill="#F24E1E"
-      />
-      <path
-        d="M6 15C6 16.66 7.34 18 9 18H12V12H9C7.34 12 6 13.34 6 15Z"
-        fill="#A259FF"
-      />
-    </svg>
-  );
+interface ArticleGridProps {
+  allDeals?: DealApiResponse[];
+  selectedDealIds?: string[];
+  onDealsChange?: (dealIds: string[]) => void;
 }
 
-function NotionLogo(): ReactElement{
-  return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M4 4L20 4C20.55 4 21 4.45 21 5V19C21 19.55 20.55 20 20 20H4C3.45 20 3 19.55 3 19V5C3 4.45 3.45 4 4 4ZM5 6V18H19V6H5ZM7 8H17V10H7V8ZM7 12H17V14H7V12ZM7 16H13V18H7V16Z"
-        fill="white"
-      />
-    </svg>
-  );
-}
-
-function SlackLogo(): ReactElement{
-  return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M5.042 15.165C5.042 16.73 3.777 18 2.217 18C0.656 18 -0.609 16.73 -0.609 15.165C-0.609 13.6 0.656 12.33 2.217 12.33H5.042V15.165Z"
-        fill="#E01E5A"
-      />
-      <path
-        d="M6.313 15.165C6.313 13.6 7.578 12.33 9.139 12.33C10.7 12.33 11.965 13.6 11.965 15.165V21.783C11.965 23.348 10.7 24.618 9.139 24.618C7.578 24.618 6.313 23.348 6.313 21.783V15.165Z"
-        fill="#E01E5A"
-      />
-      <path
-        d="M9.139 5.042C7.578 5.042 6.313 3.777 6.313 2.217C6.313 0.656 7.578 -0.609 9.139 -0.609C10.7 -0.609 11.965 0.656 11.965 2.217V5.042H9.139Z"
-        fill="#36C5F0"
-      />
-      <path
-        d="M9.139 6.313C10.7 6.313 11.965 7.578 11.965 9.139C11.965 10.7 10.7 11.965 9.139 11.965H2.521C0.96 11.965 -0.305 10.7 -0.305 9.139C-0.305 7.578 0.96 6.313 2.521 6.313H9.139Z"
-        fill="#36C5F0"
-      />
-    </svg>
-  );
-}
-
-function AirtableLogo(): ReactElement{
-  return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#FFBF00" />
-      <path
-        d="M2 17L12 22L22 17"
-        stroke="#FFBF00"
-        strokeWidth="2"
-        fill="none"
-      />
-      <path
-        d="M2 12L12 17L22 12"
-        stroke="#FFBF00"
-        strokeWidth="2"
-        fill="none"
-      />
-    </svg>
-  );
-}
-
-function WebflowLogo(): ReactElement{
-  return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M12 2C6.477 2 2 6.477 2 12C2 17.523 6.477 22 12 22C17.523 22 22 17.523 22 12C22 6.477 17.523 2 12 2ZM16.5 8L12 16L7.5 8H16.5Z"
-        fill="#4353FF"
-      />
-    </svg>
-  );
-}
-export default function ArticleGrid(): ReactElement{
+export default function ArticleGrid({
+  allDeals = [],
+  selectedDealIds = [],
+  onDealsChange,
+}: ArticleGridProps): ReactElement {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(true);
 
-  const posts = useMemo(
-    () => [
-      {
-        id: 1,
-        title: "Framer",
-        category: "No-Code Tool",
-        description:
-          "Every communications experience, Integrated contact center, voice, video, chat, and APIs.",
-        logoComponent: <FramerLogo />,
-        verified: true,
-        dealType: "Hot Deal",
-        features: [
-          "Unlimited Blocks",
-          "Team Collaboration",
-          "Advance Permissions",
-          "Version History",
-        ],
-        discount: "25% OFF",
-        savings: "Save Up To $1234",
-      },
-      {
-        id: 2,
-        title: "Figma",
-        category: "Design Tool",
-        description:
-          "Collaborative interface design tool for teams. Create, prototype, and gather feedback all in one place.",
-        logoComponent: <FigmaLogo />,
-        verified: true,
-        dealType: "Limited Time",
-        features: [
-          "Unlimited Files",
-          "Advanced Prototyping",
-          "Team Libraries",
-          "Version Control",
-        ],
-        discount: "50% OFF",
-        savings: "Save Up To $2000",
-      },
-      {
-        id: 3,
-        title: "Notion",
-        category: "Productivity Tool",
-        description:
-          "All-in-one workspace for notes, tasks, wikis, and databases. Organize your work and life.",
-        logoComponent: <NotionLogo />,
-        verified: false,
-        dealType: "New Deal",
-        features: [
-          "Unlimited Pages",
-          "Real-time Collaboration",
-          "Advanced Permissions",
-          "API Access",
-        ],
-        discount: "40% OFF",
-        savings: "Save Up To $800",
-      },
-      {
-        id: 4,
-        title: "Slack",
-        category: "Communication Tool",
-        description:
-          "Team communication platform with channels, direct messages, file sharing, and integrations.",
-        logoComponent: <SlackLogo />,
-        verified: true,
-        dealType: "Popular",
-        features: [
-          "Unlimited Messages",
-          "App Integrations",
-          "Advanced Search",
-          "Guest Access",
-        ],
-        discount: "30% OFF",
-        savings: "Save Up To $1500",
-      },
-      {
-        id: 5,
-        title: "Airtable",
-        category: "Database Tool",
-        description:
-          "Flexible database platform that combines the simplicity of a spreadsheet with database power.",
-        logoComponent: <AirtableLogo />,
-        verified: true,
-        dealType: "Best Value",
-        features: [
-          "Unlimited Bases",
-          "Advanced Views",
-          "Automation",
-          "API Access",
-        ],
-        discount: "35% OFF",
-        savings: "Save Up To $1200",
-      },
-      {
-        id: 6,
-        title: "Webflow",
-        category: "Web Design Tool",
-        description:
-          "Visual web design platform that generates clean, semantic code automatically.",
-        logoComponent: <WebflowLogo />,
-        verified: true,
-        dealType: "Hot Deal",
-        features: [
-          "Visual Editor",
-          "CMS Integration",
-          "E-commerce Features",
-          "Custom Code",
-        ],
-        discount: "45% OFF",
-        savings: "Save Up To $1800",
-      },
-    ],
-    []
-  );
+  // Convert deals to display format
+  const posts = useMemo(() => {
+    return allDeals.map((deal) => {
+      const dealId = deal._id || (deal as { id?: string }).id || "";
+      return {
+        id: dealId,
+        _id: dealId,
+        title: deal.title || "",
+        category: deal.category || "",
+        description: deal.description || "",
+        logoUri: deal.logoUri,
+        verified: deal.verified || false,
+        dealType: deal.tag || "",
+        features: deal.features || [],
+        discount: deal.discount || "",
+        savings: deal.savings || "",
+        isSelected: selectedDealIds.includes(dealId),
+      };
+    });
+  }, [allDeals, selectedDealIds]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -275,11 +72,33 @@ export default function ArticleGrid(): ReactElement{
     });
   }, [posts, query]);
 
+  const handleToggleDeal = (dealId: string) => {
+    if (!onDealsChange) return;
+    
+    const isSelected = selectedDealIds.includes(dealId);
+    let newSelection: string[];
+    
+    if (isSelected) {
+      newSelection = selectedDealIds.filter((id) => id !== dealId);
+    } else {
+      newSelection = [...selectedDealIds, dealId];
+    }
+    
+    onDealsChange(newSelection);
+  };
+
   return (
     <div className="w-full p-4 bg-zinc-800 rounded-2xl flex flex-col justify-start items-start gap-6">
       <div className="self-stretch pb-4 border-b border-zinc-700 inline-flex justify-between items-center">
+        <div className="flex flex-col gap-1">
         <div className="text-neutral-50 text-xl font-medium leading-loose">
           Feature Deals On Top
+          </div>
+          <div className="text-zinc-400 text-sm">
+            {selectedDealIds.length > 0
+              ? `${selectedDealIds.length} deal${selectedDealIds.length === 1 ? "" : "s"} selected`
+              : "Select deals to feature"}
+          </div>
         </div>
         <button
           type="button"
@@ -327,7 +146,7 @@ export default function ArticleGrid(): ReactElement{
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search Deals"
-              className="bg-transparent outline-none text-zinc-400 placeholder:text-zinc-500 w-full"
+              className="bg-transparent outline-none text-neutral-50 placeholder:text-zinc-500 w-full"
               aria-label="Search Deals"
             />
           </div>
@@ -335,11 +154,82 @@ export default function ArticleGrid(): ReactElement{
       )}
 
       {open && (
-        <div className="self-stretch grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {filtered.map((p) => (
-            <DealsCard key={p.id} {...p} />
-          ))}
+        <>
+          {filtered.length === 0 ? (
+            <div className="w-full text-center py-8 text-zinc-400">
+              {allDeals.length === 0
+                ? "No deals available. Create deals first."
+                : "No deals match your search."}
+            </div>
+          ) : (
+            <div className="self-stretch grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filtered.map((p) => {
+                const isSelected = selectedDealIds.includes(p.id);
+                return (
+                  <div
+                    key={p.id}
+                    className="relative cursor-pointer"
+                    onClick={() => handleToggleDeal(p.id)}
+                  >
+                    <div
+                      className={`absolute top-2 right-2 z-10 w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                        isSelected
+                          ? "bg-[#7f57e2] border-[#7f57e2]"
+                          : "bg-zinc-800 border-zinc-600"
+                      }`}
+                    >
+                      {isSelected && (
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                        >
+                          <path
+                            d="M11.6667 3.5L5.25 9.91667L2.33334 7"
+                            stroke="white"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                    <div
+                      className={`inline-block w-full transition-all ${
+                        isSelected
+                          ? "ring-2 ring-[#7f57e2] rounded-[24px] ring-offset-0"
+                          : ""
+                      }`}
+                    >
+                    <DealsCard
+                      title={p.title}
+                      category={p.category}
+                      description={p.description}
+                      logoComponent={
+                        p.logoUri ? (
+                          <img
+                            src={p.logoUri}
+                            alt={p.title}
+                            className="w-14 h-14 object-contain"
+                          />
+                        ) : (
+                          <FramerLogo />
+                        )
+                      }
+                      verified={p.verified}
+                      dealType={p.dealType}
+                      features={p.features}
+                      discount={p.discount}
+                      savings={p.savings}
+                    />
+                    </div>
+                  </div>
+                );
+              })}
         </div>
+          )}
+        </>
       )}
     </div>
   );

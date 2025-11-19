@@ -1,4 +1,5 @@
-import {useState, useEffect, type ChangeEvent, type FormEvent, ReactElement} from "react";
+import {useState, useEffect, type ChangeEvent, type FormEvent,type ReactElement} from "react";
+import { useNavigate } from "react-router-dom";
 import FooterActions from "./FooterActions";
 import { Plus } from "lucide-react";
 import { DEALS_API } from "../../../config/backend";
@@ -11,10 +12,10 @@ export default function Hero({
   reviewId?: string;
   create?: boolean;
 }): ReactElement{
+  const navigate = useNavigate();
   const [loadingDeal, setLoadingDeal] = useState(false);
 
-  useEffect((): void => {
-    // If a reviewId (deal id) was provided, fetch the deal and prefill the form
+  useEffect(() => {
     if (!reviewId) {
       if (create) console.log("Hero running in create mode");
       return;
@@ -22,23 +23,21 @@ export default function Hero({
 
     let mounted = true;
 
-    (async (): Promise<void> => {
+    void (async (): Promise<void> => {
       setLoadingDeal(true);
       setErrorMessage(null);
       try {
         const res = await fetch(`${DEALS_API}/${reviewId}`);
         if (!res.ok) {
-          const body = (await res.json().catch((): ReactElement=> ({}))) as ApiError | { message?: string };
+          const body = (await res.json().catch(() => ({}))) as ApiError | { message?: string };
           throw new Error(body.message || `Server returned ${res.status}`);
         }
         const data = await res.json() as DealApiResponse;
         if (!mounted) return;
-
-        // Map backend deal model to our form fields
-        const primaryCtaTextValue = ((typeof data.primary_cta_text === "string" ? data.primary_cta_text : undefined) ?? (typeof data.primaryCtaText === "string" ? data.primaryCtaText : undefined)) as string | undefined;
-        const secondaryCtaTextValue = ((typeof data.secondary_cta_text === "string" ? data.secondary_cta_text : undefined) ?? (typeof data.secondaryCtaText === "string" ? data.secondaryCtaText : undefined)) as string | undefined;
-        const primaryCtaLinkValue = ((typeof data.primary_cta_link === "string" ? data.primary_cta_link : undefined) ?? (typeof data.primaryCtaLink === "string" ? data.primaryCtaLink : undefined)) as string | undefined;
-        const secondaryCtaLinkValue = ((typeof data.secondary_cta_link === "string" ? data.secondary_cta_link : undefined) ?? (typeof data.secondaryCtaLink === "string" ? data.secondaryCtaLink : undefined)) as string | undefined;
+        const primaryCtaTextValue = typeof data.primary_cta_text === "string" ? data.primary_cta_text : undefined;
+        const secondaryCtaTextValue = typeof data.secondary_cta_text === "string" ? data.secondary_cta_text : undefined;
+        const primaryCtaLinkValue = typeof data.primary_cta_link === "string" ? data.primary_cta_link : undefined;
+        const secondaryCtaLinkValue = typeof data.secondary_cta_link === "string" ? data.secondary_cta_link : undefined;
         
         setFormData((prev) => ({
           ...prev,
@@ -304,24 +303,18 @@ export default function Hero({
         });
 
         if (!res.ok) {
-          const errBody = (await res.json().catch((): ReactElement=> ({}))) as ApiError | { message?: string };
+          const errBody = (await res.json().catch(() => ({}))) as ApiError | { message?: string };
           throw new Error(errBody.message || `Server returned ${res.status}`);
         }
 
         const data = await res.json() as DealApiResponse;
         setSuccessMessage("Deal created successfully.");
         console.log("Created deal:", data);
-        // Optionally reset form or navigate to deals list
-        // reset basic fields
-        setFormData((prev) => ({
-          ...prev,
-          toolName: "",
-          toolCategory: "",
-          toolDescription: "",
-          dealBadge: "",
-          features: ["", ""],
-        }));
-        setLogoFiles([null, null, null]);
+        
+        // Navigate to deals list page after successful creation
+        setTimeout(() => {
+          void navigate("/deals");
+        }, 1500);
       } catch (err) {
         console.error(err);
         const errorMessage = err instanceof Error ? err.message : "Failed to create deal";
@@ -367,7 +360,7 @@ export default function Hero({
                   value={formData.toolName}
                   onChange={handleInputChange}
                   placeholder="Tool Name"
-                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6"
+                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
                 />
               </div>
             </div>
@@ -401,7 +394,7 @@ export default function Hero({
                       }));
                     }
                   }}
-                  className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Poppins'] leading-6"
+                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
                 >
                   <option value="">Select Category</option>
                   <option value="productivity">Productivity</option>
@@ -462,7 +455,7 @@ export default function Hero({
                 value={formData.toolDescription}
                 onChange={handleInputChange}
                 placeholder="E.g. The collaborative user interface design tool."
-                className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Plus_Jakarta_Sans'] leading-6"
+                className="w-full bg-transparent outline-none text-neutral-50 placeholder:text-zinc-500 text-base font-normal font-['Plus_Jakarta_Sans'] leading-6"
               />
             </div>
             <div
@@ -534,7 +527,7 @@ export default function Hero({
                     value={logoFetchUrl}
                     onChange={(e) => setLogoFetchUrl(e.target.value)}
                     placeholder="e.g., google.com"
-                    className="w-full bg-transparent outline-none text-zinc-400 text-sm font-normal font-['Poppins']"
+                    className="w-full bg-transparent outline-none text-neutral-50 text-sm font-normal font-['Poppins']"
                   />
                 </div>
                 <button
@@ -570,7 +563,7 @@ export default function Hero({
             >
               <div
                 data-layer="Deal Badge"
-                className="DealBadge justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
+                className="DealBadge justify-start text-neutral-50 text-sm font-medium font-['Poppins'] placeholder:text-zinc-500"
               >
                 Deal Badge
               </div>
@@ -584,7 +577,7 @@ export default function Hero({
                   value={formData.dealBadge}
                   onChange={handleInputChange}
                   placeholder="E.g. Hot Deals"
-                  className="w-full bg-transparent outline-none text-zinc-500 text-base font-normal font-['Poppins'] leading-6"
+                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
                 />
               </div>
             </div>
@@ -598,7 +591,7 @@ export default function Hero({
         >
           <div
             data-layer="Whats Included Section Title"
-            className="WhatsIncludedSectionTitle justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
+            className="WhatsIncludedSectionTitle justify-start text-neutral-50 text-sm font-medium font-['Poppins'] placeholder:text-zinc-500"
           >
             Whats Included Section Title
           </div>
@@ -612,7 +605,7 @@ export default function Hero({
               value={formData.whatsIncludedTitle}
               onChange={handleInputChange}
               placeholder="Whats Included?"
-              className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Poppins'] leading-6"
+              className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
             />
           </div>
         </div>
@@ -634,7 +627,7 @@ export default function Hero({
                   value={feature}
                   onChange={(e) => handleFeatureChange(index, e.target.value)}
                   placeholder={`Feature ${index + 1}`}
-                  className="w-full bg-transparent outline-none text-zinc-400 text-base font-normal font-['Poppins'] leading-6"
+                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
                 />
               </div>
               {formData.features.length > 1 && (
@@ -662,7 +655,7 @@ export default function Hero({
           >
             <div
               data-layer="Add More Pros & Cons"
-              className="AddMoreProsCons justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
+              className="AddMoreProsCons justify-start text-neutral-50 text-sm font-medium font-['Poppins'] placeholder:text-zinc-500"
             >
               Add More Features
             </div>
@@ -677,7 +670,7 @@ export default function Hero({
         >
           <div
             data-layer="Money Save Upto"
-            className="MoneySaveUpto justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
+            className="MoneySaveUpto justify-start text-neutral-50 text-sm font-medium font-['Poppins'] placeholder:text-zinc-500"
           >
             Money Save Upto
           </div>
@@ -689,7 +682,7 @@ export default function Hero({
               data-layer="Input"
               className="Input h-14 px-4 py-3 bg-zinc-800 rounded-tl-xl rounded-bl-xl outline-1 -outline-offset-0.5 outline-zinc-700 flex justify-start items-center overflow-hidden"
             >
-              <div className="justify-start text-neutral-50 text-base font-normal font-['Poppins'] leading-6">
+              <div className="justify-start text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500">
                 Save Upto
               </div>
             </div>
@@ -702,7 +695,7 @@ export default function Hero({
                 name="saveUptoAmount"
                 value={formData.saveUptoAmount}
                 onChange={handleInputChange}
-                className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6"
+                className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
               />
             </div>
             <div
@@ -713,7 +706,7 @@ export default function Hero({
                 name="saveUptoUnit"
                 value={formData.saveUptoUnit}
                 onChange={handleInputChange}
-                className="bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6"
+                className="bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
               >
                 <option value="Upto">Upto</option>
                 <option value="Flat">Flat</option>
@@ -729,7 +722,7 @@ export default function Hero({
         >
           <div
             data-layer="Discount"
-            className="Discount justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
+            className="Discount justify-start text-neutral-50 text-sm font-medium font-['Poppins'] placeholder:text-zinc-500"
           >
             Discount
           </div>
@@ -741,7 +734,7 @@ export default function Hero({
               data-layer="Input"
               className="Input w-[114px] h-14 px-4 py-3 bg-zinc-800 rounded-tl-xl rounded-bl-xl outline-1 -outline-offset-0.5 outline-zinc-700 flex justify-start items-center overflow-hidden"
             >
-              <div className="justify-start text-neutral-50 text-base font-normal font-['Poppins'] leading-6">
+              <div className="justify-start text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500">
                 Discount
               </div>
             </div>
@@ -785,7 +778,7 @@ export default function Hero({
           >
             <div
               data-layer="Primary CTA Button Text"
-              className="PrimaryCtaButtonText justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
+              className="PrimaryCtaButtonText justify-start text-neutral-50 text-sm font-medium font-['Poppins'] placeholder:text-zinc-500"
             >
               Primary CTA Button Text
             </div>
@@ -799,7 +792,7 @@ export default function Hero({
                 value={formData.primaryCtaText}
                 onChange={handleInputChange}
                 placeholder="e.g., Get Notion"
-                className="w-full bg-transparent outline-none text-zinc-500 text-base font-normal font-['Poppins'] leading-6"
+                className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
               />
             </div>
             <div
@@ -816,7 +809,7 @@ export default function Hero({
           >
             <div
               data-layer="Primary CTA Button Link"
-              className="PrimaryCtaButtonLink justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
+              className="PrimaryCtaButtonLink justify-start text-neutral-50 text-sm font-medium font-['Poppins'] placeholder:text-zinc-500"
             >
               Primary CTA Button Link
             </div>
@@ -830,7 +823,7 @@ export default function Hero({
                 value={formData.primaryCtaLink}
                 onChange={handleInputChange}
                 placeholder="https://..."
-                className="w-full bg-transparent outline-none text-zinc-500 text-base font-normal font-['Poppins'] leading-6"
+                className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
               />
             </div>
           </div>
@@ -861,7 +854,7 @@ export default function Hero({
                 value={formData.secondaryCtaText}
                 onChange={handleInputChange}
                 placeholder="e.g., Get Motion"
-                className="w-full bg-transparent outline-none text-zinc-500 text-base font-normal font-['Poppins'] leading-6"
+                className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
               />
             </div>
             <div
@@ -892,7 +885,7 @@ export default function Hero({
                 value={formData.secondaryCtaLink}
                 onChange={handleInputChange}
                 placeholder="https://..."
-                className="w-full bg-transparent outline-none text-zinc-500 text-base font-normal font-['Poppins'] leading-6"
+                className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
               />
             </div>
           </div>

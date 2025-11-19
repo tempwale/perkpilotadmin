@@ -245,7 +245,7 @@ export default function ModulesCard({
                     placeholder="Title"
                     value={module.title}
                     onChange={(e): void => handleTitleChange(moduleIndex, e.target.value)}
-                    className="w-full bg-transparent text-zinc-400 text-base font-normal font-['Poppins'] leading-6 outline-none"
+                    className="w-full bg-transparent text-neutral-50 text-base font-normal font-['Poppins'] leading-6 outline-none placeholder:text-zinc-500"
                   />
                 </div>
               </div>
@@ -265,7 +265,7 @@ export default function ModulesCard({
                       placeholder="Benefit"
                       value={benefit}
                       onChange={(e): void => handleBenefitChange(moduleIndex, benefitIndex, e.target.value)}
-                      className="w-full bg-transparent text-zinc-400 text-base font-normal font-['Poppins'] leading-6 outline-none"
+                      className="w-full bg-transparent text-neutral-50 text-base font-normal font-['Poppins'] leading-6 outline-none placeholder:text-zinc-500"
                     />
                   </div>
                 </div>

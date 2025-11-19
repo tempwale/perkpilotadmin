@@ -97,7 +97,7 @@ export default function Header({
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onBlur={(): void => {}}
-                className="bg-transparent text-zinc-200 text-base font-normal font-['Poppins'] leading-normal outline-none"
+                className="bg-transparent text-neutral-50 text-base font-normal font-['Poppins'] leading-normal outline-none placeholder:text-zinc-500"
                 placeholder="Search"
               />
             </div>
