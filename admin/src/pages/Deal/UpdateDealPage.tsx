@@ -1,13 +1,14 @@
 import { useEffect, useState, type ReactElement } from "react";
 import Header from "../../components/Deals/UpdateDeal/Header";
 import Hero from "../../components/Deals/UpdateDeal/Hero";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { DEALS_API } from "../../config/backend";
 import type { Deal, DealApiResponse } from "../../types/api.types";
 import { normalizeDeal, denormalizeDeal } from "../../types/api.types";
 
 export default function UpdateDealPage(): ReactElement{
   const params = useParams<{ id?: string; reviewId?: string }>();
+  const navigate = useNavigate();
   const id = params.id ?? params.reviewId;
 
   const [deal, setDeal] = useState<Deal | null>(null);
@@ -43,12 +44,16 @@ export default function UpdateDealPage(): ReactElement{
     };
   }, [id]);
 
+  const handleBack = () => {
+    void navigate("/deals");
+  };
+
   return (
     <div
       data-layer="Frame 2147206029"
       className="Frame2147206029 w-[1116px] p-6 bg-zinc-900 rounded-3xl outline-1 -outline-offset-1 outline-zinc-800 inline-flex flex-col justify-start items-start gap-6"
     >
-      <Header title="Update Deal" />
+      <Header title="Update Deal" onBack={handleBack} />
       {loading ? (
         <div className="text-sm text-zinc-400">Loading deal...</div>
       ) : error ? (
