@@ -8,7 +8,6 @@ type SortOption =
   | "price-high"
   | "price-low"
   | "name-az";
-type FilterOption = "all" | "active" | "expired" | "pending" | "draft";
 
 interface SortOptionItem {
   value: SortOption;
@@ -17,7 +16,6 @@ interface SortOptionItem {
 
 interface DealsHeaderProps {
   onSortChange?: (value: SortOption) => void;
-  onFilterChange?: (value: FilterOption) => void;
   onAddDeal?: () => void;
 }
 
@@ -27,7 +25,7 @@ export default function DealsHeader({
 }: DealsHeaderProps): ReactElement{
   const [sortBy, setSortBy] = useState<SortOption>("newly-published");
   const [showSortDropdown, setShowSortDropdown] = useState<boolean>(false);
-  // Sort options with proper typing
+  
   const sortOptions: SortOptionItem[] = [
     { value: "newly-published", label: "Newly Published First" },
     { value: "oldest", label: "Oldest First" },
@@ -44,8 +42,6 @@ export default function DealsHeader({
 
   const handleAddNewDeal = (): void => {
     onAddDeal?.();
-    // Navigate to the add deal page. Use window.location so this works
-    // whether or not a client router is configured.
     window.location.assign("/adddeal");
   };
 
