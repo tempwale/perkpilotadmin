@@ -110,7 +110,7 @@ export default function Hero({
                 aria-label="Hero heading"
                 value={localHeading}
                 onChange={handleHeadingChange}
-                className="w-full h-14 px-4 py-3 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-zinc-400 text-base font-['Poppins'] leading-6 outline-none"
+                className="w-full h-14 px-4 py-3 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-neutral-50 text-base font-['Poppins'] leading-6 outline-none placeholder:text-zinc-500"
                 placeholder="Hero heading"
               />
             </div>
@@ -124,7 +124,7 @@ export default function Hero({
                 aria-label="Hero body"
                 value={localBody}
                 onChange={handleBodyChange}
-                className="w-full h-14 px-4 py-3 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-zinc-400 text-base font-['Poppins'] leading-6 outline-none"
+                className="w-full h-14 px-4 py-3 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-neutral-50 text-base font-['Poppins'] leading-6 outline-none placeholder:text-zinc-500"
                 placeholder="Hero Body"
               />
             </div>

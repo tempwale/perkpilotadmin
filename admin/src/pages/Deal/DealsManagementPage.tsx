@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import DealManagementHeader from "../../components/Deals/DealManagement/DealManagementHeader";
 import DealPageSettings from "../../components/Deals/DealManagement/DealPageSettings";
 import HeroSectionManagement from "../../components/Deals/DealManagement/HeroSectionManagement";

@@ -1,7 +1,44 @@
-import { useState, type ReactElement } from "react";
-import CardPopup from "./CardPopup";
+import { type ReactElement } from "react";
 
-// card-local state is used to control the details modal
+function DefaultLogo(): ReactElement {
+  return (
+    <svg
+      width="61"
+      height="60"
+      viewBox="0 0 61 60"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect x="2.5" y="2" width="56" height="56" rx="28" fill="#F9FAFB" />
+      <rect
+        x="1.5"
+        y="1"
+        width="58"
+        height="58"
+        rx="29"
+        stroke="white"
+        strokeOpacity="0.08"
+        strokeWidth="2"
+      />
+      <g clipPath="url(#clip0_1_1899)">
+        <path
+          d="M20 14H41V24.6667H30.5L20 14ZM20 24.6667H30.5L41 35.3333H30.5V46L20 35.3333V24.6667Z"
+          fill="#0D0D11"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_1_1899">
+          <rect
+            width="21"
+            height="32"
+            fill="white"
+            transform="translate(20 14)"
+          />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+}
 
 function VerificationIcon(): ReactElement {
   return (
@@ -23,8 +60,6 @@ function VerificationIcon(): ReactElement {
 }
 
 interface DealCardProps {
-  id: string;
-  showCustomizeHeader?: boolean;
   title?: string;
   category?: string;
   description?: string;
@@ -34,9 +69,16 @@ interface DealCardProps {
   features?: string[];
   discount?: string;
   savings?: string;
+  redeemUrl?: string;
   onViewDetails?: () => void;
   onGetDeal?: () => void;
-  onDelete?: () => void;
+  // Admin-specific props
+  showCustomizeHeader?: boolean;
+  onCustomize?: () => void;
+  customizeHeaderText?: string;
+  // Additional styling props
+  className?: string;
+  buttonLayout?: "responsive" | "row"; // responsive = mobile column, desktop row; row = always row
 }
 
 function CheckCircle({ className }: { className?: string }): ReactElement {
@@ -48,12 +90,10 @@ function CheckCircle({ className }: { className?: string }): ReactElement {
 }
 
 export default function DealCard({
-  id,
-  showCustomizeHeader = true,
   title = "Framer",
   category = "No-Code Tool",
   description = "Every communications experience, Integrated contact center, voice, video, chat, and APIs.",
-  logoComponent = <div />,
+  logoComponent = <DefaultLogo />,
   verified = true,
   dealType = "Hot Deal",
   features = [
@@ -64,33 +104,37 @@ export default function DealCard({
   ],
   discount = "25% OFF",
   savings = "Save Up To $1234",
+  redeemUrl,
   onViewDetails,
   onGetDeal,
-  onDelete,
+  showCustomizeHeader = false,
+  onCustomize,
+  customizeHeaderText = "Customize Deal Card?",
+  className = "",
+  buttonLayout = "responsive",
 }: DealCardProps): ReactElement {
-  const [showModal, setShowModal] = useState(false);
-
-  const openModal = (): void => {
-    setShowModal(true);
-  };
-  const closeModal = (): void => {
-    setShowModal(false);
-  };
+  const buttonLayoutClass =
+    buttonLayout === "responsive"
+      ? "flex-col sm:flex-row gap-3 sm:gap-[24px] items-stretch sm:items-center"
+      : "gap-[24px] items-center";
 
   return (
-    <div>
+    <div className={className}>
+      {/* Admin Customize Header */}
       {showCustomizeHeader && (
         <div className="flex justify-center items-center w-full">
           <div
             data-layer="Frame 2147223651"
-            className="Frame2147223651 w-[250px] p-2.5 bg-[#2f2f32] rounded-tl-lg rounded-tr-lg inline-flex justify-center items-center gap-2.5"
+            className="Frame2147223651 w-[250px] p-2.5 bg-[#2f2f32] rounded-tl-lg rounded-tr-lg inline-flex justify-center items-center gap-2.5 cursor-pointer"
+            onClick={onCustomize}
+            role="button"
+            tabIndex={0}
           >
             <div
               data-layer="Customize Deal Card?"
               className="CustomizeDealCard justify-start text-neutral-50 text-sm font-medium font-['Plus_Jakarta_Sans'] underline leading-[21px]"
-              onClick={openModal}
             >
-              Customize Deal Card?
+              {customizeHeaderText}
             </div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -110,12 +154,12 @@ export default function DealCard({
           </div>
         </div>
       )}
+
+      {/* Main Card */}
       <div
-        className="backdrop-blur-md backdrop-filter bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.08)] border-solid box-border content-stretch flex flex-col gap-[16px] items-center pb-[16px] pt-0 px-[16px] relative rounded-[24px] size-full cursor-pointer"
+        className="backdrop-blur-md backdrop-filter bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.08)] border-solid box-border content-stretch flex flex-col gap-[16px] items-center pb-[16px] pt-0 px-[16px] relative rounded-[24px] w-full h-full min-h-[400px]"
         data-name="Card"
         data-node-id="1:1652"
-        role="button"
-        tabIndex={0}
       >
         <div
           className="border-[rgba(235,239,245,0.12)] border-b border-l-0 border-r-0 border-solid border-t-0 box-border content-stretch flex flex-col gap-[16px] items-start px-0 py-[16px] relative shrink-0 w-full"
@@ -126,7 +170,7 @@ export default function DealCard({
             data-node-id="1:1654"
           >
             <div
-              className="content-stretch flex flex-[1_0_0] gap-[12px] items-center min-h-px min-w-px relative shrink-0"
+              className="content-stretch flex flex-[1_0_0] gap-[12px] items-center min-h-px relative shrink-0 min-w-0"
               data-node-id="1:1655"
             >
               <div
@@ -134,7 +178,7 @@ export default function DealCard({
                 data-node-id="1:1656"
               >
                 <div
-                  className="h-[45px] relative shrink-0 w-[21px]"
+                  className="w-full h-full flex items-center justify-center overflow-hidden"
                   data-name="logo"
                   data-node-id="1:1657"
                 >
@@ -142,22 +186,22 @@ export default function DealCard({
                 </div>
               </div>
               <div
-                className="content-stretch flex flex-col gap-[4px] items-start relative shrink-0"
+                className="content-stretch flex flex-col gap-[4px] items-start relative shrink-0 min-w-0 flex-1 overflow-hidden"
                 data-node-id="1:1659"
               >
                 <div
-                  className="content-stretch flex gap-[8px] items-center relative shrink-0"
+                  className="content-stretch flex gap-[8px] items-start relative shrink-0 min-w-0 w-full"
                   data-node-id="1:1660"
                 >
                   <p
-                    className="font-medium leading-[normal] relative shrink-0 text-[20px] text-white"
+                    className="font-medium leading-[normal] relative text-[20px] text-white flex-1 min-w-0 wrap-break-word"
                     data-node-id="1:1661"
                   >
                     {title}
                   </p>
                   {verified && (
                     <div
-                      className="relative shrink-0 size-[24px]"
+                      className="relative shrink-0 size-[24px] mt-1"
                       data-name="verification-icon"
                       data-node-id="1:1662"
                     >
@@ -166,7 +210,7 @@ export default function DealCard({
                   )}
                 </div>
                 <p
-                  className="leading-[normal] not-italic relative shrink-0 text-[#cbd2da] text-[12px]"
+                  className="leading-[normal] not-italic relative text-[#cbd2da] text-[12px] w-full wrap-break-word"
                   data-node-id="1:1664"
                 >
                   {category}
@@ -174,12 +218,12 @@ export default function DealCard({
               </div>
             </div>
             <div
-              className="bg-[rgba(255,255,255,0.08)] box-border content-stretch flex gap-[16px] items-start px-[12px] py-[4px] relative rounded-[100px] shrink-0"
+              className="bg-[rgba(255,255,255,0.08)] box-border content-stretch flex gap-[16px] items-start px-[12px] py-[4px] relative rounded-[100px] shrink-0 max-w-[120px] min-w-0"
               data-name="Container"
               data-node-id="1:1665"
             >
               <p
-                className="leading-[normal] not-italic relative shrink-0 text-[12px] text-center text-gray-50"
+                className="leading-[normal] not-italic relative text-[12px] text-center text-gray-50 w-full wrap-break-word"
                 data-node-id="1:1666"
               >
                 {dealType}
@@ -191,7 +235,7 @@ export default function DealCard({
             data-node-id="1:1667"
           >
             <p
-              className="leading-[normal] not-italic relative shrink-0 text-[#cbd2da] text-[12px] w-full whitespace-pre-wrap"
+              className="leading-[normal] not-italic relative shrink-0 text-[#cbd2da] text-[12px] w-full line-clamp-3 overflow-hidden wrap-break-word"
               data-node-id="1:1668"
             >
               {description}
@@ -213,12 +257,12 @@ export default function DealCard({
                 {features.map((feature, index) => (
                   <div
                     key={index}
-                    className="content-stretch flex gap-[8px] items-center relative shrink-0"
+                    className="content-stretch flex gap-[8px] items-start relative shrink-0 w-full min-w-0"
                     data-node-id="1:1672"
                   >
-                    <CheckCircle className="overflow-clip relative shrink-0 size-[20px]" />
+                    <CheckCircle className="overflow-clip relative shrink-0 size-[20px] mt-0.5" />
                     <p
-                      className="font-normal leading-[21px] relative shrink-0 text-[14px] text-white"
+                      className="font-normal leading-[21px] relative text-[14px] text-white flex-1 min-w-0 wrap-break-word"
                       data-node-id="1:1674"
                     >
                       {feature}
@@ -229,22 +273,22 @@ export default function DealCard({
             </div>
           </div>
           <div
-            className="bg-[rgba(255,255,255,0.08)] box-border content-stretch flex items-center justify-between px-[16px] py-[8px] relative rounded-[100px] shrink-0 w-full"
+            className="bg-[rgba(255,255,255,0.08)] box-border content-stretch flex items-center justify-between px-[16px] py-[8px] relative rounded-[100px] shrink-0 w-full gap-2 min-w-0"
             data-node-id="1:1684"
           >
             <div
-              className="content-stretch flex gap-[10px] items-center justify-center relative shrink-0"
+              className="content-stretch flex gap-[10px] items-center justify-start relative min-w-0 flex-1"
               data-node-id="1:1685"
             >
               <p
-                className="leading-[normal] not-italic relative shrink-0 text-[14px] text-neutral-50"
+                className="leading-[normal] not-italic relative text-[14px] text-neutral-50 wrap-break-word text-left"
                 data-node-id="1:1686"
               >
                 {discount}
               </p>
             </div>
             <p
-              className="leading-[normal] not-italic relative shrink-0 text-[14px] text-zinc-200"
+              className="leading-[normal] not-italic relative text-[14px] text-zinc-200 text-right min-w-0 flex-1 wrap-break-word "
               data-node-id="1:1687"
             >
               {savings}
@@ -252,64 +296,59 @@ export default function DealCard({
           </div>
         </div>
         <div
-          className="content-stretch flex gap-[24px] items-center relative shrink-0 w-full"
+          className={`content-stretch flex ${buttonLayoutClass} relative shrink-0 w-full`}
           data-name="Filter"
           data-node-id="1:1688"
         >
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewDetails?.();
-              openModal();
-            }}
+            onClick={onViewDetails}
             className="bg-[rgba(255,255,255,0.08)] box-border content-stretch flex flex-[1_0_0] items-center justify-center min-h-px min-w-px px-[12px] py-[8px] relative rounded-[100px] shrink-0 hover:bg-[rgba(255,255,255,0.12)] transition-colors"
             data-name="All Assets"
             data-node-id="1:1689"
           >
             <p
-              className="leading-[24px] not-italic relative shrink-0 text-[16px] text-neutral-50"
+              className="leading-[24px] not-italic relative shrink-0 text-[14px] sm:text-[16px] text-neutral-50"
               data-node-id="1:1690"
             >
               View Details
             </p>
           </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onGetDeal?.();
-            }}
-            className="group bg-white hover:bg-linear-to-b hover:from-[#501BD6] hover:to-[#7F57E2] box-border content-stretch flex flex-[1_0_0] items-center justify-center min-h-px min-w-px px-[12px] py-[8px] relative rounded-[100px] shrink-0 transition-all duration-200"
-            data-name="All Assets"
-            data-node-id="1:1691"
-          >
-            <p
-              className="leading-[24px] not-italic relative shrink-0 text-[16px] text-zinc-950 group-hover:text-white transition-colors duration-200"
-              data-node-id="1:1692"
+          {redeemUrl ? (
+            <a
+              href={redeemUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group bg-white hover:bg-linear-to-b hover:from-[#501BD6] hover:to-[#7F57E2] box-border content-stretch flex flex-[1_0_0] items-center justify-center min-h-px min-w-px px-[12px] py-[8px] relative rounded-[100px] shrink-0 transition-all duration-200 no-underline"
+              data-name="All Assets"
+              data-node-id="1:1691"
             >
-              Get This Deal
-            </p>
-          </button>
+              <p
+                className="leading-[24px] not-italic relative shrink-0 text-[14px] sm:text-[16px] text-zinc-950 group-hover:text-white transition-colors duration-200"
+                data-node-id="1:1692"
+              >
+                Get This Deal
+              </p>
+            </a>
+          ) : (
+            <button
+              onClick={onGetDeal}
+              className="group bg-white hover:bg-linear-to-b hover:from-[#501BD6] hover:to-[#7F57E2] box-border content-stretch flex flex-[1_0_0] items-center justify-center min-h-px min-w-px px-[12px] py-[8px] relative rounded-[100px] shrink-0 transition-all duration-200"
+              data-name="All Assets"
+              data-node-id="1:1691"
+              disabled={!onGetDeal}
+              title={!onGetDeal ? "Redeem URL not available" : undefined}
+            >
+              <p
+                className="leading-[24px] not-italic relative shrink-0 text-[14px] sm:text-[16px] text-zinc-950 group-hover:text-white transition-colors duration-200"
+                data-node-id="1:1692"
+              >
+                Get This Deal
+              </p>
+            </button>
+          )}
         </div>
       </div>
-      {/* Modal: basic details popup */}
-      {showModal && (
-        <CardPopup
-          onClose={closeModal}
-          onDelete={onDelete}
-          deal={{
-            id,
-            title,
-            category,
-            description,
-            logoComponent: typeof logoComponent === "string" ? logoComponent : undefined,
-            verified,
-            dealType,
-            features,
-            discount,
-            savings,
-          }}
-        />
-      )}
     </div>
   );
 }
+

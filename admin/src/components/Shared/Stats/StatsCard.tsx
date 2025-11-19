@@ -1,4 +1,4 @@
-import {useEffect, useState, type ReactElement} from "react";
+import { useEffect, useState, type ReactElement } from "react";
 
 type Props = {
   numberValue?: string | number;
@@ -14,7 +14,7 @@ export default function StatsCard({
   message,
   onMessageChange,
   onDelete,
-}: Props): ReactElement{
+}: Props): ReactElement {
   const [localNumber, setLocalNumber] = useState<string>(
     numberValue != null ? String(numberValue) : ""
   );
@@ -45,56 +45,27 @@ export default function StatsCard({
   }
 
   return (
-    <div
-      data-layer="Row"
-      className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline-1 outline-zinc-700 inline-flex justify-start items-center overflow-hidden"
-    >
-      <div
-        data-layer="Column"
-        className="Column self-stretch px-4 py-3 rounded-xl inline-flex flex-col justify-center items-start gap-3"
-      >
-        <div
-          data-layer="Frame 2147205991"
-          className="Frame2147205991 inline-flex justify-start items-center"
-        >
-          <div
-            data-layer="charm:menu-kebab"
-            className="CharmMenuKebab w-6 h-6 relative overflow-hidden"
-            aria-hidden
-          >
-            <div className="Vector w-[2.25px] h-[2.25px] left-[10.88px] top-[2.62px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-zinc-400" />
-            <div className="Vector w-[2.25px] h-[2.25px] left-[10.88px] top-[10.88px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-zinc-400" />
-            <div className="Vector w-[2.25px] h-[2.25px] left-[10.88px] top-[19.12px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-zinc-400" />
+    <div className="self-stretch py-4 bg-zinc-800 rounded-3xl outline-1 outline-zinc-700 inline-flex justify-start items-center overflow-hidden">
+      <div className="self-stretch px-4 py-3 rounded-xl inline-flex flex-col justify-center items-start gap-3">
+        <div className="inline-flex justify-start items-center">
+          <div className="w-6 h-6 relative overflow-hidden" aria-hidden>
+            <div className="w-[2.25px] h-[2.25px] left-[10.88px] top-[2.62px] absolute outline-[1.50px] outline-offset-[-0.75px] outline-zinc-400" />
+            <div className="w-[2.25px] h-[2.25px] left-[10.88px] top-[10.88px] absolute outline-[1.50px] outline-offset-[-0.75px] outline-zinc-400" />
+            <div className="w-[2.25px] h-[2.25px] left-[10.88px] top-[19.12px] absolute outline-[1.50px] outline-offset-[-0.75px] outline-zinc-400" />
           </div>
-          <div
-            data-layer="charm:menu-kebab"
-            className="CharmMenuKebab w-6 h-6 relative overflow-hidden"
-            aria-hidden
-          >
-            <div className="Vector w-[2.25px] h-[2.25px] left-[10.88px] top-[2.62px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-zinc-400" />
-            <div className="Vector w-[2.25px] h-[2.25px] left-[10.88px] top-[10.88px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-zinc-400" />
-            <div className="Vector w-[2.25px] h-[2.25px] left-[10.88px] top-[19.12px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-zinc-400" />
+          <div className="w-6 h-6 relative overflow-hidden" aria-hidden>
+            <div className="w-[2.25px] h-[2.25px] left-[10.88px] top-[2.62px] absolute outline-[1.50px] outline-offset-[-0.75px] outline-zinc-400" />
+            <div className="w-[2.25px] h-[2.25px] left-[10.88px] top-[10.88px] absolute outline-[1.50px] outline-offset-[-0.75px] outline-zinc-400" />
+            <div className="w-[2.25px] h-[2.25px] left-[10.88px] top-[19.12px] absolute outline-[1.50px] outline-offset-[-0.75px] outline-zinc-400" />
           </div>
         </div>
       </div>
-      <div
-        data-layer="Frame 2147205992"
-        className="Frame2147205992 flex-1 inline-flex flex-col justify-center items-start gap-2"
-      >
-        <div
-          data-layer="Frame 2147205559"
-          className="Frame2147205559 self-stretch flex flex-col justify-center items-start gap-2"
-        >
-          <div
-            data-layer="Number"
-            className="Number justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
-          >
-            Number{" "}
+      <div className="flex-1 inline-flex flex-col justify-center items-start gap-2">
+        <div className="self-stretch flex flex-col justify-center items-start gap-2">
+          <div className="text-neutral-50 text-sm font-medium font-['Poppins']">
+            Number
           </div>
-          <div
-            data-layer="Input"
-            className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
-          >
+          <div className="self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden">
             <label htmlFor="stats-number" className="sr-only">
               Number
             </label>
@@ -107,20 +78,11 @@ export default function StatsCard({
             />
           </div>
         </div>
-        <div
-          data-layer="Frame 2147205560"
-          className="Frame2147205560 self-stretch flex flex-col justify-center items-start gap-2"
-        >
-          <div
-            data-layer="Message Body"
-            className="MessageBody justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
-          >
+        <div className="self-stretch flex flex-col justify-center items-start gap-2">
+          <div className="text-neutral-50 text-sm font-medium font-['Poppins']">
             Message Body
           </div>
-          <div
-            data-layer="Input"
-            className="Input self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
-          >
+          <div className="self-stretch h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden">
             <label htmlFor="stats-message" className="sr-only">
               Message body
             </label>
@@ -134,15 +96,12 @@ export default function StatsCard({
           </div>
         </div>
       </div>
-      <div
-        data-layer="Column"
-        className="Column self-stretch px-4 py-3 flex justify-start items-center gap-4"
-      >
+      <div className="self-stretch px-4 py-3 flex justify-start items-center gap-4">
         <button
           type="button"
           aria-label="Delete stat"
           onClick={handleDelete}
-          className="FluentDelete16Regular w-6 h-6 relative"
+          className="w-6 h-6 relative"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -161,3 +120,4 @@ export default function StatsCard({
     </div>
   );
 }
+

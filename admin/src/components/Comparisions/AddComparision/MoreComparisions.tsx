@@ -164,7 +164,7 @@ export default function MoreComparisions(): ReactElement {
                 value={query}
                 onChange={handleSearchChange}
                 placeholder="Search blogs"
-                className="bg-transparent outline-none text-zinc-400 placeholder:text-zinc-500 w-full"
+                className="bg-transparent outline-none text-neutral-50 placeholder:text-zinc-500 w-full"
                 aria-label="Search blogs"
               />
             </div>

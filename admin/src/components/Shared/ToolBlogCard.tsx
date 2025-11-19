@@ -134,7 +134,7 @@ export default function ToolBlogCard({ onCardsChange, initialCards }: Props): Re
                 placeholder="Enter blog heading"
                 value={card.blogTitle}
                 onChange={(e) => handleChange(card.id, "title", e.target.value)}
-                className="self-stretch h-14 px-4 py-3 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-zinc-200 font-normal font-['Poppins'] text-base placeholder:text-zinc-500"
+                className="self-stretch h-14 px-4 py-3 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-neutral-50 font-normal font-['Poppins'] text-base placeholder:text-zinc-500"
               />
             </div>
 
@@ -146,7 +146,7 @@ export default function ToolBlogCard({ onCardsChange, initialCards }: Props): Re
                 placeholder="Blog Body Messsage"
                 value={card.blogBody}
                 onChange={(e) => handleChange(card.id, "body", e.target.value)}
-                className="self-stretch px-4 py-2 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-zinc-200 font-normal font-['Poppins'] text-base placeholder:text-zinc-500 placeholder:leading-[48px]"
+                className="self-stretch px-4 py-2 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-neutral-50 font-normal font-['Poppins'] text-base placeholder:text-zinc-500 placeholder:leading-[48px]"
                  />
             </div>
 
@@ -311,7 +311,7 @@ function SearchAndAddDeal({
               onChange={(e): void => setQuery(e.target.value)}
               onFocus={(): void => setShowResults(true)}
               placeholder="Search & Add Deal Mentioned in this blog"
-              className="bg-transparent outline-none text-zinc-400 placeholder:text-zinc-500 w-full"
+              className="bg-transparent outline-none text-neutral-50 placeholder:text-zinc-500 w-full"
               aria-label="Search deals"
             />
           </div>

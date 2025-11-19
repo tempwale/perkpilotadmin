@@ -99,7 +99,7 @@ export default function TagChips({
             />
           </svg>
           <input
-            className="bg-transparent text-zinc-400 placeholder:text-zinc-500 outline-none w-[260px]"
+            className="bg-transparent text-neutral-50 placeholder:text-zinc-500 outline-none w-[260px]"
             value={input}
             onChange={(e): void => setInput(e.target.value)}
             onFocus={(): void => setIsFocused(true)}

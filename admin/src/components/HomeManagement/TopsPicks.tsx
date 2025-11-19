@@ -181,7 +181,7 @@ export default function TopPicks({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search Deals"
-                className="bg-transparent outline-none text-zinc-400 placeholder:text-zinc-500 w-full"
+                className="bg-transparent outline-none text-neutral-50 placeholder:text-zinc-500 w-full"
                 aria-label="Search Deals"
               />
             </div>

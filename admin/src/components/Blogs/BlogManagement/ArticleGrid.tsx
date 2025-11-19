@@ -150,7 +150,7 @@ export default function ArticleGrid(): ReactElement{
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-      },
+        },
         body: JSON.stringify({
           blogIsFeatured: newFeaturedStatus,
         }),
@@ -339,7 +339,7 @@ export default function ArticleGrid(): ReactElement{
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search blogs"
-              className="bg-transparent outline-none text-zinc-400 placeholder:text-zinc-500 w-full"
+              className="bg-transparent outline-none text-neutral-50 placeholder:text-zinc-500 w-full"
               aria-label="Search blogs"
             />
           </div>
@@ -405,7 +405,7 @@ export default function ArticleGrid(): ReactElement{
                     date={blog.date}
                     readTime={blog.readTime}
                     featured={featuredBlogIds.has(blog.id ?? "")}
-            />
+                  />
                 </div>
           ))}
         </div>

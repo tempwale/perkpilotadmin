@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import Header from "../../components/Deals/AddDeal/Header";
 import Hero from "../../components/Deals/AddDeal/Hero";
 

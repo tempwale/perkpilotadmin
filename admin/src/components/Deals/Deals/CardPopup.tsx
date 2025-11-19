@@ -37,7 +37,7 @@ export default function CardPopup({
           ✕
         </button>
         <div className="w-full flex items-center gap-4">
-          <div className="w-12 h-12 flex-shrink-0">
+          <div className="w-12 h-12 shrink-0">
             {deal?.logoComponent ?? (
               <div className="w-12 h-12 bg-gray-200 rounded-full" />
             )}
