@@ -6,6 +6,7 @@ export { default as ToolsMentioned } from "./ToolsMentioned";
 export { default as DeleteConfirmationPopup } from "./DeleteConfirmationPopup";
 export { default as ConfirmationModal } from "./ConfirmationModal";
 export { default as CardActionPopup } from "./CardActionPopup";
+export { default as DealCard } from "./DealCard";
 
 // TYPES
 export type { Module, ModulesCardProps } from "./ModulesCard";
