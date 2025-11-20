@@ -96,7 +96,6 @@ export default function DeletePopup({
               category={(deal?.category ?? deal?.dealType) ?? undefined}
               description={deal?.description ?? undefined}
               logoComponent={deal?.logoComponent ?? undefined}
-              verified={deal?.verified ?? undefined}
               dealType={deal?.dealType ?? undefined}
               features={deal?.features ?? undefined}
               discount={deal?.discount ?? undefined}

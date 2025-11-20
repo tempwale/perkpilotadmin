@@ -64,7 +64,6 @@ interface DealCardProps {
   category?: string;
   description?: string;
   logoComponent?: React.ReactNode;
-  verified?: boolean;
   dealType?: string;
   features?: string[];
   discount?: string;
@@ -94,7 +93,6 @@ export default function DealCard({
   category = "No-Code Tool",
   description = "Every communications experience, Integrated contact center, voice, video, chat, and APIs.",
   logoComponent = <DefaultLogo />,
-  verified = true,
   dealType = "Hot Deal",
   features = [
     "Unlimited Blocks",
@@ -190,24 +188,16 @@ export default function DealCard({
                 data-node-id="1:1659"
               >
                 <div
-                  className="content-stretch flex gap-[8px] items-start relative shrink-0 min-w-0 w-full"
+                  className="content-stretch flex gap-[8px] items-center relative shrink-0 min-w-0 w-full"
                   data-node-id="1:1660"
                 >
                   <p
-                    className="font-medium leading-[normal] relative text-[20px] text-white flex-1 min-w-0 wrap-break-word"
+                    className="font-medium flex items-center gap-2 leading-[normal] relative text-[20px] text-white flex-1 min-w-0 wrap-break-word"
                     data-node-id="1:1661"
                   >
                     {title}
+                    <VerificationIcon />
                   </p>
-                  {verified && (
-                    <div
-                      className="relative shrink-0 size-[24px] mt-1"
-                      data-name="verification-icon"
-                      data-node-id="1:1662"
-                    >
-                      <VerificationIcon />
-                    </div>
-                  )}
                 </div>
                 <p
                   className="leading-[normal] not-italic relative text-[#cbd2da] text-[12px] w-full wrap-break-word"

@@ -280,7 +280,6 @@ export default function DealGrid({
                 category={category}
                 description={deal.description}
                 logoComponent={logoComponent}
-                verified={deal.verified ?? false}
                 dealType={dealType}
                 features={deal.features ?? []}
                 discount={deal.discount ?? ""}
