@@ -4,7 +4,6 @@ import { DealCard } from "../../Shared";
 
 interface DealsCardProps {
   id: string;
-  showCustomizeHeader?: boolean;
   title?: string;
   category?: string;
   description?: string;
