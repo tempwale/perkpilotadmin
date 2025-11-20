@@ -217,7 +217,6 @@ export default function ArticleGrid({
                           <FramerLogo />
                         )
                       }
-                      verified={p.verified}
                       dealType={p.dealType}
                       features={p.features}
                       discount={p.discount}
