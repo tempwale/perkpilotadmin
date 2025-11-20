@@ -8,7 +8,6 @@ interface DealsCardProps {
   category?: string;
   description?: string;
   logoComponent?: React.ReactNode;
-  verified?: boolean;
   dealType?: string;
   features?: string[];
   discount?: string;
@@ -16,7 +15,6 @@ interface DealsCardProps {
   onViewDetails?: () => void;
   onGetDeal?: () => void;
   onDelete?: () => void;
-  showCustomizeHeader?: boolean;
 }
 
 export default function DealsCard({
@@ -25,7 +23,6 @@ export default function DealsCard({
   category,
   description,
   logoComponent,
-  verified,
   dealType,
   features,
   discount,
@@ -57,7 +54,6 @@ export default function DealsCard({
         category={category}
         description={description}
         logoComponent={logoComponent}
-        verified={verified}
         dealType={dealType}
         features={features}
         discount={discount}
@@ -81,7 +77,6 @@ export default function DealsCard({
             category,
             description,
             logoComponent: typeof logoComponent === "string" ? logoComponent : undefined,
-            verified,
             dealType,
             features,
             discount,
