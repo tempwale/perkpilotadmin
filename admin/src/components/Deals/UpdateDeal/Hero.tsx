@@ -1,7 +1,7 @@
 import { useState, useEffect, type ChangeEvent, type FormEvent, type ReactElement } from "react";
 import { useNavigate } from "react-router-dom";
 import FooterActions from "./FooterActions";
-import { Plus } from "lucide-react";
+import { Plus, Star } from "lucide-react";
 import { DEALS_API } from "../../../config/backend";
 import { fetchLogoByDomain } from "../../../utils/LogoFetch";
 import type { DealApiResponse, ApiError } from "../../../types/api.types";
@@ -26,6 +26,10 @@ export default function ToolComparisonForm({
         toolCategory: initialDeal.category ?? prev.toolCategory,
         toolDescription: initialDeal.description ?? prev.toolDescription,
         dealBadge: initialDeal.tag ?? prev.dealBadge,
+        rating:
+          initialDeal.rating !== undefined && initialDeal.rating !== null
+            ? String(initialDeal.rating)
+            : prev.rating,
         features:
           Array.isArray(initialDeal.features) && initialDeal.features.length > 0
             ? initialDeal.features
@@ -80,6 +84,10 @@ export default function ToolComparisonForm({
           toolCategory: data.category ?? prev.toolCategory,
           toolDescription: data.description ?? prev.toolDescription,
           dealBadge: data.tag ?? prev.dealBadge,
+          rating:
+            data.rating !== undefined && data.rating !== null
+              ? String(data.rating)
+              : prev.rating,
           features:
             Array.isArray(data.features) && data.features.length > 0
               ? data.features
@@ -124,6 +132,7 @@ export default function ToolComparisonForm({
     toolCategory: string;
     toolDescription: string;
     dealBadge: string;
+    rating: string;
     whatsIncludedTitle: string;
     features: string[];
     saveUptoAmount: string;
@@ -151,6 +160,7 @@ export default function ToolComparisonForm({
     toolCategory: "",
     toolDescription: "",
     dealBadge: "",
+    rating: "",
     whatsIncludedTitle: "",
     features: ["", ""],
     saveUptoAmount: "1080",
@@ -320,6 +330,7 @@ export default function ToolComparisonForm({
           discountPercentage: Number(formData.discountValue) || 0,
           savingsAmount: Number(formData.saveUptoAmount) || 0,
           tag: formData.dealBadge || null,
+          rating: formData.rating ? Number(formData.rating) : null,
           logoUri: logoFiles[0] || null,
           verified: false,
           // CTA fields (backend expects snake_case)
@@ -610,7 +621,7 @@ export default function ToolComparisonForm({
           </div>
         </div>
 
-        {/* Deal Badge */}
+        {/* Deal Badge and Rating */}
         <div
           data-layer="Frame 2147206055"
           className="Frame2147206055 self-stretch inline-flex justify-start items-center gap-6"
@@ -641,6 +652,48 @@ export default function ToolComparisonForm({
                   placeholder="E.g. Hot Deals"
                   className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
                 />
+              </div>
+            </div>
+
+            <div
+              data-layer="Frame 2147205562"
+              className="Frame2147205562 flex-1 inline-flex flex-col justify-center items-start gap-3"
+            >
+              <div
+                data-layer="Star Rating"
+                className="StarRating justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
+              >
+                Star Rating
+              </div>
+              <div className="flex items-center gap-3">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={(): void => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        rating: prev.rating === String(star) ? "" : String(star),
+                      }));
+                    }}
+                    className="hover:scale-110 transition-transform"
+                    aria-label={`Rate ${star} stars`}
+                  >
+                    <Star
+                      className={`w-8 h-8 ${
+                        star <= Number(formData.rating)
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-neutral-50"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+              <div
+                data-layer="Helper text"
+                className="HelperText justify-start text-neutral-50 text-[10px] font-medium font-['Poppins']"
+              >
+                Click to select a star rating (1-5)
               </div>
             </div>
           </div>
