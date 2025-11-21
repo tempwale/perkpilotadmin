@@ -45,6 +45,7 @@ export interface DealApiResponse {
   tag?: string;
   logoUri?: string;
   verified?: boolean;
+  rating?: number;
   primary_cta_text?: string;
   secondary_cta_text?: string;
   primary_cta_link?: string;
@@ -69,6 +70,7 @@ export interface Deal {
   tag?: string;
   logoUri?: string;
   verified?: boolean;
+  rating?: number;
   primaryCtaText?: string;
   secondaryCtaText?: string;
   primaryCtaLink?: string;
