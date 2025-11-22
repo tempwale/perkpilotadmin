@@ -1,4 +1,3 @@
-"use client";
 
 import {useState, type ReactElement} from "react";
 import { GripVertical, Trash2, Plus, Star, Camera } from "lucide-react";
@@ -10,6 +9,8 @@ interface Review {
   companyPosition: string;
   rating: number;
   reviewText: string;
+  helpful?: number;
+  notHelpful?: number;
 }
 
 interface ReviewsProps {
@@ -133,16 +134,15 @@ export default function Reviews({
         >
           <div
             data-layer="Frame 2147205991"
-            className="Frame2147205991 flex justify-start items-center"
+            className="Frame2147205991 flex justify-start items-center cursor-grab"
           >
-            <GripVertical className="w-6 h-6 text-neutral-50" />
             <GripVertical className="w-6 h-6 text-neutral-50" />
           </div>
           <div
             data-layer="Text"
             className="Text justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
           >
-            Pricing Plan
+            Reviews
           </div>
         </div>
         <div
@@ -172,21 +172,36 @@ export default function Reviews({
 
       {/* Reviews List */}
       <div className="px-4 flex flex-col gap-6">
-        {reviews.map((review) => (
-          <div
-            key={review.id}
-            className="w-full py-6 px-6 bg-zinc-800 rounded-2xl outline-1 outline-zinc-700 flex gap-6"
-          >
-            {/* Drag Handle and Profile Avatar */}
-            <div className="flex flex-col items-center gap-3">
-              <div className="flex items-center">
-                <GripVertical className="w-6 h-6 text-neutral-50" />
-                <GripVertical className="w-6 h-6 text-neutral-50" />
+        {reviews.map((review, index) => {
+          // Convert index to number name (One, Two, Three, etc.)
+          const numberNames = [
+            "One",
+            "Two",
+            "Three",
+            "Four",
+            "Five",
+            "Six",
+            "Seven",
+            "Eight",
+            "Nine",
+            "Ten",
+          ];
+          const reviewNumber = numberNames[index] || `${index + 1}`;
+
+          return (
+            <div
+              key={review.id}
+              className="w-full py-6 px-6 bg-zinc-800 rounded-2xl outline-1 outline-zinc-700 flex gap-6"
+            >
+              {/* Drag Handle and Label */}
+              <div className="flex flex-col items-center gap-3">
+                <div className="cursor-grab">
+                  <GripVertical className="w-6 h-6 text-neutral-50" />
+                </div>
+                <div className="text-neutral-50 text-sm font-medium font-['Poppins'] whitespace-nowrap">
+                  Review {reviewNumber}
+                </div>
               </div>
-              <div className="text-neutral-50 text-sm font-medium font-['Poppins']">
-                Review One
-              </div>
-            </div>
 
             {/* Profile Image Upload */}
             <div className="flex flex-col items-center gap-2">
@@ -215,6 +230,45 @@ export default function Reviews({
                   aria-label="Upload profile image"
                 />
               </label>
+              {/* Star Rating */}
+              <div className="flex items-center gap-1 mt-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={(): void => handleRatingChange(review.id, star)}
+                    onMouseEnter={(e): void => {
+                      const stars = e.currentTarget.parentElement?.children;
+                      if (stars) {
+                        Array.from(stars).forEach((s, idx) => {
+                          if (idx < star) {
+                            s.classList.add("opacity-80");
+                          }
+                        });
+                      }
+                    }}
+                    onMouseLeave={(e): void => {
+                      const stars = e.currentTarget.parentElement?.children;
+                      if (stars) {
+                        Array.from(stars).forEach((s) => {
+                          s.classList.remove("opacity-80");
+                        });
+                      }
+                    }}
+                    className="hover:scale-110 transition-transform p-0.5"
+                    aria-label={`Rate ${star} stars`}
+                  >
+                    <Star
+                      className={`w-6 h-6 transition-colors ${
+                        star <= review.rating
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "fill-none text-zinc-600 stroke-zinc-600"
+                      }`}
+                      strokeWidth={1.5}
+                    />
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Review Details */}
@@ -260,27 +314,7 @@ export default function Reviews({
                 </div>
               </div>
 
-              {/* Star Rating */}
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-4">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      onClick={(): void => handleRatingChange(review.id, star)}
-                      className="hover:scale-110 transition-transform"
-                      aria-label={`Rate ${star} stars`}
-                    >
-                      <Star
-                        className={`w-6 h-6 ${
-                          star <= review.rating
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-neutral-50"
-                        }`}
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
+        
 
               {/* Review Text */}
               <div className="flex flex-col gap-2">
@@ -312,7 +346,8 @@ export default function Reviews({
               <Trash2 className="w-6 h-6 text-neutral-50" />
             </button>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Add More Button */}

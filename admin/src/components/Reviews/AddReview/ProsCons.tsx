@@ -1,4 +1,4 @@
-"use client";
+
 
 import {useState, type ReactElement} from "react";
 import { GripVertical, Trash2, Plus } from "lucide-react";

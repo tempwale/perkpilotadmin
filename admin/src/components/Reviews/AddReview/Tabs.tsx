@@ -50,8 +50,8 @@ export default function Tabs({ reviewData, updateReviewData }: Props = {}): Reac
             planTitle: p.plan,
             price: p.amount,
             priceType: "Monthly" as const,
-            ctaButtonText: "",
-            ctaButtonLink: "",
+            ctaButtonText: p.ctaText || "",
+            ctaButtonLink: p.ctaLink || "",
           }))}
           onPlansChange={(plans) => {
             updateReviewData?.({
@@ -59,6 +59,8 @@ export default function Tabs({ reviewData, updateReviewData }: Props = {}): Reac
                 plan: p.planTitle,
                 amount: p.price,
                 note: p.priceType,
+                ctaText: p.ctaButtonText,
+                ctaLink: p.ctaButtonLink,
               })),
             });
           }}

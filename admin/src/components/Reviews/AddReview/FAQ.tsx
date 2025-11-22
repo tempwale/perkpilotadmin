@@ -1,4 +1,4 @@
-"use client";
+
 
 import {useState, type ReactElement} from "react";
 import { GripVertical, Trash2, Plus } from "lucide-react";
@@ -62,57 +62,72 @@ export default function FAQ({ initialFaqs, onFaqsChange }: Props = {}): ReactEle
       className="Frame2147206003 self-stretch inline-flex flex-col justify-start items-start gap-2"
     >
       <div
-        data-layer="FAQs Update"
+        data-layer="Product FAQs"
         className="FaqsUpdate self-stretch justify-start text-neutral-50 text-xl font-medium font-['Poppins'] leading-8"
       >
-        FAQs Update
+        Product FAQs
       </div>
 
-      {faqs.map((faq) => (
-        <div
-          key={faq.id}
-          data-layer="Row"
-          className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 inline-flex justify-start items-center overflow-hidden"
-        >
-          <div
-            data-layer="Column"
-            className="Column self-stretch px-6 py-3 rounded-xl inline-flex flex-col justify-center items-start gap-3"
-          >
-            <div
-              data-layer="Frame 2147205991"
-              className="Frame2147205991 inline-flex justify-start items-center"
-            >
-              <GripVertical className="w-6 h-6 text-neutral-50" />
-              <GripVertical className="w-6 h-6 text-neutral-50" />
-            </div>
-            <div
-              data-layer="Text"
-              className="Text justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
-            >
-              FAQ One
-            </div>
-          </div>
+      {faqs.map((faq, index) => {
+        // Convert index to number name (One, Two, Three, etc.)
+        const numberNames = [
+          "One",
+          "Two",
+          "Three",
+          "Four",
+          "Five",
+          "Six",
+          "Seven",
+          "Eight",
+          "Nine",
+          "Ten",
+        ];
+        const faqNumber = numberNames[index] || `${index + 1}`;
 
+        return (
           <div
-            data-layer="Frame 2147205992"
-            className="Frame2147205992 flex-1 inline-flex flex-col justify-center items-start gap-2"
+            key={faq.id}
+            data-layer="Row"
+            className="Row self-stretch py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 inline-flex justify-start items-center overflow-hidden"
           >
             <div
-              data-layer="Frame 2147205559"
-              className="Frame2147205559 self-stretch flex flex-col justify-center items-start gap-2"
+              data-layer="Column"
+              className="Column self-stretch px-6 py-3 rounded-xl inline-flex flex-col justify-center items-start gap-3"
             >
               <div
-                data-layer="FAQ Question One"
-                className="FaqQuestionOne justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
+                data-layer="Frame 2147205991"
+                className="Frame2147205991 inline-flex justify-start items-center cursor-grab"
               >
-                FAQ Question One
+                <GripVertical className="w-6 h-6 text-neutral-50" />
               </div>
+              <div
+                data-layer="Text"
+                className="Text justify-start text-neutral-50 text-sm font-medium font-['Poppins'] whitespace-nowrap"
+              >
+                FAQ {faqNumber}
+              </div>
+            </div>
+
+            <div
+              data-layer="Frame 2147205992"
+              className="Frame2147205992 flex-1 inline-flex flex-col justify-center items-start gap-2"
+            >
+              <div
+                data-layer="Frame 2147205559"
+                className="Frame2147205559 self-stretch flex flex-col justify-center items-start gap-2"
+              >
+                <div
+                  data-layer="FAQ Question One"
+                  className="FaqQuestionOne justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
+                >
+                  FAQ Question {faqNumber}
+                </div>
               <input
                 type="text"
                 value={faq.question}
                 onChange={(e): void => handleQuestionChange(faq.id, e.target.value)}
                 placeholder="Question here..."
-                className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-400 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
+                className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500 placeholder:text-zinc-400"
               />
             </div>
 
@@ -121,17 +136,17 @@ export default function FAQ({ initialFaqs, onFaqsChange }: Props = {}): ReactEle
               className="Frame2147205560 self-stretch flex flex-col justify-center items-start gap-2"
             >
               <div
-                data-layer="Description"
+                data-layer="Answer"
                 className="Description justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
               >
-                Description
+                Answer
               </div>
               <input
                 type="text"
                 value={faq.answer}
                 onChange={(e) => handleAnswerChange(faq.id, e.target.value)}
                 placeholder="Answer here..."
-                className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-400 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
+                className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500 placeholder:text-zinc-400"
               />
             </div>
           </div>
@@ -149,7 +164,8 @@ export default function FAQ({ initialFaqs, onFaqsChange }: Props = {}): ReactEle
             </button>
           </div>
         </div>
-      ))}
+        );
+      })}
 
       <div
         data-layer="Frame 2147205993"

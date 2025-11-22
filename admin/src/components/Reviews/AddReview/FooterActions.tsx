@@ -1,11 +1,13 @@
 import { type ReactElement } from "react";
 
 type Props = {
+  saving?: boolean;
   onSaveDraft?: () => void;
   onSaveAndPublish?: () => void;
 };
 
 export default function FooterActions({
+  saving = false,
   onSaveDraft,
   onSaveAndPublish,
 }: Props): ReactElement {
@@ -14,16 +16,20 @@ export default function FooterActions({
       <button
         type="button"
         onClick={onSaveDraft}
-        className="flex-1 h-12 px-3 py-2 rounded-lg outline-1 -outline-offset-1 outline-neutral-50 flex justify-center items-center transition-colors duration-150 hover:bg-zinc-700/30 focus:outline-none focus:ring-2 focus:ring-[#7f57e2]"
+        disabled={saving}
+        className="flex-1 h-12 px-3 py-2 rounded-lg outline-1 -outline-offset-1 outline-neutral-50 flex justify-center items-center transition-colors duration-150 hover:bg-zinc-700/30 focus:outline-none focus:ring-2 focus:ring-[#7f57e2] disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <div className="text-neutral-50 text-base">Save Draft</div>
       </button>
       <button
         type="button"
         onClick={onSaveAndPublish}
-        className="flex-1 h-12 px-3 py-2 bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-lg flex justify-center items-center transition-transform duration-150 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[#7f57e2]"
+        disabled={saving}
+        className="flex-1 h-12 px-3 py-2 bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-lg flex justify-center items-center transition-transform duration-150 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[#7f57e2] disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <div className="text-white text-base">Save & Publish</div>
+        <div className="text-white text-base">
+          {saving ? "Saving..." : "Save & Publish"}
+        </div>
       </button>
     </div>
   );

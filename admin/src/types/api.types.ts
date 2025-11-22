@@ -191,6 +191,8 @@ export interface PricingReviewApiResponse {
   plan: string;
   amount: string;
   note?: string;
+  ctaText?: string;
+  ctaLink?: string;
 }
 
 export interface AlternativeReviewApiResponse {
@@ -220,9 +222,30 @@ export interface FAQApiResponse {
   answer?: string;
 }
 
+export interface UserReviewApiResponse {
+  userName: string;
+  userTitle?: string;
+  userAvatar?: string;
+  date?: string;
+  verified?: boolean;
+  rating: number;
+  reviewText: string;
+  helpful?: number;
+  notHelpful?: number;
+}
+
 export interface ReviewApiResponse {
   _id?: string;
   id?: string;
+  // Review page management fields
+  isReviewPageSettings?: boolean;
+  reviewPageStatus?: "live" | "maintenance";
+  reviewPageTopTagline?: string;
+  reviewPageHeading?: string;
+  reviewPageSubheading?: string;
+  reviewPageTags?: string[];
+  featuredReviews?: string[] | ReviewApiResponse[]; // ObjectId[] or populated reviews
+  // Reviewer's details (for backward compatibility - main reviewer)
   userName?: string;
   userTitle?: string;
   userAvatar?: string;
@@ -232,11 +255,16 @@ export interface ReviewApiResponse {
   rating?: number;
   helpful?: number;
   notHelpful?: number;
+  // Product-specific review context
   productName: string;
   productType?: string;
   avatarUrl?: string;
   description?: string;
   overview?: string;
+  showProductUsedBy?: boolean;
+  productUsedByText?: string;
+  showAverageRating?: boolean;
+  averageRatingText?: string;
   features?: FeatureReviewApiResponse[];
   pricing?: PricingReviewApiResponse[];
   alternatives?: AlternativeReviewApiResponse[];
@@ -255,6 +283,7 @@ export interface ReviewApiResponse {
   faqs?: FAQApiResponse[];
   useCases?: UseCaseApiResponse[];
   integrations?: string[];
+  productReviews?: UserReviewApiResponse[];
   logoComponent?: string;
   dealType?: string;
   createdAt?: string | Date;
