@@ -185,6 +185,7 @@ export default function AddReviewPage(): ReactElement {
               ctaButtonText: plan.ctaText ?? "",
               ctaButtonLink: plan.ctaLink ?? "",
             }))}
+            tryForFreeLink={reviewData.tryForFreeLink ?? ""}
             onPlansChange={(plans) => {
               updateReviewData({
                 pricing: plans.map((plan) => ({
@@ -194,6 +195,11 @@ export default function AddReviewPage(): ReactElement {
                   ctaText: plan.ctaButtonText,
                   ctaLink: plan.ctaButtonLink,
                 })),
+              });
+            }}
+            onTryForFreeLinkChange={(link) => {
+              updateReviewData({
+                tryForFreeLink: link,
               });
             }}
           />
