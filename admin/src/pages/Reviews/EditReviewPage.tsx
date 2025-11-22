@@ -1,5 +1,6 @@
-import { useState, type ReactElement } from "react";
-import type { ReviewApiResponse, UseCaseApiResponse, UserReviewApiResponse } from "../../types/api.types";
+import { useEffect, useState, type ReactElement } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import type { ReviewApiResponse, UseCaseApiResponse } from "../../types/api.types";
 import Hero from "../../components/Reviews/AddReview/Hero";
 import Header from "../../components/Reviews/AddReview/Header";
 import OverviewTab, {
@@ -16,7 +17,6 @@ import TagChips from "../../components/Reviews/AddReview/TagChips";
 import FAQ from "../../components/Reviews/AddReview/FAQ";
 import FooterActions from "../../components/Reviews/AddReview/FooterActions";
 import { REVIEWS_API } from "../../config/backend";
-import { formatDateISO } from "../../utils/helpers";
 
 type TabId = "overview" | "features" | "pricing" | "reviews" | "alternatives";
 
@@ -44,91 +44,56 @@ const serializeOverview = (value: OverviewData): string => {
   return JSON.stringify(value);
 };
 
-const getProductReviews = (
-  reviews: ReviewApiResponse["productReviews"]
-): UserReviewApiResponse[] => {
-  return Array.isArray(reviews) ? reviews : [];
-};
+export default function EditReviewPage(): ReactElement {
+  const params = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const id = params.id;
+  const [reviewData, setReviewData] = useState<ReviewApiResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
-export default function AddReviewPage(): ReactElement {
-  // Main review state matching backend schema
-  const [reviewData, setReviewData] = useState<ReviewApiResponse>({
-    userName: "",
-    userTitle: "",
-    userAvatar: "",
-    date: formatDateISO(),
-    verified: false,
-    reviewText: "",
-    rating: 0,
-    helpful: 0,
-    notHelpful: 0,
+  useEffect(() => {
+    if (!id) {
+      setError("Review ID is required");
+      setLoading(false);
+      return;
+    }
 
-    // Product Info (empty initially)
-    productName: "",
-    productType: "",
-    avatarUrl: "",
-    description: "",
-    overview: "",
-    showProductUsedBy: true,
-    productUsedByText: "",
-    showAverageRating: false,
-    averageRatingText: "",
+    let mounted = true;
+    (async (): Promise<void> => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`${REVIEWS_API}/${id}`);
+        if (!res.ok) {
+          const body = (await res.json().catch(() => ({}))) as { message?: string };
+          throw new Error(
+            body.message || `Server returned ${res.status}`
+          );
+        }
+        const data = await res.json() as ReviewApiResponse;
+        if (!mounted) return;
+        setReviewData(data);
+      } catch (err) {
+        console.error("Failed to load review:", err);
+        const errorMessage = err instanceof Error ? err.message : "Failed to load review";
+        if (mounted) setError(errorMessage);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
 
-    // Arrays
-    features: [] as Array<{ title: string; description: string }>,
-    pricing: [] as Array<{ plan: string; amount: string; note: string }>,
-    alternatives: [] as Array<{
-      name: string;
-      type: string;
-      avatarUrl?: string;
-      price: string;
-      rating: number;
-      reviewCount: number;
-      compareNote: string;
-    }>,
-
-    // Product Stats
-    userCount: "",
-    foundedYear: 0,
-    employeeRange: "",
-    headquarters: "",
-    lastUpdated: formatDateISO(),
-    upvotes: 0,
-    shareCount: 0,
-
-    // Ratings
-    aggregateRating: 0,
-    ratingCount: 0,
-    ratingCategories: [] as Array<{
-      category: string;
-      value: number;
-      outOf: number;
-    }>,
-
-    // Pros/Cons
-    pros: [] as string[],
-    cons: [] as string[],
-
-    // FAQs
-    faqs: [] as Array<{ question: string; answer: string }>,
-
-    // Use Cases
-    useCases: [] as Array<{
-      title: string;
-      description: string;
-      rating: number;
-    }>,
-
-    // Integrations
-    integrations: [] as string[],
-
-    // Product Reviews
-    productReviews: [] as UserReviewApiResponse[],
-  });
+    return (): void => {
+      mounted = false;
+    };
+  }, [id]);
 
   // Handler for child components to update state
   const updateReviewData = (updates: Partial<ReviewApiResponse>): void => {
-    setReviewData((prev) => ({ ...prev, ...updates }));
+    if (reviewData) {
+      setReviewData((prev) => (prev ? { ...prev, ...updates } : null));
+    }
   };
 
   const tabOptions: Array<{ id: TabId; label: string }> = [
@@ -141,6 +106,8 @@ export default function AddReviewPage(): ReactElement {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
 
   const renderActiveTab = (): ReactElement => {
+    if (!reviewData) return <div>No data available</div>;
+
     switch (activeTab) {
       case "overview":
         return (
@@ -193,11 +160,10 @@ export default function AddReviewPage(): ReactElement {
             }}
           />
         );
-      case "reviews": {
-        const productReviews = getProductReviews(reviewData.productReviews);
+      case "reviews":
         return (
           <ReviewsTab
-            initialReviews={productReviews.map((review, idx) => ({
+            initialReviews={reviewData.productReviews?.map((review, idx) => ({
               id: idx + 1,
               profileImage: review.userAvatar ?? null,
               reviewerName: review.userName ?? "",
@@ -206,7 +172,7 @@ export default function AddReviewPage(): ReactElement {
               reviewText: review.reviewText ?? "",
               helpful: review.helpful ?? 0,
               notHelpful: review.notHelpful ?? 0,
-            }))}
+            })) ?? []}
             onReviewsChange={(reviews) => {
               updateReviewData({
                 productReviews: reviews.map((review) => ({
@@ -215,14 +181,13 @@ export default function AddReviewPage(): ReactElement {
                   userAvatar: review.profileImage ?? undefined,
                   rating: review.rating,
                   reviewText: review.reviewText,
-                  helpful: review.helpful ?? 0,
-                  notHelpful: review.notHelpful ?? 0,
+                  helpful: review.helpful,
+                  notHelpful: review.notHelpful,
                 })),
               });
             }}
           />
         );
-      }
       case "alternatives":
       default:
         return (
@@ -245,7 +210,12 @@ export default function AddReviewPage(): ReactElement {
 
   // Submit handler
   const handleSaveAndPublish = async (): Promise<void> => {
-    console.log("=== SAVING REVIEW ===");
+    if (!reviewData || !id) {
+      alert("Review data is not available");
+      return;
+    }
+
+    console.log("=== UPDATING REVIEW ===");
     console.log("Review Data:", JSON.stringify(reviewData, null, 2));
 
     // Validate required fields
@@ -254,16 +224,15 @@ export default function AddReviewPage(): ReactElement {
       return;
     }
 
-
-
     if (!reviewData.rating || reviewData.rating === 0) {
       alert("Rating is required");
       return;
     }
 
     try {
-      const response = await fetch(REVIEWS_API, {
-        method: "POST",
+      setSaving(true);
+      const response = await fetch(`${REVIEWS_API}/${id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -278,28 +247,84 @@ export default function AddReviewPage(): ReactElement {
       }
 
       const result = await response.json() as ReviewApiResponse;
-      console.log("Review created successfully:", result);
-      alert("Review published successfully!");
-      // Navigate to reviews list or show success message
-      // navigate("/reviews");
+      console.log("Review updated successfully:", result);
+      alert("Review updated successfully!");
+      void navigate("/reviews");
     } catch (error: unknown) {
-      console.error("Error saving review:", error);
+      console.error("Error updating review:", error);
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      alert(`Failed to save review: ${errorMessage}`);
+      alert(`Failed to update review: ${errorMessage}`);
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleSaveDraft = (): void => {
-    console.log("Saving draft:", reviewData);
-    alert("Draft saved locally (implement backend draft endpoint)");
+  const handleSaveDraft = async (): Promise<void> => {
+    if (!reviewData || !id) {
+      alert("Review data is not available");
+      return;
+    }
+
+    try {
+      setSaving(true);
+      const response = await fetch(`${REVIEWS_API}/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(reviewData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({})) as { message?: string };
+        throw new Error(
+          errorData.message || `Server error: ${response.status}`
+        );
+      }
+
+      alert("Draft saved successfully!");
+    } catch (error: unknown) {
+      console.error("Error saving draft:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      alert(`Failed to save draft: ${errorMessage}`);
+    } finally {
+      setSaving(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-neutral-50">Loading review...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-red-400">{error}</div>
+      </div>
+    );
+  }
+
+  if (!reviewData) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-neutral-50">Review not found</div>
+      </div>
+    );
+  }
 
   return (
     <div
       data-layer="Frame 2147206029"
       className="Frame2147206029 w-[1116px] p-6 bg-zinc-900 rounded-3xl outline-1 outline-solid -outline-offset-1 outline-zinc-800 inline-flex flex-col justify-start items-start gap-6"
     >
-      <Header />
+      <Header 
+        title="Edit Review" 
+        onBack={() => navigate("/reviews")}
+      />
       <Hero reviewData={reviewData} updateReviewData={updateReviewData} />
       <div className="w-full p-4 bg-zinc-800 rounded-2xl flex flex-col gap-4">
         <div className="flex flex-wrap gap-2">
@@ -324,7 +349,7 @@ export default function AddReviewPage(): ReactElement {
         initialCategories={reviewData.ratingCategories ? reviewData.ratingCategories.map((cat) => ({
           category: cat.category,
           value: cat.value,
-          outOf: cat.outOf ?? 5, // Default to 5 if undefined
+          outOf: cat.outOf ?? 5,
         })) : undefined}
         onCategoriesChange={(categories) => {
           updateReviewData({ ratingCategories: categories });
@@ -344,7 +369,7 @@ export default function AddReviewPage(): ReactElement {
         initialUseCases={reviewData.useCases ? reviewData.useCases.map((uc: UseCaseApiResponse, idx: number) => ({
           id: idx + 1,
           title: uc.title,
-          description: uc.description ?? "", // Default to empty string if undefined
+          description: uc.description ?? "",
           rating: uc.rating,
         })) : undefined}
         onUseCasesChange={(useCases) => {
@@ -383,9 +408,11 @@ export default function AddReviewPage(): ReactElement {
         }}
       />
       <FooterActions
+        saving={saving}
         onSaveDraft={handleSaveDraft}
         onSaveAndPublish={handleSaveAndPublish}
       />
     </div>
   );
 }
+

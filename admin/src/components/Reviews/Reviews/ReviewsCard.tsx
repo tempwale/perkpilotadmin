@@ -222,8 +222,8 @@ export default function ReviewsCard({
                 {(() => {
                   const amount = pricing?.amount || "$14/Monthly";
                   const amountPart = amount.split("/")[0]?.trim() || "$14";
-                  // Remove $ if already present to avoid double $
-                  const cleanAmount = amountPart.startsWith("$") ? amountPart : `$${amountPart}`;
+                  const cleanAmountPart = amountPart.replace(/\$/g, "");
+                  const cleanAmount = cleanAmountPart ? `$${cleanAmountPart}` : "$14";
                   return `${cleanAmount}/Month`;
                 })()}
               </div>

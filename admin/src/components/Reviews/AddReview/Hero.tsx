@@ -60,16 +60,15 @@ export default function ToolReviewForm({
     primaryCtaLink: "",
     secondaryCtaText: "",
     secondaryCtaLink: "",
-    // New field defaults
-    showProductUsedBy: true,
-    showAverageRating: false,
-    productUsedByText: "",
-    averageRating: 0,
-    averageRatingText: "",
-    totalUsers: "",
-    founded: "",
-    employees: "",
-    headquarters: "",
+    showProductUsedBy: reviewData?.showProductUsedBy ?? true,
+    showAverageRating: reviewData?.showAverageRating ?? false,
+    productUsedByText: reviewData?.productUsedByText ?? "",
+    averageRating: reviewData?.aggregateRating ?? 0,
+    averageRatingText: reviewData?.averageRatingText ?? "",
+    totalUsers: reviewData?.userCount ?? "",
+    founded: reviewData?.foundedYear ? String(reviewData?.foundedYear) : "",
+    employees: reviewData?.employeeRange ?? "",
+    headquarters: reviewData?.headquarters ?? "",
   });
 
   const [selectedLogo, setSelectedLogo] = useState<number>(0);
@@ -85,36 +84,57 @@ export default function ToolReviewForm({
 
   // Sync all form data to parent's reviewData
   useEffect((): void => {
-    if (updateReviewData) {
-      const updates: Partial<ReviewApiResponse> = {};
+    if (!updateReviewData) return;
 
-      // Basic product info
-      if (formData.toolName) updates.productName = formData.toolName;
-      if (formData.toolCategory) updates.productType = formData.toolCategory;
-      if (formData.toolDescription)
-        updates.description = formData.toolDescription;
-
-      // Logo (use first non-null logo as avatarUrl)
-      const firstLogo = logoFiles.find((logo) => logo !== null);
-      if (firstLogo) updates.avatarUrl = firstLogo;
-
-      // Stats
-      if (formData.totalUsers) updates.userCount = formData.totalUsers;
-      if (formData.founded) {
-        const year = parseInt(formData.founded);
-        if (!isNaN(year)) updates.foundedYear = year;
+    const updates: Partial<ReviewApiResponse> = {};
+    const pushIfChanged = <K extends keyof ReviewApiResponse>(
+      key: K,
+      value: ReviewApiResponse[K]
+    ): void => {
+      const currentValue = reviewData ? reviewData[key] : undefined;
+      if (!Object.is(currentValue, value)) {
+        updates[key] = value;
       }
-      if (formData.employees) updates.employeeRange = formData.employees;
-      if (formData.headquarters) updates.headquarters = formData.headquarters;
+    };
 
-      // Rating
-      if (formData.averageRating > 0)
-        updates.aggregateRating = formData.averageRating;
+    // Basic product info
+    pushIfChanged("productName", formData.toolName);
+    pushIfChanged("productType", formData.toolCategory);
+    pushIfChanged("description", formData.toolDescription);
 
-      // Only update if there are changes
-      if (Object.keys(updates).length > 0) {
-        updateReviewData(updates);
-      }
+    // Logo (use first non-null logo as avatarUrl)
+    const firstLogo = logoFiles.find((logo) => logo !== null) ?? undefined;
+    pushIfChanged("avatarUrl", firstLogo);
+
+    // Stats
+    pushIfChanged("userCount", formData.totalUsers);
+    if (formData.founded) {
+      const year = parseInt(formData.founded);
+      if (!isNaN(year)) pushIfChanged("foundedYear", year);
+    } else {
+      pushIfChanged("foundedYear", undefined);
+    }
+    pushIfChanged("employeeRange", formData.employees);
+    pushIfChanged("headquarters", formData.headquarters);
+
+    // Hero toggles + copy
+    pushIfChanged("showProductUsedBy", formData.showProductUsedBy);
+    pushIfChanged("productUsedByText", formData.productUsedByText);
+    pushIfChanged("showAverageRating", formData.showAverageRating);
+    pushIfChanged(
+      "averageRatingText",
+      formData.showAverageRating ? formData.averageRatingText : ""
+    );
+
+    // Rating
+    const aggregateRatingValue =
+      formData.showAverageRating && formData.averageRating > 0
+        ? formData.averageRating
+        : undefined;
+    pushIfChanged("aggregateRating", aggregateRatingValue);
+
+    if (Object.keys(updates).length > 0) {
+      updateReviewData(updates);
     }
   }, [
     formData.toolName,
@@ -125,7 +145,12 @@ export default function ToolReviewForm({
     formData.employees,
     formData.headquarters,
     formData.averageRating,
+    formData.productUsedByText,
+    formData.averageRatingText,
+    formData.showProductUsedBy,
+    formData.showAverageRating,
     logoFiles,
+    reviewData,
     updateReviewData,
   ]);
 
@@ -210,6 +235,36 @@ export default function ToolReviewForm({
       </div>
     );
   };
+
+  const ToggleOption = ({
+    label,
+    active,
+    onToggle,
+  }: {
+    label: string;
+    active: boolean;
+    onToggle: () => void;
+  }): ReactElement => (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="SelectSelected w-[208px] h-7 relative cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7f57e2]"
+    >
+      <span className="absolute left-[40px] top-[4px] text-left text-neutral-50 text-base font-normal font-['Roboto']">
+        {label}
+      </span>
+      <span
+        className={`Rectangle31 w-7 h-7 left-0 top-0 absolute rounded-[14px] ${
+          active
+            ? "border-2 border-[#501bd6]"
+            : "bg-zinc-800 border border-zinc-700"
+        }`}
+      />
+      {active && (
+        <span className="Rectangle32 w-[18px] h-[18px] left-[5px] top-[5px] absolute bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[14px]" />
+      )}
+    </button>
+  );
 
   // Handle logo selection
   const handleLogoSelect = (index: number): void => {
@@ -307,7 +362,7 @@ export default function ToolReviewForm({
                   value={formData.toolName}
                   onChange={handleInputChange}
                   placeholder="Tool Name"
-                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6"
+                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
                 />
               </div>
             </div>
@@ -477,69 +532,16 @@ export default function ToolReviewForm({
             data-layer="Frame 2147206063"
             className="Frame2147206063 inline-flex justify-start items-start gap-4"
           >
-            {/* Product Used By Checkbox */}
-            <div
-              data-layer="Select/Selected"
-              className="SelectSelected w-[163px] h-7 relative cursor-pointer"
-              onClick={(): void => handleCheckboxChange("showProductUsedBy")}
-            >
-              <div
-                data-layer="Product Used By"
-                className="ProductUsedBy left-[40px] top-[4px] absolute justify-start text-neutral-50 text-base font-normal font-['Roboto']"
-              >
-                Product Used By
-              </div>
-              <div
-                data-layer="Rectangle 3.1"
-                className={`Rectangle31 w-7 h-7 left-0 top-0 absolute rounded-[14px] ${
-                  formData.showProductUsedBy
-                    ? "border-2 border-[#501bd6]"
-                    : "bg-zinc-800 border border-zinc-700"
-                }`}
-              />
-              {formData.showProductUsedBy && (
-                <div
-                  data-layer="Rectangle 3.2"
-                  className="Rectangle32 w-[18px] h-[18px] left-[5px] top-[5px] absolute bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[14px]"
-                />
-              )}
-            </div>
-
-            {/* Average Deal Rating Checkbox */}
-            {/* Average Deal Rating Section */}
-            <div
-              data-layer="Frame 2147205997"
-              className="Frame2147205997 flex-1 inline-flex flex-col justify-center items-start gap-3"
-            >
-              <div
-                data-layer="Add Deal Average Raings"
-                className="AddDealAverageRaings justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
-              >
-                Add Deal Average Ratings
-              </div>
-              <div
-                data-layer="Frame 2147205996"
-                className="Frame2147205996 inline-flex justify-start items-center gap-2"
-              >
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <StarButton key={star} star={star} />
-                ))}
-              </div>
-              <div
-                data-layer="Input"
-                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
-              >
-                <input
-                  type="text"
-                  name="averageRatingText"
-                  value={formData.averageRatingText}
-                  onChange={handleInputChange}
-                  placeholder="4.9 / 5 ( 24 )"
-                  disabled={!formData.showAverageRating}
-                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500 disabled:opacity-50"
-                />
-              </div>
-            </div>
+            <ToggleOption
+              label="Product Used By"
+              active={formData.showProductUsedBy}
+              onToggle={(): void => handleCheckboxChange("showProductUsedBy")}
+            />
+            <ToggleOption
+              label="Average Deal Rating"
+              active={formData.showAverageRating}
+              onToggle={(): void => handleCheckboxChange("showAverageRating")}
+            />
           </div>
 
           <div

@@ -1,8 +1,8 @@
-import { type ReactElement } from "react";
-import ReviewsGrid from "../../components/Reviews/Reviews/ReviewsGrid";
+import type { ReactElement } from "react";
 import ReviewsHeader from "../../components/Reviews/Reviews/ReviewsHeader";
+import ReviewsGrid from "../../components/Reviews/Reviews/ReviewsGrid";
 
-export default function ReviewsPage(): ReactElement {
+export default function ManageReviewPage(): ReactElement {
   return (
     <div
       data-layer="Frame 2147206029"

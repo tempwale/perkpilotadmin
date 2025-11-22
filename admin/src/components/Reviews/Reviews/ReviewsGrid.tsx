@@ -1,61 +1,25 @@
-import { useState, useEffect, type ReactNode, type ReactElement } from "react";
-import DealCard from "./ReviewsCard";
+import { useState, useEffect, type ReactElement } from "react";
+import ReviewsCard from "./ReviewsCard";
 import Pagination from "./Pagination";
 import type { ReviewApiResponse } from "../../../types/api.types";
 import { REVIEWS_API } from "../../../config/backend";
 
-// UI-facing review shape that may include backend-specific fields.
-type UIDeal = Partial<ReviewApiResponse> & {
-  _id?: string;
-  id?: number;
-  logoUri?: string;
-  logoComponent?: ReactNode;
-  verified?: boolean;
-  tag?: string;
-  dealType?: string;
-  features?: string[];
-  discount?: string;
-  savings?: string;
-  category?: string;
-};
-
-interface DealGridProps {
-  deals?: UIDeal[];
-  onViewDetails?: (dealId: string | number) => void;
-  onGetDeal?: (dealId: string | number) => void;
+interface ReviewsGridProps {
+  reviews?: ReviewApiResponse[];
+  onViewDetails?: (reviewId: string | number) => void;
   itemsPerPage?: number;
   showPagination?: boolean;
 }
 
-// Helper to safely extract title string
-const getTitleString = (deal: UIDeal): string => {
-  if (typeof deal.productName === "string") {
-    return String(deal.productName);
-  }
-  return "";
-};
-
-// Helper to safely extract category string
-const getCategoryString = (deal: UIDeal): string => {
-  if (typeof deal.category === "string") {
-    return String(deal.category);
-  }
-  if (typeof deal.dealType === "string") {
-    return String(deal.dealType);
-  }
-  return "";
-};
-
-export default function DealGrid({
-  deals,
+export default function ReviewsGrid({
+  reviews,
   onViewDetails,
-  onGetDeal,
   itemsPerPage = 6,
   showPagination = true,
-}: DealGridProps): ReactElement {
+}: ReviewsGridProps): ReactElement {
   const [currentPage, setCurrentPage] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
-  const [apiDeals, setApiDeals] = useState<UIDeal[]>([]);
+  const [apiReviews, setApiReviews] = useState<ReviewApiResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -79,9 +43,9 @@ export default function DealGrid({
     setCurrentPage(1);
   }, [isMobile]);
 
-  // Fetch deals from API on mount (if no `deals` prop provided)
+  // Fetch reviews from API on mount (if no `reviews` prop provided)
   useEffect(() => {
-    if (deals && deals.length) return; // caller provided deals
+    if (reviews && reviews.length) return; // caller provided reviews
 
     let mounted = true;
     async function load(): Promise<void> {
@@ -94,8 +58,10 @@ export default function DealGrid({
         }
         const data = await response.json() as ReviewApiResponse[] | { data: ReviewApiResponse[] };
         if (!mounted) return;
-        const reviews = Array.isArray(data) ? data : (data.data ?? []);
-        setApiDeals(reviews as UIDeal[]);
+        const fetchedReviews = Array.isArray(data) ? data : (data.data ?? []);
+        // Filter out review page settings document
+        const actualReviews = fetchedReviews.filter((r) => !r.isReviewPageSettings);
+        setApiReviews(actualReviews);
       } catch (e) {
         console.error("fetchReviews error", e);
         if (mounted) {
@@ -118,41 +84,41 @@ export default function DealGrid({
     return () => {
       mounted = false;
     };
-  }, [deals]);
+  }, [reviews]);
 
   // Decide which data source to use: prop -> API -> empty array
-  const sourceDeals = deals && deals.length > 0 ? deals : apiDeals;
+  const sourceReviews = reviews && reviews.length > 0 ? reviews : apiReviews;
 
   // Calculate items per page based on screen size
   const effectiveItemsPerPage = isMobile ? 3 : itemsPerPage;
 
-  // Filter by single global search query (title, category, description, features)
+  // Filter by single global search query (productName, productType, description, pros, cons)
   const normalizedQuery = query.trim().toLowerCase();
-  const filteredDeals = normalizedQuery
-    ? sourceDeals.filter((d): boolean => {
-        const title = getTitleString(d).toLowerCase();
-        const category = getCategoryString(d).toLowerCase();
-        const description = typeof d.description === "string" ? d.description.toLowerCase() : "";
-        const features = Array.isArray(d.features)
-          ? d.features.join(" ").toLowerCase()
-          : "";
+  const filteredReviews = normalizedQuery
+    ? sourceReviews.filter((r): boolean => {
+        const productName = (r.productName || "").toLowerCase();
+        const productType = (r.productType || "").toLowerCase();
+        const description = (r.description || r.overview || "").toLowerCase();
+        const pros = Array.isArray(r.pros) ? r.pros.join(" ").toLowerCase() : "";
+        const cons = Array.isArray(r.cons) ? r.cons.join(" ").toLowerCase() : "";
         return (
-          title.includes(normalizedQuery) ||
-          category.includes(normalizedQuery) ||
+          productName.includes(normalizedQuery) ||
+          productType.includes(normalizedQuery) ||
           description.includes(normalizedQuery) ||
-          features.includes(normalizedQuery)
+          pros.includes(normalizedQuery) ||
+          cons.includes(normalizedQuery)
         );
       })
-    : sourceDeals;
+    : sourceReviews;
 
   // Calculate pagination based on filtered results
   const totalPages =
-    Math.ceil(filteredDeals.length / effectiveItemsPerPage) || 1;
+    Math.ceil(filteredReviews.length / effectiveItemsPerPage) || 1;
   const startIndex = (currentPage - 1) * effectiveItemsPerPage;
   const endIndex = startIndex + effectiveItemsPerPage;
-  const displayDeals = showPagination
-    ? filteredDeals.slice(startIndex, endIndex)
-    : filteredDeals;
+  const displayReviews = showPagination
+    ? filteredReviews.slice(startIndex, endIndex)
+    : filteredReviews;
 
   const handlePageChange = (page: number): void => {
     setCurrentPage(page);
@@ -160,30 +126,22 @@ export default function DealGrid({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleViewDetails = (dealId: string | number): void => {
+  const handleViewDetails = (reviewId: string | number): void => {
     if (onViewDetails) {
-      onViewDetails(dealId);
+      onViewDetails(reviewId);
     } else {
-      console.log(`View details for deal ${dealId}`);
+      console.log(`View details for review ${reviewId}`);
     }
   };
 
-  const handleGetDeal = (dealId: string | number): void => {
-    if (onGetDeal) {
-      onGetDeal(dealId);
-    } else {
-      console.log(`Get deal ${dealId}`);
-    }
-  };
-
-  // Delete handler: only works when using internal apiDeals state (not when `deals` prop is provided)
-  const handleDelete = (dealId: string | number, sourceIndex: number): void => {
-    if (deals && deals.length) {
-      console.warn("Cannot delete deals passed in via props");
+  // Delete handler: only works when using internal apiReviews state (not when `reviews` prop is provided)
+  const handleDelete = (reviewId: string | number, sourceIndex: number): void => {
+    if (reviews && reviews.length) {
+      console.warn("Cannot delete reviews passed in via props");
       return;
     }
 
-    setApiDeals((prev) => {
+    setApiReviews((prev) => {
       // prefer removing by index when available
       if (
         sourceIndex != null &&
@@ -196,9 +154,9 @@ export default function DealGrid({
       }
 
       // fallback: remove by matching id fields
-      return prev.filter((d): boolean => {
-        const dId = d._id ?? d.id;
-        return !(String(dId) === String(dealId));
+      return prev.filter((r): boolean => {
+        const rId = r._id ?? r.id;
+        return !(String(rId) === String(reviewId));
       });
     });
 
@@ -206,7 +164,7 @@ export default function DealGrid({
     setCurrentPage((p) => {
       const newTotal = Math.max(
         1,
-        Math.ceil((filteredDeals.length - 1) / effectiveItemsPerPage)
+        Math.ceil((filteredReviews.length - 1) / effectiveItemsPerPage)
       );
       return Math.min(p, newTotal);
     });
@@ -217,7 +175,7 @@ export default function DealGrid({
       {/* Grid Container with animation */}
 
       {loading && (
-        <div className="col-span-full text-center py-6">Loading deals...</div>
+        <div className="col-span-full text-center py-6">Loading reviews...</div>
       )}
 
       {fetchError && (
@@ -226,9 +184,9 @@ export default function DealGrid({
         </div>
       )}
 
-      {!loading && !fetchError && displayDeals.length === 0 && (
+      {!loading && !fetchError && displayReviews.length === 0 && (
         <div className="col-span-full text-center py-6 text-gray-500">
-          No deals available at the moment.
+          No reviews available at the moment.
         </div>
       )}
 
@@ -263,9 +221,9 @@ export default function DealGrid({
             <input
               value={query}
               onChange={(e): void => setQuery(e.target.value)}
-              placeholder="Search deals"
+              placeholder="Search reviews"
               className="bg-transparent outline-none text-neutral-50 placeholder:text-zinc-500 w-full"
-              aria-label="Search deals"
+              aria-label="Search reviews"
             />
           </div>
         </div>
@@ -273,47 +231,23 @@ export default function DealGrid({
 
       {/* Responsive grid: 1 col mobile, 2 cols sm, 3 cols md+ */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {displayDeals.map((deal, idx): ReactElement=> {
+        {displayReviews.map((review, idx): ReactElement=> {
           // Determine the index in the full source array (used for delete by index)
-          const sourceIndex = sourceDeals.indexOf(deal);
+          const sourceIndex = sourceReviews.indexOf(review);
           // Normalize API shape (supports different property names)
           const idKey =
-            deal.id ??
-            deal._id ??
-            `deal-${sourceIndex >= 0 ? sourceIndex : idx}`;
-          const category: string = deal.category ?? deal.dealType ?? "";
-          const dealType: string = deal.dealType ?? deal.tag ?? "";
-
-          const titleText = getTitleString(deal) || "logo";
-
-          const logoComponent =
-            deal.logoComponent ??
-            (deal.logoUri ? (
-              <img
-                src={deal.logoUri}
-                alt={titleText}
-                className="w-12 h-12 object-contain"
-              />
-            ) : null);
-
-          const cardTitle = getTitleString(deal) || undefined;
+            review.id ??
+            review._id ??
+            `review-${sourceIndex >= 0 ? sourceIndex : idx}`;
 
           return (
             <div key={String(idKey)}>
-              <DealCard
+              <ReviewsCard
                 id={String(idKey)}
-                title={cardTitle}
-                category={typeof category === "string" ? category : ""}
-                description={typeof deal.description === "string" ? deal.description : undefined}
-                logoComponent={logoComponent}
-                verified={deal.verified ?? false}
-                dealType={typeof dealType === "string" ? dealType : ""}
-                features={deal.features ?? []}
-                discount={deal.discount ?? ""}
-                savings={deal.savings ?? ""}
+                review={review}
                 onViewDetails={(): void => handleViewDetails(idKey)}
-                onGetDeal={(): void => handleGetDeal(idKey)}
                 onDelete={(): void => handleDelete(idKey, sourceIndex)}
+                showCustomizeHeader={true}
               />
             </div>
           );

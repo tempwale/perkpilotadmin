@@ -1,4 +1,4 @@
-"use client";
+
 
 import {useState, type ReactElement} from "react";
 import { GripVertical, Trash2, Plus, Star } from "lucide-react";
@@ -15,6 +15,15 @@ type Props = {
   initialCategories?: Array<{ category: string; value: number; outOf: number }>;
   onCategoriesChange?: (categories: Array<{ category: string; value: number; outOf: number }>) => void;
 };
+
+// Default feature names for placeholders
+const DEFAULT_FEATURE_NAMES = [
+  "Ease of Use",
+  "Features",
+  "Value",
+  "Customer Support",
+  "Reliability",
+];
 
 export default function RatingBreakdown({ initialCategories, onCategoriesChange }: Props = {}): ReactElement {
   const [isEnabled, setIsEnabled] = useState(true);
@@ -167,7 +176,7 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-400 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
+              className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500 placeholder:text-zinc-500"
             />
           </div>
         </div>
@@ -216,8 +225,8 @@ export default function RatingBreakdown({ initialCategories, onCategoriesChange 
                     onChange={(e) =>
                       handleFeatureNameChange(feature.id, e.target.value)
                     }
-                    placeholder="Enter feature name..."
-                    className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-400 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500"
+                    placeholder={DEFAULT_FEATURE_NAMES[index] || `Feature ${index + 1}`}
+                    className="self-stretch h-12 pl-6 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 focus:outline-zinc-500 placeholder:text-zinc-500"
                   />
                 </div>
               </div>

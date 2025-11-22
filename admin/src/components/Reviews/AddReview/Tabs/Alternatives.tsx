@@ -1,4 +1,3 @@
-"use client";
 
 import {useState, type ReactElement} from "react";
 import { GripVertical, Trash2, Search, Star } from "lucide-react";
@@ -115,7 +114,7 @@ export default function Alternatives({
   return (
     <div
       data-layer="Row"
-      className="Row w-[1068px] py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 inline-flex flex-col justify-center items-start gap-4 overflow-hidden"
+      className="Row w-full max-w-[1068px] py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 flex flex-col justify-center items-start gap-4 overflow-hidden"
     >
       {/* Header */}
       <div
@@ -128,16 +127,15 @@ export default function Alternatives({
         >
           <div
             data-layer="Frame 2147205991"
-            className="Frame2147205991 flex justify-start items-center"
+            className="Frame2147205991 flex justify-start items-center cursor-grab"
           >
-            <GripVertical className="w-6 h-6 text-neutral-50" />
             <GripVertical className="w-6 h-6 text-neutral-50" />
           </div>
           <div
             data-layer="Text"
             className="Text justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
           >
-            Pricing Plan
+            Product Alternatives
           </div>
         </div>
         <div

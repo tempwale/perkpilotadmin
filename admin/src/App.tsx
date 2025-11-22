@@ -10,6 +10,8 @@ import HomeManagementPage from "./pages/HomePageManagement";
 import AddComparisionPage from "./pages/Comparisions/AddComparisionPage";
 import AddDealPage from "./pages/Deal/AddDealPage";
 import AddReviewPage from "./pages/Reviews/AddReviewPage";
+import EditReviewPage from "./pages/Reviews/EditReviewPage";
+import ReviewPageManagementPage from "./pages/Reviews/ReviewPageManagementPage";
 import DealsPage from "./pages/Deal/DealsPage";
 import UpdateDealPage from "./pages/Deal/UpdateDealPage";
 import ComparisionsPage from "./pages/Comparisions/ComparisionsPage";
@@ -56,7 +58,8 @@ function AppContent(): ReactElement{
               <Route path="/home" element={<HomeManagementPage />} />
 
               <Route path="/addreview" element={<AddReviewPage />} />
-
+              <Route path="/updatereview/:id" element={<EditReviewPage />} />
+              <Route path="/reviewmanagement" element={<ReviewPageManagementPage />} />
               <Route path="/reviews" element={<ReviewsPage />} />
             </Routes>
           </div>
