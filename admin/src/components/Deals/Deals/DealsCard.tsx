@@ -15,6 +15,7 @@ interface DealsCardProps {
   onViewDetails?: () => void;
   onGetDeal?: () => void;
   onDelete?: () => void;
+  showCustomizeHeader?: boolean;
 }
 
 export default function DealsCard({
