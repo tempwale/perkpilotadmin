@@ -30,7 +30,6 @@ export default function DealsCard({
   onViewDetails,
   onGetDeal,
   onDelete,
-  showCustomizeHeader = true,
 }: DealsCardProps): ReactElement {
   const [showModal, setShowModal] = useState(false);
 
@@ -60,7 +59,6 @@ export default function DealsCard({
         savings={savings}
         onViewDetails={handleViewDetails}
         onGetDeal={onGetDeal}
-        showCustomizeHeader={showCustomizeHeader}
         onCustomize={openModal}
         customizeHeaderText="Customize Deal Card?"
         buttonLayout="row"
