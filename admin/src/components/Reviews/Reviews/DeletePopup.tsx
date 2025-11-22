@@ -1,6 +1,6 @@
-import {useState, type ReactElement} from "react";
-import DealCard from "./ReviewsCard";
-import { DEALS_API } from "../../../config/backend";
+import { useState, type ReactElement } from "react";
+import ReviewsCard from "./ReviewsCard";
+import { REVIEWS_API } from "../../../config/backend";
 import type { ReviewApiResponse, ApiError } from "../../../types/api.types";
 import { safeJsonParse } from "../../../utils/helpers";
 
@@ -16,17 +16,18 @@ export default function DeletePopup({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const reviewId = String(review?.id ?? review?._id ?? "");
+
   const handleConfirm = async (): Promise<void> => {
     setError(null);
-    const id = String(review?.id ?? review?._id ?? "");
-    if (!id) {
+    if (!reviewId) {
       setError("Missing review id");
       return;
     }
 
     try {
       setLoading(true);
-      const res = await fetch(`${DEALS_API}/${id}`, {
+      const res = await fetch(`${REVIEWS_API}/${reviewId}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });
@@ -87,17 +88,11 @@ export default function DeletePopup({
           </div>
         </div>
         <div className="self-stretch flex justify-center">
-          {/* Render the DealCard inside popup as a compact preview */}
-          <div className="w-[420px]">
-            <DealCard
-              id={String(review?.id ?? review?._id ?? "preview")}
-              title={typeof review?.productName === "string" ? review?.productName : undefined}
-              category={typeof review?.dealType === "string" ? review?.dealType : undefined}
-              description={typeof review?.description === "string" ? review?.description : undefined}
-              logoComponent={review?.logoComponent ?? undefined}
-              verified={review?.verified ?? undefined}
-              dealType={review?.dealType ?? undefined}
-              features={review?.features?.map((f) => f.title) ?? undefined}
+          <div className="w-[420px] pointer-events-none select-none">
+            <ReviewsCard
+              id={reviewId || "preview"}
+              review={review}
+              showCustomizeHeader={false}
             />
           </div>
         </div>
