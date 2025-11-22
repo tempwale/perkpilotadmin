@@ -4,6 +4,7 @@ import BlogPageSettings from "../components/Blogs/BlogManagement/BlogPageSetting
 import HeroSectionManagement from "../components/Blogs/BlogManagement/HeroSectionManagement";
 import ArticleGrid from "../components/Blogs/BlogManagement/ArticleGrid";
 import FooterActions from "../components/Blogs/BlogManagement/FooterActions";
+import Toast from "../components/Shared/Toast";
 import { BLOGPAGE_API } from "../config/backend";
 
 interface BlogPageData {
@@ -24,6 +25,7 @@ export default function BlogManagementPage(): ReactElement {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" | "warning" } | null>(null);
 
 
   useEffect(() => {
@@ -93,13 +95,18 @@ export default function BlogManagementPage(): ReactElement {
         throw new Error(errorData.message || `Failed to save: ${response.status}`);
       }
 
-      // Show success message (you can add a toast notification here)
-      alert(publish ? "Blog page settings saved and published!" : "Blog page settings saved as draft!");
+      setToast({
+        message: publish ? "Blog page settings saved and published!" : "Blog page settings saved as draft!",
+        type: "success",
+      });
     } catch (err) {
       console.error("Error saving blog page:", err);
       const errorMessage = err instanceof Error ? err.message : "Failed to save blog page settings";
       setError(errorMessage);
-      alert(`Error: ${errorMessage}`);
+      setToast({
+        message: `Error: ${errorMessage}`,
+        type: "error",
+      });
     }
   };
 
@@ -112,8 +119,16 @@ export default function BlogManagementPage(): ReactElement {
   }
 
   return (
-    <div className="flex justify-center">
-      <div className="p-4 bg-zinc-900 rounded-3xl outline outline-offset-1 outline-zinc-800 inline-flex flex-col justify-center items-center gap-6 w-full max-w-[1116px]">
+    <>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+      <div className="flex justify-center">
+        <div className="p-4 bg-zinc-900 rounded-3xl outline outline-offset-1 outline-zinc-800 inline-flex flex-col justify-center items-center gap-6 w-full max-w-[1116px]">
         {error && (
           <div className="w-full p-4 bg-red-600/20 border border-red-600 rounded-lg text-red-400">
             {error}
@@ -133,7 +148,8 @@ export default function BlogManagementPage(): ReactElement {
         </div>
 
         <FooterActions onSave={handleSave} />
+        </div>
       </div>
-    </div>
+    </>
   );
 }

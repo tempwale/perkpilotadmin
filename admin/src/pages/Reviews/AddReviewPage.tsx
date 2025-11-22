@@ -1,4 +1,6 @@
 import { useState, type ReactElement } from "react";
+import { useNavigate } from "react-router-dom";
+import Toast from "../../components/Shared/Toast";
 import type { ReviewApiResponse, UseCaseApiResponse, UserReviewApiResponse } from "../../types/api.types";
 import Hero from "../../components/Reviews/AddReview/Hero";
 import Header from "../../components/Reviews/AddReview/Header";
@@ -51,6 +53,9 @@ const getProductReviews = (
 };
 
 export default function AddReviewPage(): ReactElement {
+  const navigate = useNavigate();
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" | "warning" } | null>(null);
+  
   // Main review state matching backend schema
   const [reviewData, setReviewData] = useState<ReviewApiResponse>({
     userName: "",
@@ -250,14 +255,18 @@ export default function AddReviewPage(): ReactElement {
 
     // Validate required fields
     if (!reviewData.productName || !reviewData.productName.trim()) {
-      alert("Product Name is required");
+      setToast({
+        message: "Product Name is required",
+        type: "error",
+      });
       return;
     }
 
-
-
     if (!reviewData.rating || reviewData.rating === 0) {
-      alert("Rating is required");
+      setToast({
+        message: "Rating is required",
+        type: "error",
+      });
       return;
     }
 
@@ -279,27 +288,46 @@ export default function AddReviewPage(): ReactElement {
 
       const result = await response.json() as ReviewApiResponse;
       console.log("Review created successfully:", result);
-      alert("Review published successfully!");
-      // Navigate to reviews list or show success message
-      // navigate("/reviews");
+      setToast({
+        message: "Review published successfully!",
+        type: "success",
+      });
+      // Navigate to reviews list after a short delay
+      window.setTimeout(() => {
+        void navigate("/reviews");
+      }, 2000);
     } catch (error: unknown) {
       console.error("Error saving review:", error);
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      alert(`Failed to save review: ${errorMessage}`);
+      setToast({
+        message: `Failed to save review: ${errorMessage}`,
+        type: "error",
+      });
     }
   };
 
   const handleSaveDraft = (): void => {
     console.log("Saving draft:", reviewData);
-    alert("Draft saved locally (implement backend draft endpoint)");
+    setToast({
+      message: "Draft saved locally (implement backend draft endpoint)",
+      type: "info",
+    });
   };
 
   return (
-    <div
-      data-layer="Frame 2147206029"
-      className="Frame2147206029 w-[1116px] p-6 bg-zinc-900 rounded-3xl outline-1 outline-solid -outline-offset-1 outline-zinc-800 inline-flex flex-col justify-start items-start gap-6"
-    >
-      <Header />
+    <>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+      <div
+        data-layer="Frame 2147206029"
+        className="Frame2147206029 w-[1116px] p-6 bg-zinc-900 rounded-3xl outline-1 outline-solid -outline-offset-1 outline-zinc-800 inline-flex flex-col justify-start items-start gap-6"
+      >
+        <Header onBack={() => navigate("/reviews")} />
       <Hero reviewData={reviewData} updateReviewData={updateReviewData} />
       <div className="w-full p-4 bg-zinc-800 rounded-2xl flex flex-col gap-4">
         <div className="flex flex-wrap gap-2">
@@ -386,6 +414,7 @@ export default function AddReviewPage(): ReactElement {
         onSaveDraft={handleSaveDraft}
         onSaveAndPublish={handleSaveAndPublish}
       />
-    </div>
+      </div>
+    </>
   );
 }

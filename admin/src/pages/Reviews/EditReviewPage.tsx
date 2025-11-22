@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactElement } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import Toast from "../../components/Shared/Toast";
 import type { ReviewApiResponse, UseCaseApiResponse } from "../../types/api.types";
 import Hero from "../../components/Reviews/AddReview/Hero";
 import Header from "../../components/Reviews/AddReview/Header";
@@ -52,6 +53,7 @@ export default function EditReviewPage(): ReactElement {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" | "warning" } | null>(null);
 
   useEffect(() => {
     if (!id) {
@@ -211,7 +213,10 @@ export default function EditReviewPage(): ReactElement {
   // Submit handler
   const handleSaveAndPublish = async (): Promise<void> => {
     if (!reviewData || !id) {
-      alert("Review data is not available");
+      setToast({
+        message: "Review data is not available",
+        type: "error",
+      });
       return;
     }
 
@@ -220,12 +225,18 @@ export default function EditReviewPage(): ReactElement {
 
     // Validate required fields
     if (!reviewData.productName || !reviewData.productName.trim()) {
-      alert("Product Name is required");
+      setToast({
+        message: "Product Name is required",
+        type: "error",
+      });
       return;
     }
 
     if (!reviewData.rating || reviewData.rating === 0) {
-      alert("Rating is required");
+      setToast({
+        message: "Rating is required",
+        type: "error",
+      });
       return;
     }
 
@@ -248,12 +259,20 @@ export default function EditReviewPage(): ReactElement {
 
       const result = await response.json() as ReviewApiResponse;
       console.log("Review updated successfully:", result);
-      alert("Review updated successfully!");
-      void navigate("/reviews");
+      setToast({
+        message: "Review updated successfully!",
+        type: "success",
+      });
+      window.setTimeout(() => {
+        void navigate("/reviews");
+      }, 2000);
     } catch (error: unknown) {
       console.error("Error updating review:", error);
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      alert(`Failed to update review: ${errorMessage}`);
+      setToast({
+        message: `Failed to update review: ${errorMessage}`,
+        type: "error",
+      });
     } finally {
       setSaving(false);
     }
@@ -261,7 +280,10 @@ export default function EditReviewPage(): ReactElement {
 
   const handleSaveDraft = async (): Promise<void> => {
     if (!reviewData || !id) {
-      alert("Review data is not available");
+      setToast({
+        message: "Review data is not available",
+        type: "error",
+      });
       return;
     }
 
@@ -282,11 +304,17 @@ export default function EditReviewPage(): ReactElement {
         );
       }
 
-      alert("Draft saved successfully!");
+      setToast({
+        message: "Draft saved successfully!",
+        type: "success",
+      });
     } catch (error: unknown) {
       console.error("Error saving draft:", error);
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      alert(`Failed to save draft: ${errorMessage}`);
+      setToast({
+        message: `Failed to save draft: ${errorMessage}`,
+        type: "error",
+      });
     } finally {
       setSaving(false);
     }
@@ -317,14 +345,22 @@ export default function EditReviewPage(): ReactElement {
   }
 
   return (
-    <div
-      data-layer="Frame 2147206029"
-      className="Frame2147206029 w-[1116px] p-6 bg-zinc-900 rounded-3xl outline-1 outline-solid -outline-offset-1 outline-zinc-800 inline-flex flex-col justify-start items-start gap-6"
-    >
-      <Header 
-        title="Edit Review" 
-        onBack={() => navigate("/reviews")}
-      />
+    <>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+      <div
+        data-layer="Frame 2147206029"
+        className="Frame2147206029 w-[1116px] p-6 bg-zinc-900 rounded-3xl outline-1 outline-solid -outline-offset-1 outline-zinc-800 inline-flex flex-col justify-start items-start gap-6"
+      >
+        <Header 
+          title="Edit Review" 
+          onBack={() => navigate("/reviews")}
+        />
       <Hero reviewData={reviewData} updateReviewData={updateReviewData} />
       <div className="w-full p-4 bg-zinc-800 rounded-2xl flex flex-col gap-4">
         <div className="flex flex-wrap gap-2">
@@ -412,7 +448,8 @@ export default function EditReviewPage(): ReactElement {
         onSaveDraft={handleSaveDraft}
         onSaveAndPublish={handleSaveAndPublish}
       />
-    </div>
+      </div>
+    </>
   );
 }
 

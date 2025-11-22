@@ -19,6 +19,8 @@ import {
   Image,
   Video,
 } from "lucide-react";
+import LinkInputModal from "./LinkInputModal";
+import Toast from "./Toast";
 
 const placeholderStyles = `
   [data-placeholder]:empty:before {
@@ -59,6 +61,10 @@ export default function BlogBodyEditor({
   const [content, setContent] = useState<string>(initialBody || "");
   const contentRef = useRef<HTMLDivElement | null>(null);
   const isUserInputRef = useRef(false);
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [linkModalInitialText, setLinkModalInitialText] = useState("");
+  const savedRangeRef = useRef<Range | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" | "warning" } | null>(null);
 
   const handleToggle = (): void => {
     setIsEnabled(!isEnabled);
@@ -87,23 +93,48 @@ export default function BlogBodyEditor({
     const selection = window.getSelection();
     if (!selection) return;
     
+    let range: Range;
     if (selection.rangeCount === 0) {
-      // No selection - create a range at cursor position
-      const range = document.createRange();
+      range = document.createRange();
       range.selectNodeContents(contentRef.current);
       range.collapse(false); 
       selection.removeAllRanges();
       selection.addRange(range);
+    } else {
+      range = selection.getRangeAt(0);
     }
     
-    const range = selection.getRangeAt(0);
+    savedRangeRef.current = range.cloneRange();
     const selectedText = range.toString().trim();
     
-    if (selectedText) {
-      const url = prompt("Enter URL for the selected text:", "https://");
-      if (!url || !url.trim()) return;
-      
-  
+    setLinkModalInitialText(selectedText);
+    setShowLinkModal(true);
+  };
+
+  const handleLinkConfirm = (linkText: string, url: string): void => {
+    if (!contentRef.current) return;
+    
+    const selection = window.getSelection();
+    if (!selection) return;
+    
+    let range: Range;
+    if (savedRangeRef.current) {
+      // Restore the saved range
+      range = savedRangeRef.current;
+      selection.removeAllRanges();
+      selection.addRange(range);
+    } else {
+      range = document.createRange();
+      range.selectNodeContents(contentRef.current);
+      range.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+    
+    const selectedText = range.toString().trim();
+    const hasSelectedText = selectedText && selectedText === linkModalInitialText;
+    
+    if (hasSelectedText) {
       let linkElement: Element | null = null;
       let currentNode: Node | null = range.commonAncestorContainer;
       
@@ -116,12 +147,10 @@ export default function BlogBodyEditor({
       }
       
       if (linkElement) {
-        // Update existing link
-        (linkElement as HTMLAnchorElement).href = url.trim();
+        (linkElement as HTMLAnchorElement).href = url;
       } else {
-        // Create new link
         const link = document.createElement("a");
-        link.href = url.trim();
+        link.href = url;
         link.target = "_blank";
         link.rel = "noopener noreferrer";
         link.style.color = "#737eff";
@@ -130,7 +159,6 @@ export default function BlogBodyEditor({
         try {
           range.surroundContents(link);
         } catch {
-          // If surroundContents fails, delete and insert
           const text = selectedText;
           range.deleteContents();
           link.textContent = text;
@@ -138,17 +166,9 @@ export default function BlogBodyEditor({
         }
       }
     } else {
-      // No text selected - ask for both link text and URL
-      const linkText = prompt("Enter link text:", "");
-      if (!linkText || !linkText.trim()) return;
-      
-      const url = prompt("Enter URL:", "https://");
-      if (!url || !url.trim()) return;
-      
-      // Insert link at cursor position
       const link = document.createElement("a");
-      link.href = url.trim();
-      link.textContent = linkText.trim();
+      link.href = url;
+      link.textContent = linkText;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
       link.style.color = "#737eff";
@@ -156,14 +176,12 @@ export default function BlogBodyEditor({
       
       range.insertNode(link);
       
-      // Move cursor after the link
       range.setStartAfter(link);
       range.collapse(true);
       selection.removeAllRanges();
       selection.addRange(range);
     }
     
-    // Trigger input event to update state
     const event = new Event('input', { bubbles: true });
     contentRef.current.dispatchEvent(event);
   };
@@ -171,17 +189,18 @@ export default function BlogBodyEditor({
   const handleInsertImage = (): void => {
     if (!contentRef.current) return;
     
-    // Ensure the editor is focused
     contentRef.current.focus();
     
     const url = prompt("Enter image URL:", "https://");
     if (!url || !url.trim()) return;
     
-    // Validate URL format
     try {
       new URL(url.trim());
     } catch {
-      alert("Please enter a valid URL (e.g., https://example.com/image.jpg)");
+      setToast({
+        message: "Please enter a valid URL (e.g., https://example.com/image.jpg)",
+        type: "error",
+      });
       return;
     }
     
@@ -194,7 +213,6 @@ export default function BlogBodyEditor({
     img.style.margin = "10px auto";
     img.style.borderRadius = "8px";
     
-    // Create a container div for better styling
     const container = document.createElement("div");
     container.style.width = "100%";
     container.style.margin = "16px 0";
@@ -220,8 +238,7 @@ export default function BlogBodyEditor({
         selection.addRange(range);
       }
     }
-    
-    // Trigger input event
+
     const event = new Event('input', { bubbles: true });
     contentRef.current.dispatchEvent(event);
   };
@@ -229,13 +246,11 @@ export default function BlogBodyEditor({
   const handleInsertYouTube = (): void => {
     if (!contentRef.current) return;
     
-    // Ensure the editor is focused
     contentRef.current.focus();
     
     const url = prompt("Enter YouTube video URL:", "https://www.youtube.com/watch?v=");
     if (!url || !url.trim()) return;
     
-    // Extract video ID from various YouTube URL formats
     let videoId = "";
     const patterns = [
       /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
@@ -252,17 +267,19 @@ export default function BlogBodyEditor({
     }
     
     if (!videoId) {
-      alert("Invalid YouTube URL. Please enter a valid YouTube video URL.\n\nExamples:\n- https://www.youtube.com/watch?v=VIDEO_ID\n- https://youtu.be/VIDEO_ID");
+      setToast({
+        message: "Invalid YouTube URL. Please enter a valid YouTube video URL (e.g., https://www.youtube.com/watch?v=VIDEO_ID)",
+        type: "error",
+      });
       return;
     }
     
-    // Create YouTube embed iframe with responsive container
     const container = document.createElement("div");
     container.style.width = "100%";
     container.style.maxWidth = "800px";
     container.style.margin = "20px auto";
     container.style.position = "relative";
-    container.style.paddingBottom = "56.25%"; // 16:9 aspect ratio
+    container.style.paddingBottom = "56.25%"; 
     container.style.height = "0";
     container.style.borderRadius = "8px";
     container.style.overflow = "hidden";
@@ -284,7 +301,6 @@ export default function BlogBodyEditor({
     
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) {
-      // No selection - insert at end
       const range = document.createRange();
       range.selectNodeContents(contentRef.current);
       range.collapse(false);
@@ -293,14 +309,12 @@ export default function BlogBodyEditor({
       const range = selection.getRangeAt(0);
       range.insertNode(container);
       
-      // Move cursor after the video
       range.setStartAfter(container);
       range.collapse(true);
       selection.removeAllRanges();
       selection.addRange(range);
     }
     
-    // Trigger input event
     const event = new Event('input', { bubbles: true });
     contentRef.current.dispatchEvent(event);
   };
@@ -313,7 +327,7 @@ export default function BlogBodyEditor({
 
   const handleContentChange = (e: FormEvent<HTMLDivElement>): void => {
     const el = e.currentTarget as HTMLDivElement;
-    const newContent = el.innerHTML; // Use innerHTML to preserve formatting, links, images, etc.
+    const newContent = el.innerHTML; 
     isUserInputRef.current = true;
     setContent(newContent);
     onBodyChange?.(newContent);
@@ -331,7 +345,6 @@ export default function BlogBodyEditor({
     }, 0);
   };
 
-  // Sync refs with state/props on mount and when state changes externally (not from user input)
   useEffect(() => {
     if (contentRef.current && !isUserInputRef.current) {
       const currentContent = contentRef.current.innerHTML || "";
@@ -366,6 +379,21 @@ export default function BlogBodyEditor({
 
   return (
     <>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+      <LinkInputModal
+        isOpen={showLinkModal}
+        onClose={() => setShowLinkModal(false)}
+        onConfirm={handleLinkConfirm}
+        initialText={linkModalInitialText}
+        initialUrl=""
+        title="Add Link"
+      />
       <style>{placeholderStyles}</style>
       <div className="w-full py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 flex flex-col justify-center items-start gap-4 overflow-hidden">
         <div className="self-stretch h-14 inline-flex justify-start items-center">
