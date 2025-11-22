@@ -1,4 +1,3 @@
-"use client";
 
 import {useState, type ReactElement} from "react";
 import { GripVertical, Trash2, Plus } from "lucide-react";
@@ -140,7 +139,7 @@ export default function Pricing({
         >
           <div
             data-layer="Frame 2147205991"
-            className="Frame2147205991 flex justify-start items-center"
+            className="Frame2147205991 flex justify-start items-center cursor-grab"
           >
             <GripVertical className="w-6 h-6 text-neutral-50" />
           </div>
@@ -148,7 +147,7 @@ export default function Pricing({
             data-layer="Text"
             className="Text justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
           >
-            Pricing Plan
+            Product Pricing
           </div>
         </div>
         <div

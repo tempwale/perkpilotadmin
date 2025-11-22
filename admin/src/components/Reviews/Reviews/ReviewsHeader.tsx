@@ -106,7 +106,7 @@ export default function ReviewsHeader({
         <div
           data-layer="Button"
           className="Button pl-3 pr-2 py-2 bg-neutral-50 rounded-lg inline-flex justify-start items-center gap-2"
-          onClick={(): void => window.location.assign("/Reviewsmanagement")}
+          onClick={(): void => window.location.assign("/reviewmanagement")}
         >
           <div
             data-layer="Horizontal container"

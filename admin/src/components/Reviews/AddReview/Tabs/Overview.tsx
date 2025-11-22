@@ -1,6 +1,4 @@
-"use client";
-
-import {useState, useRef, type FormEvent, type ReactElement} from "react";
+import {useState, useRef, useEffect, type FormEvent, type ReactElement} from "react";
 import {
   GripVertical,
   Trash2,
@@ -23,19 +21,63 @@ import {
   Tag,
 } from "lucide-react";
 
+const placeholderStyles = `
+  [data-placeholder]:empty:before {
+    content: attr(data-placeholder);
+    color: #71717a;
+    opacity: 0.6;
+    pointer-events: none;
+    display: block;
+  }
+  [data-placeholder]:focus:empty:before {
+    opacity: 0.4;
+  }
+  [data-placeholder].empty:before {
+    content: attr(data-placeholder);
+    color: #71717a;
+    opacity: 0.6;
+    pointer-events: none;
+    display: block;
+  }
+  [data-placeholder].empty:focus:before {
+    opacity: 0.4;
+  }
+`;
+
+export type OverviewData =
+  | string
+  | {
+      heading?: string;
+      content?: string | string[];
+    };
+
 type Props = {
-  initialOverview?: string;
-  onOverviewChange?: (overview: string) => void;
+  initialOverview?: OverviewData;
+  onOverviewChange?: (overview: OverviewData) => void;
 };
 
 export default function Overview({ initialOverview, onOverviewChange }: Props = {}): ReactElement {
   const [isEnabled, setIsEnabled] = useState(true);
   const [fontSize, setFontSize] = useState(16);
-  const [content, setContent] = useState(
-    initialOverview || "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam..."
-  );
-  const [heading, setHeading] = useState("Heading 1");
+  const [content, setContent] = useState<string>(() => {
+    if (typeof initialOverview === "string" || !initialOverview) {
+      return initialOverview || "";
+    }
+    if (Array.isArray(initialOverview.content)) {
+      return initialOverview.content.join("\n\n");
+    }
+    return initialOverview.content || "";
+  });
+  const [heading, setHeading] = useState<string>(() => {
+    if (typeof initialOverview === "object" && initialOverview && "heading" in initialOverview) {
+      return initialOverview.heading || "";
+    }
+    return "";
+  });
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const headingRef = useRef<HTMLDivElement | null>(null);
+  // Track if updates are from user input to avoid overwriting
+  const isUserInputRef = useRef({ heading: false, content: false });
 
   const handleToggle = (): void => {
     setIsEnabled(!isEnabled);
@@ -49,7 +91,6 @@ export default function Overview({ initialOverview, onOverviewChange }: Props = 
   };
 
   const execCommand = (command: string, value?: string): void => {
-    // document.execCommand expects a string or undefined for the value
     document.execCommand(command, false, value);
     contentRef.current?.focus();
   };
@@ -63,18 +104,104 @@ export default function Overview({ initialOverview, onOverviewChange }: Props = 
   const handleContentChange = (e: FormEvent<HTMLDivElement>): void => {
     const el = e.currentTarget as HTMLDivElement;
     const newContent = el.innerText;
+    isUserInputRef.current.content = true;
     setContent(newContent);
-    onOverviewChange?.(newContent);
+    onOverviewChange?.({
+      heading,
+      content: newContent,
+    });
+    if (!newContent.trim()) {
+      el.classList.add("empty");
+      if (el.innerHTML === "<br>" || el.innerHTML === "<br/>") {
+        el.innerHTML = "";
+      }
+    } else {
+      el.classList.remove("empty");
+    }
+    setTimeout(() => {
+      isUserInputRef.current.content = false;
+    }, 0);
   };
 
   const handleHeadingChange = (e: FormEvent<HTMLDivElement>): void => {
     const el = e.currentTarget as HTMLDivElement;
-    setHeading(el.innerText);
+    const newHeading = el.innerText || el.textContent || "";
+    isUserInputRef.current.heading = true;
+    setHeading(newHeading);
+    onOverviewChange?.({
+      heading: newHeading,
+      content,
+    });
+    if (!newHeading.trim()) {
+      el.classList.add("empty");
+      if (el.innerHTML === "<br>" || el.innerHTML === "<br/>") {
+        el.innerHTML = "";
+      }
+    } else {
+      el.classList.remove("empty");
+    }
+    // Reset flag after a brief delay to allow state update
+    setTimeout(() => {
+      isUserInputRef.current.heading = false;
+    }, 0);
   };
 
+  // Sync refs with state/props on mount and when state changes externally (not from user input)
+  useEffect(() => {
+    // Sync heading ref - skip if update is from user input
+    if (headingRef.current && !isUserInputRef.current.heading) {
+      const currentRefText = headingRef.current.textContent || "";
+      // Only update if ref is empty or if state differs (external update)
+      if (!currentRefText.trim() || currentRefText !== heading) {
+        headingRef.current.textContent = heading;
+      }
+      // Update empty class
+      if (!headingRef.current.textContent?.trim()) {
+        headingRef.current.classList.add("empty");
+      } else {
+        headingRef.current.classList.remove("empty");
+      }
+    }
+    // Sync content ref - skip if update is from user input
+    if (contentRef.current && !isUserInputRef.current.content) {
+      const currentRefText = contentRef.current.textContent || "";
+      // Only update if ref is empty or if state differs (external update)
+      if (!currentRefText.trim() || currentRefText !== content) {
+        contentRef.current.textContent = content;
+      }
+      // Update empty class
+      if (!contentRef.current.textContent?.trim()) {
+        contentRef.current.classList.add("empty");
+      } else {
+        contentRef.current.classList.remove("empty");
+      }
+    }
+  }, [heading, content]);
+
+  // Sync local state when initialOverview prop changes externally
+  useEffect(() => {
+    if (!initialOverview) {
+      setHeading("");
+      setContent("");
+      return;
+    }
+    if (typeof initialOverview === "string") {
+      setHeading("");
+      setContent(initialOverview);
+      return;
+    }
+    setHeading(initialOverview.heading || "");
+    if (Array.isArray(initialOverview.content)) {
+      setContent(initialOverview.content.join("\n\n"));
+    } else {
+      setContent(initialOverview.content || "");
+    }
+  }, [initialOverview]);
+
   return (
-    <div className="Row w-[1068px] py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 flex flex-col justify-center items-start gap-4 overflow-hidden">
-      {/* Header Row */}
+    <>
+      <style>{placeholderStyles}</style>
+      <div className="Row w-full max-w-[1068px] py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 flex flex-col justify-center items-start gap-4 overflow-hidden">
       <div className="Row self-stretch h-14 inline-flex justify-start items-center">
         <div className="Column flex-1 self-stretch px-6 py-3 border-b border-zinc-700 flex justify-start items-center gap-3">
           <div className="Frame2147205991 flex justify-start items-center cursor-grab">
@@ -106,12 +233,9 @@ export default function Overview({ initialOverview, onOverviewChange }: Props = 
         </div>
       </div>
 
-      {/* Editor Area */}
       <div className="Frame self-stretch px-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 flex flex-col justify-start items-start overflow-hidden">
-        {/* Toolbar */}
         <div className="Frame self-stretch border-b border-zinc-700 inline-flex justify-center items-center">
           <div className="Frame flex justify-start items-start">
-            {/* Frame Dropdown */}
             <div className="Frame self-stretch min-h-12 px-3 py-2 border-r border-zinc-700 inline-flex flex-col justify-center items-center gap-2.5">
               <button className="Button inline-flex justify-center items-center gap-1 hover:opacity-70 transition-opacity">
                 <Type size={16} className="text-neutral-50" />
@@ -122,7 +246,6 @@ export default function Overview({ initialOverview, onOverviewChange }: Props = 
               </button>
             </div>
 
-            {/* Font Size */}
             <div className="Frame self-stretch min-h-12 px-3 py-2 border-r border-zinc-700 inline-flex flex-col justify-center items-center gap-2.5">
               <div className="Button inline-flex justify-center items-center gap-1 overflow-hidden">
                 <div className="Text justify-start text-neutral-50 text-base font-bold font-['Plus_Jakarta_Sans'] leading-[22px]">
@@ -147,7 +270,6 @@ export default function Overview({ initialOverview, onOverviewChange }: Props = 
               </div>
             </div>
 
-            {/* Text Formatting */}
             <div className="Frame p-2 border-r border-zinc-700 flex justify-start items-start gap-2">
               <button
                 onClick={(): void => execCommand("bold")}
@@ -193,7 +315,6 @@ export default function Overview({ initialOverview, onOverviewChange }: Props = 
               </button>
             </div>
 
-            {/* Alignment */}
             <div className="Frame p-2 border-r border-zinc-700 flex justify-start items-start gap-2">
               <button
                 onClick={(): void => execCommand("justifyLeft")}
@@ -218,7 +339,6 @@ export default function Overview({ initialOverview, onOverviewChange }: Props = 
               </button>
             </div>
 
-            {/* Lists */}
             <div className="Frame p-2 border-r border-zinc-700 flex justify-start items-start gap-2">
               <button
                 onClick={(): void => execCommand("insertOrderedList")}
@@ -236,7 +356,6 @@ export default function Overview({ initialOverview, onOverviewChange }: Props = 
               </button>
             </div>
 
-            {/* Image and Links */}
             <div className="Frame p-2 border-r border-zinc-700 flex justify-start items-start gap-2">
               <button
                 onClick={(): void => {
@@ -268,7 +387,6 @@ export default function Overview({ initialOverview, onOverviewChange }: Props = 
             </div>
           </div>
 
-          {/* Tags Button */}
           <div className="Frame flex-1 h-12 min-h-12 px-3 py-1 inline-flex flex-col justify-center items-start gap-2.5">
             <button className="Button inline-flex justify-center items-center gap-2 overflow-hidden hover:opacity-70 transition-opacity">
               <Tag size={20} className="text-neutral-50" />
@@ -279,31 +397,32 @@ export default function Overview({ initialOverview, onOverviewChange }: Props = 
           </div>
         </div>
 
-        {/* Content Area */}
         <div className="Frame self-stretch p-6 flex flex-col justify-center items-start gap-6">
           <div className="Frame flex flex-col justify-start items-start gap-2">
             <div
+              ref={headingRef}
               contentEditable={isEnabled}
               onInput={handleHeadingChange}
               suppressContentEditableWarning={true}
-              className="Heading1 justify-start text-neutral-50 text-[40px] font-semibold font-['Urbanist'] outline-none"
-              style={{ fontSize: `${fontSize * 2.5}px` }}
-            >
-              {heading}
-            </div>
+              dir="ltr"
+              className="Heading1 justify-start text-neutral-50 text-[40px] font-semibold font-['Urbanist'] outline-none min-h-[48px] w-full focus:outline-none focus:ring-0"
+              style={{ fontSize: `${fontSize * 2.5}px`, direction: "ltr", textAlign: "left" }}
+              data-placeholder="Enter heading..."
+            />
           </div>
           <div
             ref={contentRef}
             contentEditable={isEnabled}
             onInput={handleContentChange}
             suppressContentEditableWarning={true}
-            className="w-[688px] justify-start text-neutral-50 text-base font-normal font-['Poppins'] leading-6 outline-none"
-            style={{ fontSize: `${fontSize}px` }}
-          >
-            {content}
-          </div>
+            dir="ltr"
+            className="w-[688px] justify-start text-neutral-50 text-base font-normal font-['Poppins'] leading-6 outline-none min-h-[100px] focus:outline-none focus:ring-0"
+            style={{ fontSize: `${fontSize}px`, direction: "ltr", textAlign: "left" }}
+            data-placeholder="Enter content..."
+          />
         </div>
       </div>
     </div>
+    </>
   );
 }
