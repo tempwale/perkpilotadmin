@@ -86,7 +86,7 @@ export default function ToolReviewForm({
   useEffect((): void => {
     if (!updateReviewData) return;
 
-    const updates: Partial<ReviewApiResponse> = {};
+      const updates: Partial<ReviewApiResponse> = {};
     const pushIfChanged = <K extends keyof ReviewApiResponse>(
       key: K,
       value: ReviewApiResponse[K]
@@ -97,19 +97,19 @@ export default function ToolReviewForm({
       }
     };
 
-    // Basic product info
+      // Basic product info
     pushIfChanged("productName", formData.toolName);
     pushIfChanged("productType", formData.toolCategory);
     pushIfChanged("description", formData.toolDescription);
 
-    // Logo (use first non-null logo as avatarUrl)
+      // Logo (use first non-null logo as avatarUrl)
     const firstLogo = logoFiles.find((logo) => logo !== null) ?? undefined;
     pushIfChanged("avatarUrl", firstLogo);
 
-    // Stats
+      // Stats
     pushIfChanged("userCount", formData.totalUsers);
-    if (formData.founded) {
-      const year = parseInt(formData.founded);
+      if (formData.founded) {
+        const year = parseInt(formData.founded);
       if (!isNaN(year)) pushIfChanged("foundedYear", year);
     } else {
       pushIfChanged("foundedYear", undefined);
@@ -126,15 +126,15 @@ export default function ToolReviewForm({
       formData.showAverageRating ? formData.averageRatingText : ""
     );
 
-    // Rating
+      // Rating
     const aggregateRatingValue =
       formData.showAverageRating && formData.averageRating > 0
         ? formData.averageRating
         : undefined;
     pushIfChanged("aggregateRating", aggregateRatingValue);
 
-    if (Object.keys(updates).length > 0) {
-      updateReviewData(updates);
+      if (Object.keys(updates).length > 0) {
+        updateReviewData(updates);
     }
   }, [
     formData.toolName,
