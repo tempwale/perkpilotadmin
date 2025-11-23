@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, type ReactElement } from "react";
 import { uploadToCloudinary } from "../../config/cloudinary";
 import { DEALS_API } from "../../config/backend";
 import type { BlogSectionApiResponse, ToolApiResponse, DealApiResponse } from "../../types/api.types";
+import BlogBodyEditor from "./BlogBodyEditor";
 
 type CardWithId = BlogSectionApiResponse & { id: number };
 
@@ -25,9 +26,28 @@ export default function ToolBlogCard({ onCardsChange, initialCards }: Props): Re
   });
 
   const onCardsChangeRef = useRef(onCardsChange);
+  const hasInitializedRef = useRef(false);
+  
   useEffect((): void => {
     onCardsChangeRef.current = onCardsChange;
   }, [onCardsChange]);
+
+  // Sync cards state when initialCards changes (e.g., after refresh/API load)
+  // This ensures real data from API is loaded instead of demo data
+  // Only sync once when initialCards is first provided, not on every change
+  useEffect((): void => {
+    if (initialCards && initialCards.length > 0 && !hasInitializedRef.current) {
+      const newCards = initialCards.map((card, index) => ({
+        ...card,
+        id: index + 1,
+      }));
+      setCards(newCards);
+      hasInitializedRef.current = true;
+    } else if (!initialCards && hasInitializedRef.current) {
+      // Reset flag if initialCards becomes undefined (e.g., new form)
+      hasInitializedRef.current = false;
+    }
+  }, [initialCards]);
 
   useEffect((): void => {
     const mappedCards: BlogSectionApiResponse[] = cards.map(({ id: _id, ...rest }) => rest);
@@ -139,35 +159,34 @@ export default function ToolBlogCard({ onCardsChange, initialCards }: Props): Re
             </div>
 
             <div className="Frame2147205563 self-stretch flex flex-col justify-center items-start gap-3">
-              <div className="BlogBodyTextEditor text-neutral-50 text-sm font-medium font-['Poppins']">
-                Blog Body Text Editor
-              </div>
-              <textarea
-                placeholder="Blog Body Messsage"
-                value={card.blogBody}
-                onChange={(e) => handleChange(card.id, "body", e.target.value)}
-                className="self-stretch px-4 py-2 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-neutral-50 font-normal font-['Poppins'] text-base placeholder:text-zinc-500 placeholder:leading-[48px]"
-                 />
+              <BlogBodyEditor
+                initialBody={card.blogBody || ""}
+                onBodyChange={(body) => handleChange(card.id, "body", body)}
+                label="Blog Body Text Editor"
+              />
             </div>
 
             <SearchAndAddDeal
               selectedDeals={
-                (card.dealsMentioned || []).map((deal) => ({
-                  toolName: deal.title || "",
-                  toolLogo: deal.logoUri || "",
-                  toolCategory: deal.category || deal.tag || "Tool",
-                  isVerified: deal.verified || false,
-                }))
+                (card.dealsMentioned || [])
+                  .filter((deal) => deal && (deal.title || deal._id || deal.id)) // Filter out invalid deals
+                  .map((deal) => ({
+                    toolName: deal.title || "",
+                    toolLogo: deal.logoUri || deal.logoComponent || "",
+                    toolCategory: deal.category || deal.tag || "Tool",
+                    isVerified: deal.verified ?? false,
+                  }))
+                  .filter((tool) => tool.toolName) // Only include deals with a name
               }
               onDealsChange={(tools): void => {
                 const deals: DealApiResponse[] = tools.map((tool) => ({
-                  title: tool.toolName,
-                  logoUri: tool.toolLogo,
-                  category: tool.toolCategory,
-                  verified: tool.isVerified,
+                  title: tool.toolName || "",
+                  logoUri: tool.toolLogo || "",
+                  category: tool.toolCategory || "Tool",
+                  verified: tool.isVerified || false,
                 }));
-                setCards(
-                  cards.map((c) =>
+                setCards((prevCards) =>
+                  prevCards.map((c) =>
                     c.id === card.id ? { ...c, dealsMentioned: deals } : c
                   )
                 );
