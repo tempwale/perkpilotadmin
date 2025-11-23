@@ -275,6 +275,7 @@ export interface ReviewApiResponse {
   lastUpdated?: string;
   upvotes?: number;
   shareCount?: number;
+  tryForFreeLink?: string;
   aggregateRating?: number;
   ratingCount?: number;
   ratingCategories?: RatingCategoryApiResponse[];

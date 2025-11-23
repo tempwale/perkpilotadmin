@@ -1,5 +1,5 @@
 
-import {useState, type ReactElement} from "react";
+import {useState, useEffect, type ReactElement} from "react";
 import { GripVertical, Trash2, Plus } from "lucide-react";
 
 interface PricingPlan {
@@ -14,13 +14,18 @@ interface PricingPlan {
 interface PricingProps {
   initialPlans?: PricingPlan[];
   onPlansChange?: (plans: PricingPlan[]) => void;
+  tryForFreeLink?: string;
+  onTryForFreeLinkChange?: (link: string) => void;
 }
 
 export default function Pricing({
   initialPlans,
   onPlansChange,
+  tryForFreeLink = "",
+  onTryForFreeLinkChange,
 }: PricingProps): ReactElement{
   const [isEnabled, setIsEnabled] = useState<boolean>(true);
+  const [tryForFreeUrl, setTryForFreeUrl] = useState<string>(tryForFreeLink);
   const [plans, setPlans] = useState<PricingPlan[]>(
     initialPlans || [
       {
@@ -126,8 +131,41 @@ export default function Pricing({
     setIsEnabled(!isEnabled);
   };
 
+  const handleTryForFreeLinkChange = (value: string): void => {
+    setTryForFreeUrl(value);
+    onTryForFreeLinkChange?.(value);
+  };
+
+  useEffect(() => {
+    setTryForFreeUrl(tryForFreeLink);
+  }, [tryForFreeLink]);
+
   return (
     <div className="w-full max-w-[1068px] py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 flex flex-col gap-4">
+      <div className="px-6 py-4 border-b border-zinc-700">
+        <div className="flex flex-col gap-2">
+          <label
+            htmlFor="try-for-free-link"
+            className="text-neutral-50 text-sm font-medium font-['Poppins']"
+          >
+            Try For Free Button Link
+          </label>
+          <input
+            id="try-for-free-link"
+            type="url"
+            value={tryForFreeUrl}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleTryForFreeLinkChange(e.target.value)
+            }
+            placeholder="https://example.com/try-for-free"
+            className="h-12 px-6 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 focus:outline-zinc-500"
+          />
+          <p className="text-zinc-400 text-xs font-normal font-['Poppins']">
+            This link will be used for the "Try For Free" button in the pricing sidebar
+          </p>
+        </div>
+      </div>
+
       {/* Header */}
       <div
         data-layer="Row"
