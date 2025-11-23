@@ -1,13 +1,37 @@
 import { type ReactElement } from "react";
 import Alternatives from "./Tabs/Alternatives";
 import Features from "./Tabs/Features";
-import Overview from "./Tabs/Overview";
+import Overview, { type OverviewData } from "./Tabs/Overview";
 import Pricing from "./Tabs/Pricing";
 import type { ReviewApiResponse } from "../../../types/api.types";
 
 type Props = {
   reviewData?: ReviewApiResponse;
   updateReviewData?: (updates: Partial<ReviewApiResponse>) => void;
+};
+
+const parseOverview = (value?: string): OverviewData => {
+  if (!value) return "";
+  try {
+    const parsed = JSON.parse(value) as OverviewData;
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      ("heading" in parsed || "content" in parsed)
+    ) {
+      return parsed as OverviewData;
+    }
+  } catch {
+    // ignore
+  }
+  return value;
+};
+
+const serializeOverview = (value: OverviewData): string => {
+  if (typeof value === "string") {
+    return value;
+  }
+  return JSON.stringify(value);
 };
 
 export default function Tabs({ reviewData, updateReviewData }: Props = {}): ReactElement {
@@ -24,9 +48,9 @@ export default function Tabs({ reviewData, updateReviewData }: Props = {}): Reac
           Tabs
         </div>
         <Overview
-          initialOverview={reviewData?.overview}
+          initialOverview={parseOverview(reviewData?.overview)}
           onOverviewChange={(overview) => {
-            updateReviewData?.({ overview });
+            updateReviewData?.({ overview: serializeOverview(overview) });
           }}
         />
         <Features

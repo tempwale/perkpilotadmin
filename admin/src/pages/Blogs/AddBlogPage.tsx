@@ -6,6 +6,7 @@ import Author from "../../components/Shared/Author";
 import ModulesCard from "../../components/Shared/ModulesCard";
 import ToolBlogCard from "../../components/Shared/ToolBlogCard";
 import SimilarBlogs from "../../components/Blogs/AddBlog/SimilarBlogs";
+import Toast, { type ToastLink } from "../../components/Shared/Toast";
 import type { Tool } from "../../types/comparison.types";
 import type { BlogSectionApiResponse } from "../../types/api.types";
 import type { BlogData } from "../../types/blog.types";
@@ -18,6 +19,11 @@ export default function AddBlogPage(): ReactElement {
   const [loading, setLoading] = useState(isEditMode);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error" | "info" | "warning";
+    links?: ToastLink[];
+  } | null>(null);
   const [blogData, setBlogData] = useState<BlogData>({
     blogHeading: "",
     blogBody: "",
@@ -325,42 +331,66 @@ export default function AddBlogPage(): ReactElement {
 
     // Validate required fields
     if (!blogData.blogHeroImage?.trim()) {
-      alert("Please upload a hero image for the blog.");
+      setToast({
+        message: "Please upload a hero image for the blog.",
+        type: "error",
+      });
       return null;
     }
 
     if (!blogData.blogHeading?.trim()) {
-      alert("Please enter a blog heading.");
+      setToast({
+        message: "Please enter a blog heading.",
+        type: "error",
+      });
       return null;
     }
 
     if (!blogData.blogBody?.trim()) {
-      alert("Please enter blog body content.");
+      setToast({
+        message: "Please enter blog body content.",
+        type: "error",
+      });
       return null;
     }
 
     if (!blogData.sectionHeadline?.trim()) {
-      alert("Please enter a section headline.");
+      setToast({
+        message: "Please enter a section headline.",
+        type: "error",
+      });
       return null;
     }
 
     if (!blogData.tipBulbText?.trim()) {
-      alert("Please enter tip bulb text.");
+      setToast({
+        message: "Please enter tip bulb text.",
+        type: "error",
+      });
       return null;
     }
 
     if (!blogData.blogAuthor) {
-      alert("Please select an author.");
+      setToast({
+        message: "Please select an author.",
+        type: "error",
+      });
       return null;
     }
 
     if (!blogData.blogCategory?.trim()) {
-      alert("Please select a category.");
+      setToast({
+        message: "Please select a category.",
+        type: "error",
+      });
       return null;
     }
 
     if (!blogData.blogReadingTime?.trim()) {
-      alert("Please enter reading time.");
+      setToast({
+        message: "Please enter reading time.",
+        type: "error",
+      });
       return null;
     }
 
@@ -380,7 +410,7 @@ export default function AddBlogPage(): ReactElement {
     } as BlogData;
   };
 
-  const saveBlog = async (cleanedData: ReturnType<typeof prepareBlogData>, publish: boolean): Promise<void> => {
+  const saveBlog = async (cleanedData: ReturnType<typeof prepareBlogData>, publish: boolean): Promise<string> => {
       const url = isEditMode && id ? `${BLOGS_API}/${id}` : BLOGS_API;
       const method = isEditMode ? "PUT" : "POST";
 
@@ -398,20 +428,45 @@ export default function AddBlogPage(): ReactElement {
       throw new Error(errorData.message || (publish ? "Failed to publish blog" : "Failed to save draft"));
       }
 
-    // Redirect to blogs list page after saving/publishing
-    void navigate("/blogs");
+      const savedBlog = await response.json() as { _id?: string; blogSlug?: string };
+      return savedBlog._id || id || "";
   };
 
   const handleSaveDraft = async (): Promise<void> => {
+    if (!navigate) return;
     try {
       setIsSaving(true);
       const cleanedData = prepareBlogData();
       if (!cleanedData) return;
 
       await saveBlog(cleanedData, false);
+      
+      // Show success toast with link
+      const blogSlug = cleanedData.blogSlug || "";
+      const frontendUrl = blogSlug ? `http://localhost:5173/blog/${blogSlug}` : undefined;
+      
+      setToast({
+        message: "Blog saved as draft successfully!",
+        type: "success",
+        links: frontendUrl ? [
+          {
+            text: "View Blog",
+            url: frontendUrl,
+            external: true,
+          },
+        ] : undefined,
+      });
+
+      // Redirect after a short delay to show toast
+      void setTimeout(() => {
+        void navigate("/blogs");
+      }, 2000);
     } catch (error) {
       console.error("Error saving draft:", error);
-      alert(error instanceof Error ? error.message : "Failed to save draft. Please try again.");
+      setToast({
+        message: error instanceof Error ? error.message : "Failed to save draft. Please try again.",
+        type: "error",
+      });
     } finally {
       setIsSaving(false);
     }
@@ -424,20 +479,53 @@ export default function AddBlogPage(): ReactElement {
       if (!cleanedData) return;
 
       await saveBlog(cleanedData, true);
+      
+      // Show success toast with link
+      const blogSlug = cleanedData.blogSlug || "";
+      const frontendUrl = blogSlug ? `http://localhost:5173/blog/${blogSlug}` : undefined;
+      
+      setToast({
+        message: isEditMode ? "Blog updated and published successfully!" : "Blog published successfully!",
+        type: "success",
+        links: frontendUrl ? [
+          {
+            text: "View Blog",
+            url: frontendUrl,
+            external: true,
+          },
+        ] : undefined,
+      });
+
+      // Redirect after a short delay to show toast
+      void setTimeout(() => {
+        void navigate("/blogs");
+      }, 2000);
     } catch (error) {
       console.error("Error publishing blog:", error);
-      alert(error instanceof Error ? error.message : "Failed to publish blog. Please try again.");
+      setToast({
+        message: error instanceof Error ? error.message : "Failed to publish blog. Please try again.",
+        type: "error",
+      });
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <div className="flex justify-center p-4">
-      <div
-        data-layer="Frame 2147206029"
-        className="box-border flex flex-col justify-start items-start p-6 gap-6 w-[1116px] bg-[#18181B] border border-[#27272A] rounded-3xl"
-      >
+    <>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          links={toast.links}
+          onClose={() => setToast(null)}
+        />
+      )}
+      <div className="flex justify-center p-4">
+        <div
+          data-layer="Frame 2147206029"
+          className="box-border flex flex-col justify-start items-start p-6 gap-6 w-[1116px] bg-[#18181B] border border-[#27272A] rounded-3xl"
+        >
         {/* Header with Back Button */}
         <div className="box-border flex flex-row items-center p-0 pb-4 gap-4 w-[719px] h-12 border-b border-[#27272A]">
           <button
@@ -592,5 +680,6 @@ export default function AddBlogPage(): ReactElement {
         )}
       </div>
     </div>
+    </>
   );
 }
