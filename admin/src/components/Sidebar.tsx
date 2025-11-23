@@ -14,6 +14,7 @@ import {
   LogOut,
   Sun,
   Moon,
+  UserPlus,
 } from "lucide-react";
 
 type SidebarProps = {
@@ -26,43 +27,84 @@ type SidebarProps = {
 const getActiveKeyFromPath = (pathname: string): string => {
   const path = pathname.toLowerCase();
   
-  if (path.startsWith("/blogs") || path.startsWith("/addblog") || path.startsWith("/blogsmanagement")) {
+  // Blogs routes (check more specific routes first)
+  if (path.startsWith("/blogsmanagement") || path.startsWith("/addblog")) {
     return "blogs";
   }
-  if (path.startsWith("/reviews") || path.startsWith("/addreview")) {
+  if (path.startsWith("/blogs")) {
+    return "blogs";
+  }
+  
+  // Reviews routes (check more specific routes first)
+  if (path.startsWith("/updatereview") || path.startsWith("/reviewmanagement") || path.startsWith("/addreview")) {
     return "reviews";
   }
-  if (path.startsWith("/comparisons") || path.startsWith("/addcomparison") || path.startsWith("/comparisonsmanagement")) {
+  if (path.startsWith("/reviews")) {
+    return "reviews";
+  }
+  
+  // Comparisons routes (check more specific routes first, note: route has capital C but we lowercase it)
+  if (path.startsWith("/comparisonsmanagement") || path.startsWith("/addcomparision")) {
     return "comparisons";
   }
-  if (path.startsWith("/deals") || path.startsWith("/adddeal") || path.startsWith("/updatedeal") || path.startsWith("/dealsmanagement")) {
+  if (path.startsWith("/comparisons")) {
+    return "comparisons";
+  }
+  
+  // Deals routes (check more specific routes first)
+  if (path.startsWith("/dealsmanagement") || path.startsWith("/updatedeal") || path.startsWith("/adddeal")) {
     return "deals";
   }
+  if (path.startsWith("/deals")) {
+    return "deals";
+  }
+  
+  // Site Management routes
   if (path.startsWith("/home") || path.startsWith("/homemanagement")) {
     return "site-management";
   }
+  
+  // Add Author route
+  if (path.startsWith("/addauthor")) {
+    return "addAuthor";
+  }
+  
+  // Dashboard route
   if (path.startsWith("/dashboard")) {
     return "dashboard";
   }
+  
+  // Analytics route
   if (path.startsWith("/analytics")) {
     return "analytics";
   }
+  
+  // Users route
   if (path.startsWith("/users")) {
     return "users";
   }
+  
+  // Settings route
   if (path.startsWith("/settings")) {
     return "settings";
   }
+  
+  // Support route
   if (path.startsWith("/support")) {
     return "support";
   }
+  
+  // Admin Management route
   if (path.startsWith("/admin-management")) {
     return "admin-management";
   }
+  
+  // Stacks route
   if (path.startsWith("/stacks")) {
     return "stacks";
   }
-  
+
+  // Default to dashboard
   return "dashboard"; 
 };
 
@@ -302,26 +344,44 @@ export default function Sidebar({
               Analytics
             </div>
           </button>
-
           <button
             data-layer="Side Menu"
-            onClick={(): void => handleNav("users")}
+            onClick={(): void => handleNav("addAuthor")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
-              active === "users"
+              active === "addAuthor"
                 ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
-            <Users className={iconClass} />
+            <UserPlus className={iconClass} />
             <div
-              data-layer="Users"
+              data-layer="Add Author"
               className={`Users justify-center text-sm font-normal font-['Poppins'] ${
                 active === "users" ? "text-white" : "text-[#ebeef4]"
               }`}
             >
-              Users
+              Add Author
             </div>
           </button>
+            <button
+              data-layer="Side Menu"
+              onClick={(): void => handleNav("users")}
+              className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
+                active === "users"
+                  ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
+                  : ""
+              }`}
+            >
+              <Users className={iconClass} />
+              <div
+                data-layer="Users"
+                className={`Users justify-center text-sm font-normal font-['Poppins'] ${
+                  active === "users" ? "text-white" : "text-[#ebeef4]"
+                }`}
+              >
+                Users
+              </div>
+            </button>
 
           <div
             data-layer="Line 46"
