@@ -37,11 +37,11 @@ export default function ToolBlogCard({ onCardsChange, initialCards }: Props): Re
   // Only sync once when initialCards is first provided, not on every change
   useEffect((): void => {
     if (initialCards && initialCards.length > 0 && !hasInitializedRef.current) {
-      const newCards = initialCards.map((card, index) => ({
-        ...card,
-        id: index + 1,
-      }));
-      setCards(newCards);
+        const newCards = initialCards.map((card, index) => ({
+          ...card,
+          id: index + 1,
+        }));
+        setCards(newCards);
       hasInitializedRef.current = true;
     } else if (!initialCards && hasInitializedRef.current) {
       // Reset flag if initialCards becomes undefined (e.g., new form)
@@ -163,7 +163,7 @@ export default function ToolBlogCard({ onCardsChange, initialCards }: Props): Re
                 initialBody={card.blogBody || ""}
                 onBodyChange={(body) => handleChange(card.id, "body", body)}
                 label="Blog Body Text Editor"
-              />
+                 />
             </div>
 
             <SearchAndAddDeal
@@ -171,11 +171,11 @@ export default function ToolBlogCard({ onCardsChange, initialCards }: Props): Re
                 (card.dealsMentioned || [])
                   .filter((deal) => deal && (deal.title || deal._id || deal.id)) // Filter out invalid deals
                   .map((deal) => ({
-                    toolName: deal.title || "",
+                  toolName: deal.title || "",
                     toolLogo: deal.logoUri || deal.logoComponent || "",
-                    toolCategory: deal.category || deal.tag || "Tool",
+                  toolCategory: deal.category || deal.tag || "Tool",
                     isVerified: deal.verified ?? false,
-                  }))
+                }))
                   .filter((tool) => tool.toolName) // Only include deals with a name
               }
               onDealsChange={(tools): void => {
