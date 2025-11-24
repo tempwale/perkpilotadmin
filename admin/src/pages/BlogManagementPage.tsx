@@ -127,8 +127,8 @@ export default function BlogManagementPage(): ReactElement {
           onClose={() => setToast(null)}
         />
       )}
-      <div className="flex justify-center">
-        <div className="p-4 bg-zinc-900 rounded-3xl outline outline-offset-1 outline-zinc-800 inline-flex flex-col justify-center items-center gap-6 w-full max-w-[1116px]">
+    <div className="flex justify-center">
+      <div className="p-4 bg-zinc-900 rounded-3xl outline outline-offset-1 outline-zinc-800 inline-flex flex-col justify-center items-center gap-6 w-full max-w-[1116px]">
         {error && (
           <div className="w-full p-4 bg-red-600/20 border border-red-600 rounded-lg text-red-400">
             {error}
@@ -148,8 +148,8 @@ export default function BlogManagementPage(): ReactElement {
         </div>
 
         <FooterActions onSave={handleSave} />
-        </div>
       </div>
+    </div>
     </>
   );
 }
