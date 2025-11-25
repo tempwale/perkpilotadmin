@@ -311,6 +311,7 @@ export default function ComparisionGrid({
               <ComparisionCard
                 id={idKey}
                 {...cardProps}
+                comparisonData={Comparision as ComparisonApiResponse}
                 onReadComparison={() => handleViewDetails(idKey)}
                 onDelete={() => handleDeleteComparision(idKey)}
               />

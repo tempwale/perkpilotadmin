@@ -40,6 +40,16 @@ export type ProsConsCard = {
   prosConsPairs: ProsConsPair[];
 };
 
+export type BlogModuleEntry = {
+  moduleNumber: number;
+  moduleName: string;
+};
+
+export type ComparisonModuleValue = {
+  id: string;
+  name: string;
+};
+
 export type ComparisonData = {
   pageType: string;
   heroHeading: string;

@@ -4,17 +4,18 @@ import Author from "../../components/Shared/Author";
 import Header from "../../components/Comparisions/AddComparision/Header";
 import Hero from "../../components/Shared/Hero";
 import ToolsMentioned from "../../components/Shared/ToolsMentioned";
-import ModulesCard from "../../components/Shared/ModulesCard";
 import ToolBlogCard from "../../components/Shared/ToolBlogCard";
 import FeatureComparision from "../../components/Comparisions/AddComparision/FeatureComparision";
 import ProConGrid from "../../components/Comparisions/AddComparision/ProConGrid";
 import MoreComparisions from "../../components/Comparisions/AddComparision/MoreComparisions";
 import FooterActions from "../../components/Comparisions/AddComparision/FooterActions";
+import ComparisonModulesCard from "../../components/Comparisions/AddComparision/ComparisonModulesCard";
 import type {
   Tool,
   FeaturesData,
   ProsConsCard,
   ComparisonData,
+  BlogModuleEntry,
 } from "../../types/comparison.types";
 import type { FeatureComparisonApiResponse, BlogSectionApiResponse } from "../../types/api.types";
 
@@ -29,7 +30,7 @@ export default function AddComparisionPage(): ReactElement {
     sectionHeadline: "",
     tipBulbText: "",
     toolsMentioned: [],
-    authorId: "", // Changed from 'author' to 'authorId'
+    authorId: "",
     blogCategory: "",
     readingTime: "",
     toolBlogCards: [],
@@ -43,6 +44,8 @@ export default function AddComparisionPage(): ReactElement {
     slug: "",
     isPublished: true,
   });
+  const [blogModules, setBlogModules] = useState<BlogModuleEntry[]>([]);
+  const [moreComparisonsTitle, setMoreComparisonsTitle] = useState<string>("");
 
   const handleHeroHeadingChange = (heading: string): void => {
     const slug = heading
@@ -67,13 +70,12 @@ export default function AddComparisionPage(): ReactElement {
   };
 
   const handleToolsChange = (tools: Tool[]): void => {
-    // Transform tools to match backend structure with default placeholder logos
     const toolsMentioned = tools.map((tool) => ({
       toolName: tool.name || "",
       toolLogo:
         tool.logo ||
-        `https://via.placeholder.com/100?text=${tool.name || "Tool"}`, // Default placeholder
-      toolCategory: tool.category || "Tool", // Default category
+        `https://via.placeholder.com/100?text=${tool.name || "Tool"}`,
+      toolCategory: tool.category || "Tool",
       isVerified: false,
     }));
     setComparisonData((prev) => ({
@@ -99,7 +101,7 @@ export default function AddComparisionPage(): ReactElement {
   const handleAuthorChange = (authorId: string | undefined): void => {
     setComparisonData((prev) => ({
       ...prev,
-      authorId: authorId || "", // Changed from 'author' to 'authorId'
+      authorId: authorId || "",
     }));
   };
 
@@ -138,7 +140,6 @@ export default function AddComparisionPage(): ReactElement {
   };
 
   const handleFeaturesChange = (featuresData: FeatureComparisonApiResponse): void => {
-    // Transform FeatureComparisonApiResponse to FeaturesData
     const transformedFeatures: FeaturesData = {
       sectionTitle: featuresData.sectionTitle,
       featuresHeadline: featuresData.featuresHeadline,
@@ -161,12 +162,11 @@ export default function AddComparisionPage(): ReactElement {
   const handleProsConsChange = (prosConsData: ProsConsCard[]): void => {
     console.log("Received pros/cons data:", prosConsData);
 
-    // Use the data exactly as it comes from ProConCard
     const prosConsCards = prosConsData.map((item) => ({
       cardNumber: item.cardNumber,
       titlePros: item.titlePros,
       titleCons: item.titleCons,
-      prosConsPairs: item.prosConsPairs, // Already in correct format from ProConCard
+      prosConsPairs: item.prosConsPairs,
     }));
 
     console.log("Transformed pros/cons cards:", prosConsCards);
@@ -177,6 +177,32 @@ export default function AddComparisionPage(): ReactElement {
     }));
   };
 
+  const handleModulesChange = (modules: Array<{ id: string; name: string }>): void => {
+    console.log("=== handleModulesChange called ===");
+    console.log("Received modules:", modules);
+    
+    const normalized: BlogModuleEntry[] = modules
+      .filter((m) => m.name.trim().length > 0)
+      .map((m, index) => ({
+        moduleNumber: index + 1,
+        moduleName: m.name.trim(),
+      }));
+    
+    console.log("Normalized modules:", normalized);
+    setBlogModules(normalized);
+  };
+
+  const handleMoreComparisonsTitleChange = (title: string): void => {
+    setMoreComparisonsTitle(title);
+  };
+
+  const buildModuleCards = (modules: BlogModuleEntry[]): Array<{ id: string; name: string }> => {
+    return modules.map((module) => ({
+      id: `module-${module.moduleNumber}`,
+      name: module.moduleName,
+    }));
+  };
+
   const handleSaveSuccess = (): void => {
     void Promise.resolve(navigate("/comparisons"));
   };
@@ -184,6 +210,8 @@ export default function AddComparisionPage(): ReactElement {
   const handleSaveError = (error: string): void => {
     console.error("Save error:", error);
   };
+
+  const modulesForCard = buildModuleCards(blogModules);
 
   return (
     <div
@@ -208,13 +236,20 @@ export default function AddComparisionPage(): ReactElement {
         onCategoryChange={handleBlogCategoryChange}
         onReadingTimeChange={handleReadingTimeChange}
       />
-      <ModulesCard />
+      <ComparisonModulesCard
+        initialModules={modulesForCard.length > 0 ? modulesForCard : undefined}
+        onModulesChange={handleModulesChange}
+      />
       <ToolBlogCard onCardsChange={handleToolBlogCardsChange} />
       <FeatureComparision onFeaturesChange={handleFeaturesChange} />
       <ProConGrid onProsConsChange={handleProsConsChange} />
-      <MoreComparisions />
+      <MoreComparisions
+        initialSectionTitle={moreComparisonsTitle}
+        onSectionTitleChange={handleMoreComparisonsTitleChange}
+      />
       <FooterActions
         comparisonData={comparisonData}
+        blogModules={blogModules}
         onSaveSuccess={handleSaveSuccess}
         onSaveError={handleSaveError}
       />

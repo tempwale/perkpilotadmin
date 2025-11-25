@@ -37,22 +37,20 @@ export default function CardPopup({
           ✕
         </button>
         <div className="w-full flex items-center gap-4">
-          <div className="w-12 h-12 flex-shrink-0">
-            {Comparision?.logoComponent ?? (
+          <div className="w-12 h-12 shrink-0">
               <div className="w-12 h-12 bg-gray-200 rounded-full" />
-            )}
           </div>
           <div className="flex-1 text-left">
             <div className="text-white text-lg font-semibold">
-              {Comparision?.title ?? "Comparision"}
+              {Comparision?.heroHeading ?? Comparision?.title ?? "Comparison"}
             </div>
             <div className="text-zinc-400 text-sm">
-              {Comparision?.category ?? Comparision?.ComparisionType ?? ""}
+              {Comparision?.blogCategory ?? Comparision?.toolCategory ?? Comparision?.ComparisionType ?? ""}
             </div>
           </div>
         </div>
         <div className="mt-2 w-full text-zinc-300 text-sm">
-          {Comparision?.description}
+          {Comparision?.heroBody ?? Comparision?.description ?? ""}
         </div>
         <div
           data-layer="Frame 1321315044"

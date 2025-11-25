@@ -9,6 +9,8 @@ interface ComparisionsCardProps {
   description?: string;
   tags?: string[];
   onReadComparison?: () => void;
+  isSelected?: boolean;
+  onToggleFeatured?: () => void;
 }
 
 // Example Slack and Google Meet SVGs (replace with your own as needed)
@@ -71,6 +73,8 @@ const ComparisionsCard: React.FC<ComparisionsCardProps> = ({
   description = "Deep dive into two of the most popular note-taking apps, comparing features, pricing, and use cases.",
   tags = ["Productivity", "NotesTaking", "Work"],
   onReadComparison,
+  isSelected = false,
+  onToggleFeatured,
 }) => {
   return (
     <div className="w-[466px] p-4 sm:p-6 bg-white/5 rounded-3xl outline-1 -outline-offset-1 outline-white/10 inline-flex flex-col justify-start items-start gap-6">
@@ -120,9 +124,20 @@ const ComparisionsCard: React.FC<ComparisionsCardProps> = ({
           </div>
         </div>
       </div>
+      <button
+        type="button"
+        onClick={(): void => onToggleFeatured?.()}
+        className={`self-stretch h-10 sm:h-11 px-3 py-2 rounded-[100px] inline-flex justify-center items-center text-sm font-medium transition-colors ${
+          isSelected
+            ? "bg-green-500/20 text-green-300 border border-green-500/40"
+            : "bg-white/5 text-neutral-50 border border-white/10 hover:bg-white/10"
+        }`}
+      >
+        {isSelected ? "Featured" : "Add to Featured"}
+      </button>
       {/* CTA Button */}
       <Link
-        to={`/comparison/${id}`}
+        to={`/updateComparision/${id}`}
         onClick={(): void => onReadComparison && onReadComparison()}
         className="self-stretch h-10 sm:h-12 px-3 py-2 bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[100px] inline-flex justify-center items-center cursor-pointer"
       >

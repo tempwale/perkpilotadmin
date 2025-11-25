@@ -4,6 +4,7 @@ type Props = {
   subtitle?: string;
   onPreview?: () => void;
   onSave?: () => void;
+  isSaving?: boolean;
 };
 
 export default function ComparisionManagementHeader({
@@ -11,6 +12,7 @@ export default function ComparisionManagementHeader({
   subtitle = "Control overall setting for the Comparision page.",
   onPreview,
   onSave,
+  isSaving = false,
 }: Props): ReactElement{
   return (
     <div className="flex justify-center">
@@ -34,9 +36,10 @@ export default function ComparisionManagementHeader({
             <button
               type="button"
               onClick={(): void => onSave && onSave()}
-              className="flex-1 h-12 px-3 py-2 bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-xl flex justify-center items-center text-neutral-50 text-base transition-transform duration-150 ease-in-out hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[#7f57e2] active:scale-100"
+              disabled={isSaving}
+              className="flex-1 h-12 px-3 py-2 bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-xl flex justify-center items-center text-neutral-50 text-base transition-transform duration-150 ease-in-out hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[#7f57e2] active:scale-100 disabled:opacity-50 disabled:hover:scale-100"
             >
-              Save & Publish
+              {isSaving ? "Saving..." : "Save & Publish"}
             </button>
           </div>
         </div>

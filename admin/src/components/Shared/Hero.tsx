@@ -12,8 +12,8 @@ type Props = {
 };
 
 export default function Hero({
-  heading = "Hero Heading",
-  body = "Hero Body",
+  heading = "",
+  body = "",
   image: initialImage,
   onHeadingChange,
   onBodyChange,
@@ -111,7 +111,7 @@ export default function Hero({
                 value={localHeading}
                 onChange={handleHeadingChange}
                 className="w-full h-14 px-4 py-3 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-neutral-50 text-base font-['Poppins'] leading-6 outline-none placeholder:text-zinc-500"
-                placeholder="Hero heading"
+                placeholder=""
               />
             </div>
 
@@ -125,7 +125,7 @@ export default function Hero({
                 value={localBody}
                 onChange={handleBodyChange}
                 className="w-full h-14 px-4 py-3 bg-zinc-800 rounded-xl outline-1 outline-zinc-700 text-neutral-50 text-base font-['Poppins'] leading-6 outline-none placeholder:text-zinc-500"
-                placeholder="Hero Body"
+                placeholder=""
               />
             </div>
           </div>
