@@ -1,5 +1,4 @@
 import React, { type ReactElement } from "react";
-import { Link } from "react-router-dom";
 import CardPopup from "./CardPopup";
 import { useState } from "react";
 import type { ComparisonApiResponse } from "../../../types/api.types";
@@ -10,6 +9,7 @@ interface ComparisionsCardProps {
   title?: string;
   description?: string;
   tags?: string[];
+  comparisonData?: ComparisonApiResponse;
   onReadComparison?: () => void;
   onDelete?: () => void;
 }
@@ -73,6 +73,7 @@ const ComparisionsCard: React.FC<ComparisionsCardProps> = ({
   title = "Notion vs Obsidian",
   description = "Deep dive into two of the most popular note-taking apps, comparing features, pricing, and use cases.",
   tags = ["Productivity", "NotesTaking", "Work"],
+  comparisonData,
   onReadComparison,
   onDelete,
 }) => {
@@ -157,49 +158,54 @@ const ComparisionsCard: React.FC<ComparisionsCardProps> = ({
           </div>
         </div>
         {/* CTA Button */}
-        <Link
-          to={`/comparison/${id}`}
-          onClick={(): void => onReadComparison && onReadComparison()}
-          className="self-stretch h-10 sm:h-12 px-3 py-2 bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[100px] inline-flex justify-center items-center cursor-pointer"
+        <button
+          onClick={(): void => {
+            openModal();
+            onReadComparison?.();
+          }}
+          className="self-stretch h-10 sm:h-12 px-3 py-2 bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[100px] inline-flex justify-center items-center cursor-pointer hover:opacity-90 transition-opacity"
         >
           <div className="text-neutral-50 text-sm sm:text-base font-normal font-['Poppins'] leading-normal">
             Read Full Comparison
           </div>
-        </Link>
+        </button>
       </div>
-      {/* Modal: basic details popup */}
+      {/* Modal: Edit/Delete dialog */}
       {showModal && (
         <CardPopup
           onClose={closeModal}
           onDelete={onDelete}
-          Comparision={{
-            id: typeof id === "string" ? id : String(id),
-            title: title ?? "",
-            description: description ?? "",
-            tags: tags ?? [],
-            pageType: "Tool Comparison Blog",
-            heroHeading: title ?? "",
-            heroBody: description ?? "",
-            comparisonHeroImage: "",
-            sectionHeadline: "",
-            tipBulbText: "",
-            toolsMentioned: [],
-            author: "",
-            authorId: "",
-            blogCategory: "",
-            readingTime: "",
-            toolBlogCards: [],
-            featuresComparison: {
-              sectionTitle: "",
-              featuresHeadline: "",
-              tools: [],
-              features: [],
-            },
-            prosConsCards: [],
-            slug: "",
-            isPublished: false,
-            viewCount: 0,
-          } as ComparisonApiResponse}
+          Comparision={
+            comparisonData || {
+              id: typeof id === "string" ? id : String(id),
+              _id: typeof id === "string" ? id : String(id),
+              title: title ?? "",
+              description: description ?? "",
+              tags: tags ?? [],
+              pageType: "Tool Comparison Blog",
+              heroHeading: title ?? "",
+              heroBody: description ?? "",
+              comparisonHeroImage: "",
+              sectionHeadline: "",
+              tipBulbText: "",
+              toolsMentioned: [],
+              author: "",
+              authorId: "",
+              blogCategory: "",
+              readingTime: "",
+              toolBlogCards: [],
+              featuresComparison: {
+                sectionTitle: "",
+                featuresHeadline: "",
+                tools: [],
+                features: [],
+              },
+              prosConsCards: [],
+              slug: "",
+              isPublished: false,
+              viewCount: 0,
+            } as ComparisonApiResponse
+          }
         />
       )}
     </div>

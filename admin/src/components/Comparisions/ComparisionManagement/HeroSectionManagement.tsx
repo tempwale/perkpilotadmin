@@ -133,7 +133,17 @@ export default function HeroSectionManagement({
             />
           </div>
 
-          <TagChips />
+          <TagChips
+            tags={internalTags}
+            onAdd={(tag): void =>
+              setInternalTags((prev) =>
+                prev.includes(tag) ? prev : [...prev, tag]
+              )
+            }
+            onRemove={(tag): void =>
+              setInternalTags((prev) => prev.filter((t) => t !== tag))
+            }
+          />
         </>
       )}
     </div>

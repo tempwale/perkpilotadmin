@@ -21,12 +21,9 @@ type Props = {
 };
 
 export default function ToolsMentioned({
-  headline = "e.g. Essential Productive Tools To Enhance Your Workflow",
-  tip = "Tools with exclusive discounts & cashbacks",
-  initialTools = [
-    { id: "1", name: "Motion" },
-    { id: "2", name: "Notion" },
-  ],
+  headline = "",
+  tip = "",
+  initialTools = [],
   onToolsChange,
   onHeadlineChange,
   onTipChange,
@@ -40,8 +37,7 @@ export default function ToolsMentioned({
   const [searchResults, setSearchResults] = useState<Array<{ _id?: string; id?: string; title: string; logoUri?: string; category?: string; tag?: string; verified?: boolean }>>([]);
   const [showResults, setShowResults] = useState(false);
   const [loading, setLoading] = useState(false);
-  const searchRef = useRef<HTMLDivElement>(null);
-  // Helper to normalize tools for comparison (ignore IDs)
+  const searchRef = useRef<HTMLDivElement>(null); 
   const normalizeTools = (toolList: Tool[]): Array<{ name: string; logo?: string; category?: string }> => {
     return toolList.map((t) => ({
       name: t.name,
@@ -55,7 +51,6 @@ export default function ToolsMentioned({
   const onToolsChangeRef = useRef(onToolsChange);
   const toolsRef = useRef<Tool[]>(tools);
 
-  // Keep refs updated
   useEffect((): void => {
     onToolsChangeRef.current = onToolsChange;
   }, [onToolsChange]);
@@ -64,12 +59,11 @@ export default function ToolsMentioned({
     toolsRef.current = tools;
   }, [tools]);
 
-  // Only sync with initialTools on mount or when it actually changes from outside
   useEffect((): void => {
     const currentStr = JSON.stringify(normalizeTools(initialTools));
     const prevStr = prevInitialToolsRef.current;
     
-    // On initial mount, always sync
+
     if (isInitialMountRef.current) {
       isInitialMountRef.current = false;
       prevInitialToolsRef.current = currentStr;
@@ -77,22 +71,17 @@ export default function ToolsMentioned({
       return;
     }
     
-    // Only sync if initialTools actually changed (deep comparison, ignoring IDs)
     if (currentStr !== prevStr) {
-      // Check if current tools match the new initialTools (normalized, ignoring IDs)
       const currentToolsNormalized = JSON.stringify(normalizeTools(toolsRef.current));
       if (currentToolsNormalized !== currentStr) {
-        // Only sync if the content is different (external change)
         prevInitialToolsRef.current = currentStr;
         setTools(initialTools);
       } else {
-        // Content is the same, just update the ref
         prevInitialToolsRef.current = currentStr;
       }
     }
   }, [initialTools]);
 
-  // Call callback when tools change (but not on initial mount)
   useEffect((): void => {
     if (isInitialMountRef.current) return;
     onToolsChangeRef.current?.(tools);
@@ -100,7 +89,6 @@ export default function ToolsMentioned({
   useEffect((): void => setHeadlineState(headline), [headline]);
   useEffect((): void => setTipState(tip), [tip]);
 
-  // Search for tools/deals from API
   useEffect(() => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -113,8 +101,9 @@ export default function ToolsMentioned({
     const timeoutId = setTimeout(async (): Promise<void> => {
       setLoading(true);
       try {
-        const response = await fetch(`${DEALS_API}?q=${encodeURIComponent(query)}`, {
+        const response = await fetch(`${DEALS_API}?q=${encodeURIComponent(query)}&_t=${Date.now()}`, {
           signal: abortController.signal,
+          cache: "no-cache",
         });
         
         if (!response.ok) {
@@ -178,9 +167,8 @@ export default function ToolsMentioned({
       setShowResults(false);
       return;
     }
-    // Use toolName as ID to match parent's mapping
     const next: Tool = {
-      id: trimmed, // Use name as ID to match parent mapping
+      id: trimmed,
       name: trimmed,
       logo: deal.logoUri,
       category: deal.category || deal.tag || "Tool",
@@ -201,9 +189,8 @@ export default function ToolsMentioned({
       setShowResults(false);
       return;
     }
-    // Use toolName as ID to match parent's mapping
     const next: Tool = {
-      id: trimmed, // Use name as ID to match parent mapping
+      id: trimmed,
       name: trimmed,
     };
     setTools((s) => [...s, next]);
@@ -276,7 +263,7 @@ export default function ToolsMentioned({
                   >
                     <input
                       aria-label="Section headline"
-                      placeholder="e.g. Essential Productive Tools To Enhance Your Workflow"
+                      placeholder=""
                       value={headlineState}
                       onChange={(e): void => {
                         setHeadlineState(e.target.value);
@@ -312,7 +299,7 @@ export default function ToolsMentioned({
                   >
                     <input
                       aria-label="Tip text"
-                      placeholder="Tools with exclusive discounts & cashbacks"
+                      placeholder=""
                       value={tipState}
                       onChange={(e): void => {
                         setTipState(e.target.value);
@@ -368,9 +355,9 @@ export default function ToolsMentioned({
                     value={query}
                     onChange={(e): void => setQuery(e.target.value)}
                     onKeyDown={onKey}
-                    placeholder={searchPlaceholder}
+                    placeholder={searchPlaceholder || "Search deals to add as tools..."}
                     className="bg-transparent outline-none text-neutral-50 placeholder:text-zinc-500 w-full"
-                    aria-label={searchPlaceholder}
+                    aria-label={searchPlaceholder || "Search deals to add as tools"}
                   />
                   {loading && (
                     <div className="text-zinc-400 text-xs">Searching...</div>

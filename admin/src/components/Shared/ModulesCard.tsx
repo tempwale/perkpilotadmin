@@ -209,7 +209,6 @@ export default function ModulesCard({
                 </div>
               </div>
 
-              {/* Add more benefits */}
               <div
                 onClick={(): void => handleAddBenefit(moduleIndex)}
                 className="Frame2147205993 flex justify-start items-center gap-3 cursor-pointer hover:opacity-80 transition"
@@ -225,7 +224,6 @@ export default function ModulesCard({
             </div>
           </div>
 
-          {/* Module inputs */}
           <div
             data-layer="Frame 2147206019"
             className="Frame2147206019 self-stretch inline-flex justify-start items-center gap-6"

@@ -51,7 +51,7 @@ export default function Header({
           className="Frame2147205571 self-stretch flex flex-col justify-start items-start gap-1"
         >
           <div
-            data-layer="Tool Comparison Blog"
+            data-layer="Create New Tools Comparison Blog"
             className="ToolComparisonBlog self-stretch justify-start text-neutral-50 text-xl font-medium font-['Poppins'] leading-8"
           >
             {title}

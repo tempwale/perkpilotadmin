@@ -163,6 +163,10 @@ export interface ComparisonApiResponse {
   toolBlogCards: BlogSectionApiResponse[];
   featuresComparison: FeatureComparisonApiResponse;
   prosConsCards: ProsConsCardApiResponse[];
+  blogModules?: Array<{
+    moduleNumber: number;
+    moduleName: string;
+  }>;
   slug: string;
   isPublished: boolean;
   viewCount: number;
@@ -177,6 +181,20 @@ export interface ComparisonApiResponse {
   title?: string; // For generic card display
   description?: string; // For generic card display
   tags?: string[]; // For generic card display
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+}
+
+// Comparison Page Settings Types (from backend/src/types/comparison.types.ts)
+export interface ComparisonPageSettingsApiResponse {
+  _id?: string;
+  id?: string;
+  comparisonPageStatus: "live" | "maintenance";
+  comparisonPageTopTagline: string;
+  comparisonPageHeading: string;
+  comparisonPageSubheading: string;
+  comparisonPageTags: string[];
+  featuredComparisons?: string[] | ComparisonApiResponse[];
   createdAt?: string | Date;
   updatedAt?: string | Date;
 }
