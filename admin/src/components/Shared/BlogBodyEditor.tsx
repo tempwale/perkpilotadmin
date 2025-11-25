@@ -1,4 +1,4 @@
-import {useState, useRef, useEffect, type FormEvent, type ReactElement} from "react";
+import {useState, useRef, useEffect, type FormEvent, type ReactElement, type MouseEvent} from "react";
 import {
   Bold,
   Italic,
@@ -15,7 +15,6 @@ import {
   Unlink,
   ChevronUp,
   ChevronDown,
-  Type,
   Image,
   Video,
 } from "lucide-react";
@@ -51,20 +50,26 @@ type Props = {
   label?: string;
 };
 
-export default function BlogBodyEditor({ 
-  initialBody = "", 
+export default function BlogBodyEditor({
+  initialBody = "",
   onBodyChange,
-  label = "Blog Body Text Editor"
+  label = "Blog Body Text Editor",
 }: Props): ReactElement {
   const [isEnabled, setIsEnabled] = useState(true);
   const [fontSize, setFontSize] = useState(16);
   const [content, setContent] = useState<string>(initialBody || "");
   const contentRef = useRef<HTMLDivElement | null>(null);
   const isUserInputRef = useRef(false);
+  const selectionRangeRef = useRef<Range | null>(null);
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [linkModalInitialText, setLinkModalInitialText] = useState("");
-  const savedRangeRef = useRef<Range | null>(null);
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" | "warning" } | null>(null);
+  const [linkModalInitialUrl, setLinkModalInitialUrl] = useState("");
+  const [linkModalTitle, setLinkModalTitle] = useState("Add Link");
+  const linkModalConfirmRef = useRef<(linkText: string, url: string) => void>(() => {});
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error" | "info" | "warning";
+  } | null>(null);
 
   const handleToggle = (): void => {
     setIsEnabled(!isEnabled);
@@ -77,75 +82,214 @@ export default function BlogBodyEditor({
     }
   };
 
-  const execCommand = (command: string, value?: string): void => {
+  const saveSelectionRange = (): void => {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) {
+      return;
+    }
     if (contentRef.current) {
-      contentRef.current.focus();
-      document.execCommand(command, false, value);
-      const event = new Event('input', { bubbles: true });
-      contentRef.current.dispatchEvent(event);
+      const range = selection.getRangeAt(0);
+      if (contentRef.current.contains(range.commonAncestorContainer)) {
+        selectionRangeRef.current = range.cloneRange();
+      }
     }
   };
 
-  const handleInsertLink = (): void => {
+  const restoreSelectionRange = (): void => {
+    if (!selectionRangeRef.current || !contentRef.current) {
+      return;
+    }
+    const selection = window.getSelection();
+    if (!selection) {
+      return;
+    }
+    
+    // Verify the saved range is still valid and within our editor
+    try {
+      if (contentRef.current.contains(selectionRangeRef.current.commonAncestorContainer)) {
+        selection.removeAllRanges();
+        selection.addRange(selectionRangeRef.current);
+      }
+    } catch {
+      // Range became invalid, clear it
+      selectionRangeRef.current = null;
+    }
+  };
+
+  const ensureCursorInEditor = (): void => {
     if (!contentRef.current) return;
-    contentRef.current.focus();
     
     const selection = window.getSelection();
     if (!selection) return;
-    
-    let range: Range;
-    if (selection.rangeCount === 0) {
-      range = document.createRange();
-      range.selectNodeContents(contentRef.current);
-      range.collapse(false); 
-      selection.removeAllRanges();
-      selection.addRange(range);
-    } else {
-      range = selection.getRangeAt(0);
+
+
+    if (selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      if (contentRef.current.contains(range.commonAncestorContainer)) {
+        return; 
+      }
     }
+
+    const range = document.createRange();
     
-    savedRangeRef.current = range.cloneRange();
-    const selectedText = range.toString().trim();
+    if (contentRef.current.childNodes.length > 0) {
+      const lastChild = contentRef.current.lastChild;
+      if (lastChild) {
+        if (lastChild.nodeType === Node.TEXT_NODE) {
+          range.setStart(lastChild, lastChild.textContent?.length || 0);
+          range.setEnd(lastChild, lastChild.textContent?.length || 0);
+        } else {
+          range.selectNodeContents(lastChild);
+          range.collapse(false);
+        }
+      }
+    } else {
+      range.selectNodeContents(contentRef.current);
+      range.collapse(true);
+    }
+
+    selection.removeAllRanges();
+    selection.addRange(range);
+    selectionRangeRef.current = range.cloneRange();
+  };
+
+  const execCommand = (command: string, value?: string): void => {
+    if (!contentRef.current) return;
     
-    setLinkModalInitialText(selectedText);
+    contentRef.current.focus();
+    
+    // Restore saved selection or ensure cursor is in editor
+    if (selectionRangeRef.current) {
+      restoreSelectionRange();
+    } else {
+      ensureCursorInEditor();
+    }
+
+    // Special handling for formatBlock when editor is empty
+    if (command === "formatBlock") {
+      const isEmpty = !contentRef.current.textContent?.trim();
+      
+      if (isEmpty) {
+        // Extract tag name from value (e.g., "<H1>" -> "h1")
+        const tagName = value?.replace(/[<>]/g, '').toLowerCase() || 'p';
+        
+        // Create the element directly for empty editor
+        contentRef.current.innerHTML = `<${tagName}><br></${tagName}>`;
+        
+        // Place cursor inside the new element
+        const newElement = contentRef.current.firstChild;
+        if (newElement) {
+          const range = document.createRange();
+          range.selectNodeContents(newElement);
+          range.collapse(true);
+          const selection = window.getSelection();
+          if (selection) {
+            selection.removeAllRanges();
+            selection.addRange(range);
+            selectionRangeRef.current = range.cloneRange();
+          }
+        }
+      } else {
+        // Editor has content, use execCommand normally
+        document.execCommand(command, false, value);
+      }
+    } 
+    // Special handling for list commands
+    else if (command === "insertOrderedList" || command === "insertUnorderedList") {
+      const isEmpty = !contentRef.current.textContent?.trim();
+      
+      if (isEmpty) {
+        // Create list directly for empty editor
+        const listTag = command === "insertOrderedList" ? "ol" : "ul";
+        contentRef.current.innerHTML = `<${listTag}><li><br></li></${listTag}>`;
+        
+        // Place cursor inside the list item
+        const listItem = contentRef.current.querySelector('li');
+        if (listItem) {
+          const range = document.createRange();
+          range.selectNodeContents(listItem);
+          range.collapse(true);
+          const selection = window.getSelection();
+          if (selection) {
+            selection.removeAllRanges();
+            selection.addRange(range);
+            selectionRangeRef.current = range.cloneRange();
+          }
+        }
+      } else {
+        // Editor has content, use execCommand normally
+        document.execCommand(command, false, value);
+      }
+    } else {
+      // All other commands
+      document.execCommand(command, false, value);
+    }
+
+    // Trigger input event to update state
+    const event = new Event('input', { bubbles: true });
+    contentRef.current.dispatchEvent(event);
+    
+    // Save the new selection
+    saveSelectionRange();
+  };
+
+  const handleToolbarMouseDown = (
+    event: MouseEvent<HTMLButtonElement>
+  ): void => {
+    event.preventDefault();
+    saveSelectionRange();
+  };
+
+  const openLinkModal = (config: {
+    title: string;
+    initialText?: string;
+    initialUrl?: string;
+    onConfirm: (linkText: string, url: string) => void;
+  }): void => {
+    setLinkModalTitle(config.title);
+    setLinkModalInitialText(config.initialText ?? "");
+    setLinkModalInitialUrl(config.initialUrl ?? "");
+    linkModalConfirmRef.current = config.onConfirm;
+    saveSelectionRange();
     setShowLinkModal(true);
+  };
+
+  const handleInsertLink = (): void => {
+    const selectedText = window.getSelection()?.toString().trim() ?? "";
+    openLinkModal({
+      title: "Add Link",
+      initialText: selectedText,
+      initialUrl: "",
+      onConfirm: handleLinkConfirm,
+    });
   };
 
   const handleLinkConfirm = (linkText: string, url: string): void => {
     if (!contentRef.current) return;
-    
+    restoreSelectionRange();
+
     const selection = window.getSelection();
-    if (!selection) return;
-    
-    let range: Range;
-    if (savedRangeRef.current) {
-      // Restore the saved range
-      range = savedRangeRef.current;
-      selection.removeAllRanges();
-      selection.addRange(range);
-    } else {
-      range = document.createRange();
-      range.selectNodeContents(contentRef.current);
-      range.collapse(false);
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }
-    
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
     const selectedText = range.toString().trim();
     const hasSelectedText = selectedText && selectedText === linkModalInitialText;
-    
+
     if (hasSelectedText) {
       let linkElement: Element | null = null;
       let currentNode: Node | null = range.commonAncestorContainer;
-      
+
       while (currentNode) {
-        if (currentNode.nodeType === Node.ELEMENT_NODE && (currentNode as Element).tagName === "A") {
+        if (
+          currentNode.nodeType === Node.ELEMENT_NODE &&
+          (currentNode as Element).tagName === "A"
+        ) {
           linkElement = currentNode as Element;
           break;
         }
         currentNode = currentNode.parentElement || currentNode.parentNode;
       }
-      
+
       if (linkElement) {
         (linkElement as HTMLAnchorElement).href = url;
       } else {
@@ -155,7 +299,7 @@ export default function BlogBodyEditor({
         link.rel = "noopener noreferrer";
         link.style.color = "#737eff";
         link.style.textDecoration = "underline";
-        
+
         try {
           range.surroundContents(link);
         } catch {
@@ -173,29 +317,23 @@ export default function BlogBodyEditor({
       link.rel = "noopener noreferrer";
       link.style.color = "#737eff";
       link.style.textDecoration = "underline";
-      
+      range.deleteContents();
       range.insertNode(link);
-      
       range.setStartAfter(link);
       range.collapse(true);
+
       selection.removeAllRanges();
       selection.addRange(range);
     }
-    
-    const event = new Event('input', { bubbles: true });
+
+    const event = new Event("input", { bubbles: true });
     contentRef.current.dispatchEvent(event);
   };
 
-  const handleInsertImage = (): void => {
-    if (!contentRef.current) return;
-    
-    contentRef.current.focus();
-    
-    const url = prompt("Enter image URL:", "https://");
-    if (!url || !url.trim()) return;
-    
+  const handleInsertImageConfirm = (altText: string, url: string): void => {
+    const cleanedUrl = url.trim();
     try {
-      new URL(url.trim());
+      new URL(cleanedUrl);
     } catch {
       setToast({
         message: "Please enter a valid URL (e.g., https://example.com/image.jpg)",
@@ -203,25 +341,26 @@ export default function BlogBodyEditor({
       });
       return;
     }
-    
+
+    if (!contentRef.current) return;
+
     const img = document.createElement("img");
-    img.src = url.trim();
-    img.alt = "Inserted image";
+    img.src = cleanedUrl;
+    img.alt = altText || "Inserted image";
     img.style.maxWidth = "100%";
     img.style.height = "auto";
     img.style.display = "block";
     img.style.margin = "10px auto";
     img.style.borderRadius = "8px";
-    
+
     const container = document.createElement("div");
     container.style.width = "100%";
     container.style.margin = "16px 0";
     container.style.textAlign = "center";
     container.appendChild(img);
-    
+
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) {
-      // No selection - insert at end
       const range = document.createRange();
       range.selectNodeContents(contentRef.current);
       range.collapse(false);
@@ -229,66 +368,66 @@ export default function BlogBodyEditor({
     } else {
       const range = selection.getRangeAt(0);
       range.insertNode(container);
-      
-      // Move cursor after the image
       range.setStartAfter(container);
       range.collapse(true);
-      if (selection) {
-        selection.removeAllRanges();
-        selection.addRange(range);
-      }
+      selection.removeAllRanges();
+      selection.addRange(range);
     }
 
-    const event = new Event('input', { bubbles: true });
+    const event = new Event("input", { bubbles: true });
     contentRef.current.dispatchEvent(event);
   };
 
+  const handleInsertImage = (): void => {
+    const selectedText = window.getSelection()?.toString().trim() ?? "Image";
+    openLinkModal({
+      title: "Insert Image",
+      initialText: selectedText,
+      initialUrl: "https://",
+      onConfirm: handleInsertImageConfirm,
+    });
+  };
+
   const handleInsertYouTube = (): void => {
-    if (!contentRef.current) return;
-    
-    contentRef.current.focus();
-    
-    const url = prompt("Enter YouTube video URL:", "https://www.youtube.com/watch?v=");
-    if (!url || !url.trim()) return;
-    
-    let videoId = "";
-    const patterns = [
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
-      /youtube\.com\/watch\?.*v=([^&\n?#]+)/,
-      /youtube\.com\/.*[?&]v=([^&\n?#]+)/,
-    ];
-    
-    for (const pattern of patterns) {
-      const match = url.trim().match(pattern);
-      if (match && match[1]) {
-        videoId = match[1];
-        break;
-      }
-    }
-    
+    const selectedText = window.getSelection()?.toString().trim() ?? "YouTube Video";
+    openLinkModal({
+      title: "Insert YouTube Video",
+      initialText: selectedText,
+      initialUrl: "",
+      onConfirm: handleInsertYouTubeConfirm,
+    });
+  };
+
+  const handleInsertYouTubeConfirm = (linkText: string, url: string): void => {
+    const videoId = extractYouTubeVideoId(url);
     if (!videoId) {
       setToast({
-        message: "Invalid YouTube URL. Please enter a valid YouTube video URL (e.g., https://www.youtube.com/watch?v=VIDEO_ID)",
+        message:
+          "Invalid YouTube URL. Please enter a valid YouTube video URL (e.g., https://www.youtube.com/watch?v=VIDEO_ID)",
         type: "error",
       });
       return;
     }
-    
+
+    if (!contentRef.current) return;
+
     const container = document.createElement("div");
     container.style.width = "100%";
     container.style.maxWidth = "800px";
     container.style.margin = "20px auto";
     container.style.position = "relative";
-    container.style.paddingBottom = "56.25%"; 
+    container.style.paddingBottom = "56.25%";
     container.style.height = "0";
     container.style.borderRadius = "8px";
     container.style.overflow = "hidden";
     container.setAttribute("data-youtube-embed", videoId);
-    
+    container.setAttribute("data-youtube-title", linkText);
+
     const iframe = document.createElement("iframe");
     iframe.src = `https://www.youtube.com/embed/${videoId}`;
     iframe.frameBorder = "0";
-    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+    iframe.allow =
+      "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
     iframe.allowFullscreen = true;
     iframe.style.position = "absolute";
     iframe.style.top = "0";
@@ -296,9 +435,9 @@ export default function BlogBodyEditor({
     iframe.style.width = "100%";
     iframe.style.height = "100%";
     iframe.style.border = "none";
-    
+
     container.appendChild(iframe);
-    
+
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) {
       const range = document.createRange();
@@ -308,15 +447,32 @@ export default function BlogBodyEditor({
     } else {
       const range = selection.getRangeAt(0);
       range.insertNode(container);
-      
       range.setStartAfter(container);
       range.collapse(true);
       selection.removeAllRanges();
       selection.addRange(range);
     }
-    
-    const event = new Event('input', { bubbles: true });
+
+    const event = new Event("input", { bubbles: true });
     contentRef.current.dispatchEvent(event);
+  };
+
+  const extractYouTubeVideoId = (urlString: string): string | null => {
+    const trimmed = urlString.trim();
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+      /youtube\.com\/watch\?.*v=([^&\n?#]+)/,
+      /youtube\.com\/.*[?&]v=([^&\n?#]+)/,
+    ];
+
+    for (const pattern of patterns) {
+      const match = trimmed.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+
+    return null;
   };
 
   const handleFontSizeChange = (direction: "up" | "down"): void => {
@@ -343,6 +499,11 @@ export default function BlogBodyEditor({
     setTimeout(() => {
       isUserInputRef.current = false;
     }, 0);
+    saveSelectionRange();
+  };
+
+  const handleSelectionChange = (): void => {
+    saveSelectionRange();
   };
 
   useEffect(() => {
@@ -389,10 +550,12 @@ export default function BlogBodyEditor({
       <LinkInputModal
         isOpen={showLinkModal}
         onClose={() => setShowLinkModal(false)}
-        onConfirm={handleLinkConfirm}
+        onConfirm={(linkText: string, url: string): void =>
+          linkModalConfirmRef.current(linkText, url)
+        }
         initialText={linkModalInitialText}
-        initialUrl=""
-        title="Add Link"
+        initialUrl={linkModalInitialUrl}
+        title={linkModalTitle}
       />
       <style>{placeholderStyles}</style>
       <div className="w-full py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 flex flex-col justify-center items-start gap-4 overflow-hidden">
@@ -404,6 +567,7 @@ export default function BlogBodyEditor({
           </div>
           <div className="self-stretch px-6 py-3 border-b border-zinc-700 flex justify-start items-center gap-4">
             <button
+              onMouseDown={handleToolbarMouseDown}
               onClick={handleToggle}
               className="w-[53.33px] h-7 relative bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-[66.67px] outline-1 -outline-offset-1 outline-[#501bd6] overflow-hidden cursor-pointer transition-opacity hover:opacity-90"
               aria-label="Toggle content"
@@ -415,6 +579,7 @@ export default function BlogBodyEditor({
               />
             </button>
             <button
+              onMouseDown={handleToolbarMouseDown}
               onClick={handleDelete}
               className="cursor-pointer hover:opacity-70 transition-opacity"
               aria-label="Delete content"
@@ -443,13 +608,45 @@ export default function BlogBodyEditor({
           <div className="self-stretch border-b border-zinc-700 inline-flex justify-center items-center">
             <div className="flex justify-start items-start">
               <div className="self-stretch min-h-12 px-3 py-2 border-r border-zinc-700 inline-flex flex-col justify-center items-center gap-2.5">
-                <button className="inline-flex justify-center items-center gap-1 hover:opacity-70 transition-opacity">
-                  <Type size={16} className="text-neutral-50" />
-                  <span className="text-neutral-50 text-sm font-medium">
-                    Frame
-                  </span>
-                  <ChevronDown size={14} className="text-neutral-50" />
-                </button>
+                <div className="flex flex-col items-center gap-1">
+                  <div className="text-neutral-50 text-sm font-medium">
+                    Heading
+                  </div>
+                  <div className="inline-flex items-center gap-1">
+                    <button
+                      type="button"
+                      onMouseDown={handleToolbarMouseDown}
+                      onClick={(): void => execCommand("formatBlock", "p")}
+                      className="text-xs px-2 py-1 rounded bg-zinc-700 hover:bg-zinc-600 transition-colors"
+                    >
+                      P
+                    </button>
+                    <button
+                      type="button"
+                      onMouseDown={handleToolbarMouseDown}
+                      onClick={(): void => execCommand("formatBlock", "h1")}
+                      className="text-xs px-2 py-1 rounded bg-zinc-700 hover:bg-zinc-600 transition-colors"
+                    >
+                      H1
+                    </button>
+                    <button
+                      type="button"
+                      onMouseDown={handleToolbarMouseDown}
+                      onClick={(): void => execCommand("formatBlock", "h2")}
+                      className="text-xs px-2 py-1 rounded bg-zinc-700 hover:bg-zinc-600 transition-colors"
+                    >
+                      H2
+                    </button>
+                    <button
+                      type="button"
+                      onMouseDown={handleToolbarMouseDown}
+                      onClick={(): void => execCommand("formatBlock", "h3")}
+                      className="text-xs px-2 py-1 rounded bg-zinc-700 hover:bg-zinc-600 transition-colors"
+                    >
+                      H3
+                    </button>
+                  </div>
+                </div>
               </div>
 
               <div className="self-stretch min-h-12 px-3 py-2 border-r border-zinc-700 inline-flex flex-col justify-center items-center gap-2.5">
@@ -477,42 +674,48 @@ export default function BlogBodyEditor({
               </div>
 
               <div className="p-2 border-r border-zinc-700 flex justify-start items-start gap-2">
-                <button
-                  onClick={(): void => execCommand("bold")}
-                  className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
-                  title="Bold"
-                >
+                  <button
+                    onMouseDown={handleToolbarMouseDown}
+                    onClick={(): void => execCommand("bold")}
+                    className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
+                    title="Bold"
+                  >
                   <Bold size={20} className="text-neutral-50" />
                 </button>
-                <button
-                  onClick={(): void => execCommand("italic")}
-                  className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
-                  title="Italic"
-                >
+                  <button
+                    onMouseDown={handleToolbarMouseDown}
+                    onClick={(): void => execCommand("italic")}
+                    className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
+                    title="Italic"
+                  >
                   <Italic size={20} className="text-neutral-50" />
                 </button>
-                <button
-                  onClick={(): void => execCommand("underline")}
-                  className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
-                  title="Underline"
-                >
+                  <button
+                    onMouseDown={handleToolbarMouseDown}
+                    onClick={(): void => execCommand("underline")}
+                    className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
+                    title="Underline"
+                  >
                   <Underline size={20} className="text-neutral-50" />
                 </button>
-                <button
-                  onClick={(): void => execCommand("strikeThrough")}
-                  className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
-                  title="Strikethrough"
-                >
+                  <button
+                    onMouseDown={handleToolbarMouseDown}
+                    onClick={(): void => execCommand("strikeThrough")}
+                    className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
+                    title="Strikethrough"
+                  >
                   <Strikethrough size={20} className="text-neutral-50" />
                 </button>
-                <button
-                  onClick={(): void => execCommand("superscript")}
-                  className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
-                  title="Superscript"
-                >
+                  <button
+                    onMouseDown={handleToolbarMouseDown}
+                    onClick={(): void => execCommand("superscript")}
+                    className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
+                    title="Superscript"
+                  >
                   <Superscript size={20} className="text-neutral-50" />
                 </button>
                 <button
+                  onMouseDown={handleToolbarMouseDown}
                   onClick={(): void => execCommand("subscript")}
                   className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                   title="Subscript"
@@ -523,6 +726,7 @@ export default function BlogBodyEditor({
 
               <div className="p-2 border-r border-zinc-700 flex justify-start items-start gap-2">
                 <button
+                  onMouseDown={handleToolbarMouseDown}
                   onClick={(): void => execCommand("justifyLeft")}
                   className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                   title="Align Left"
@@ -530,6 +734,7 @@ export default function BlogBodyEditor({
                   <AlignLeft size={20} className="text-neutral-50" />
                 </button>
                 <button
+                  onMouseDown={handleToolbarMouseDown}
                   onClick={(): void => execCommand("justifyCenter")}
                   className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                   title="Align Center"
@@ -537,6 +742,7 @@ export default function BlogBodyEditor({
                   <AlignCenter size={20} className="text-neutral-50" />
                 </button>
                 <button
+                  onMouseDown={handleToolbarMouseDown}
                   onClick={(): void => execCommand("justifyRight")}
                   className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                   title="Align Right"
@@ -547,6 +753,7 @@ export default function BlogBodyEditor({
 
               <div className="p-2 border-r border-zinc-700 flex justify-start items-start gap-2">
                 <button
+                  onMouseDown={handleToolbarMouseDown}
                   onClick={(): void => execCommand("insertOrderedList")}
                   className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                   title="Ordered List"
@@ -554,6 +761,7 @@ export default function BlogBodyEditor({
                   <ListOrdered size={20} className="text-neutral-50" />
                 </button>
                 <button
+                  onMouseDown={handleToolbarMouseDown}
                   onClick={(): void => execCommand("insertUnorderedList")}
                   className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                   title="Unordered List"
@@ -564,6 +772,7 @@ export default function BlogBodyEditor({
 
               <div className="p-2 border-r border-zinc-700 flex justify-start items-start gap-2">
                 <button
+                  onMouseDown={handleToolbarMouseDown}
                   onClick={handleInsertImage}
                   className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                   title="Insert Image"
@@ -571,6 +780,7 @@ export default function BlogBodyEditor({
                   <Image size={20} className="text-neutral-50" />
                 </button>
                 <button
+                  onMouseDown={handleToolbarMouseDown}
                   onClick={handleInsertYouTube}
                   className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                   title="Insert YouTube Video"
@@ -578,6 +788,7 @@ export default function BlogBodyEditor({
                   <Video size={20} className="text-neutral-50" />
                 </button>
                 <button
+                  onMouseDown={handleToolbarMouseDown}
                   onClick={handleInsertLink}
                   className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                   title="Insert Link"
@@ -585,6 +796,7 @@ export default function BlogBodyEditor({
                   <Link2 size={20} className="text-neutral-50" />
                 </button>
                 <button
+                  onMouseDown={handleToolbarMouseDown}
                   onClick={(): void => execCommand("unlink")}
                   className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
                   title="Remove Link"
@@ -600,6 +812,10 @@ export default function BlogBodyEditor({
               ref={contentRef}
               contentEditable={isEnabled}
               onInput={handleContentChange}
+              onMouseUp={handleSelectionChange}
+              onKeyUp={handleSelectionChange}
+              onPointerUp={handleSelectionChange}
+              onFocus={handleSelectionChange}
               suppressContentEditableWarning={true}
               dir="ltr"
               className="w-full justify-start text-neutral-50 text-base font-normal font-['Poppins'] leading-6 outline-none min-h-[200px] focus:outline-none focus:ring-0 prose prose-invert max-w-none"
@@ -643,10 +859,41 @@ export default function BlogBodyEditor({
               width: 100%;
               height: 100%;
             }
+            [contenteditable="true"] h1 {
+              font-size: 2em;
+              font-weight: bold;
+              margin: 0.67em 0;
+            }
+            [contenteditable="true"] h2 {
+              font-size: 1.5em;
+              font-weight: bold;
+              margin: 0.83em 0;
+            }
+            [contenteditable="true"] h3 {
+              font-size: 1.17em;
+              font-weight: bold;
+              margin: 1em 0;
+            }
+            [contenteditable="true"] p {
+              margin: 1em 0;
+            }
+            [contenteditable="true"] ul,
+            [contenteditable="true"] ol {
+              padding-left: 2em;
+              margin: 1em 0;
+            }
+            [contenteditable="true"] ul {
+              list-style-type: disc;
+            }
+            [contenteditable="true"] ol {
+              list-style-type: decimal;
+            }
+            [contenteditable="true"] li {
+              margin: 0.5em 0;
+            }
           `}</style>
         </div>
       </div>
     </>
   );
 }
-

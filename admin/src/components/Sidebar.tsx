@@ -379,9 +379,9 @@ export default function Sidebar({
                   active === "users" ? "text-white" : "text-[#ebeef4]"
                 }`}
               >
-                Users
-              </div>
-            </button>
+              Users
+            </div>
+          </button>
 
           <div
             data-layer="Line 46"

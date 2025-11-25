@@ -8,6 +8,7 @@ import ComparisionManagementPage from "./pages/Comparisions/ComparisionManagemen
 import DealManagementPage from "./pages/Deal/DealsManagementPage";
 import HomeManagementPage from "./pages/HomePageManagement";
 import AddComparisionPage from "./pages/Comparisions/AddComparisionPage";
+import UpdateComparisionPage from "./pages/Comparisions/UpdateComparisionPage";
 import AddDealPage from "./pages/Deal/AddDealPage";
 import AddReviewPage from "./pages/Reviews/AddReviewPage";
 import EditReviewPage from "./pages/Reviews/EditReviewPage";
@@ -55,6 +56,7 @@ function AppContent(): ReactElement{
                 element={<ComparisionManagementPage />}
               />
               <Route path="/addcomparision" element={<AddComparisionPage />} />
+              <Route path="/updateComparision/:id" element={<UpdateComparisionPage />} />
               <Route path="/home" element={<HomeManagementPage />} />
 
               <Route path="/addreview" element={<AddReviewPage />} />
