@@ -2,7 +2,6 @@ import { useState, useEffect, type ReactElement } from "react";
 import { useLocation } from "react-router-dom";
 import {
   Grid,
-  Briefcase,
   Star,
   Tags,
   FileText,
@@ -15,6 +14,7 @@ import {
   Sun,
   Moon,
   UserPlus,
+  Home,
 } from "lucide-react";
 
 type SidebarProps = {
@@ -60,8 +60,8 @@ const getActiveKeyFromPath = (pathname: string): string => {
   }
   
   // Site Management routes
-  if (path.startsWith("/home") || path.startsWith("/homemanagement")) {
-    return "site-management";
+  if (path.startsWith("/home") || path.startsWith("/home-management")) {
+    return "home";
   }
   
   // Add Author route
@@ -207,21 +207,21 @@ export default function Sidebar({
 
           <button
             data-layer="Side Menu"
-            onClick={(): void => handleNav("site-management")}
+            onClick={(): void => handleNav("home")}
             className={`SideMenu self-stretch h-10 p-2 rounded inline-flex items-center gap-3 ${
-              active === "site-management"
+              active === "home"
                 ? "bg-linear-to-b from-[#501bd6] to-[#7f57e2]"
                 : ""
             }`}
           >
-            <Briefcase className={iconClass} />
+            <Home className={iconClass} />
             <div
-              data-layer="Site Management"
+              data-layer="Home"
               className={`SiteManagement justify-center text-sm font-normal font-['Poppins'] leading-normal ${
                 active === "site-management" ? "text-white" : "text-[#ebeef4]"
               }`}
             >
-              Site Management
+              Home
             </div>
           </button>
 
