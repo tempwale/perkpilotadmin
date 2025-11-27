@@ -70,6 +70,7 @@ export default function BlogBodyEditor({
     message: string;
     type: "success" | "error" | "info" | "warning";
   } | null>(null);
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleToggle = (): void => {
     setIsEnabled(!isEnabled);
@@ -330,62 +331,258 @@ export default function BlogBodyEditor({
     contentRef.current.dispatchEvent(event);
   };
 
-  const handleInsertImageConfirm = (altText: string, url: string): void => {
-    const cleanedUrl = url.trim();
-    try {
-      new URL(cleanedUrl);
-    } catch {
+  const makeImageResizable = (img: HTMLImageElement): void => {
+    if (img.classList.contains('resizable-image')) return;
+
+    img.draggable = false;
+    img.classList.add('resizable-image');
+    if (!img.style.width && !img.style.height) {
+      img.style.width = '50%';
+      img.style.height = 'auto';
+    }
+
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('image-resize-wrapper');
+    wrapper.style.position = 'relative';
+    wrapper.style.display = 'inline-block';
+    wrapper.style.maxWidth = '100%';
+    wrapper.contentEditable = 'false';
+
+    const parent = img.parentElement;
+    if (parent) {
+      parent.insertBefore(wrapper, img);
+      wrapper.appendChild(img);
+    }
+
+    const createHandle = (position: string): HTMLDivElement => {
+      const handle = document.createElement('div');
+      handle.classList.add('resize-handle', `resize-handle-${position}`);
+      handle.style.position = 'absolute';
+      handle.style.width = '12px';
+      handle.style.height = '12px';
+      handle.style.backgroundColor = '#737eff';
+      handle.style.border = '2px solid white';
+      handle.style.borderRadius = '50%';
+      handle.style.zIndex = '10';
+      handle.style.display = 'none';
+
+      if (position === 'nw') {
+        handle.style.top = '-6px';
+        handle.style.left = '-6px';
+        handle.style.cursor = 'nwse-resize';
+      } else if (position === 'ne') {
+        handle.style.top = '-6px';
+        handle.style.right = '-6px';
+        handle.style.cursor = 'nesw-resize';
+      } else if (position === 'sw') {
+        handle.style.bottom = '-6px';
+        handle.style.left = '-6px';
+        handle.style.cursor = 'nesw-resize';
+      } else if (position === 'se') {
+        handle.style.bottom = '-6px';
+        handle.style.right = '-6px';
+        handle.style.cursor = 'nwse-resize';
+      }
+
+      return handle;
+    };
+
+    const nwHandle = createHandle('nw');
+    const neHandle = createHandle('ne');
+    const swHandle = createHandle('sw');
+    const seHandle = createHandle('se');
+
+    wrapper.appendChild(nwHandle);
+    wrapper.appendChild(neHandle);
+    wrapper.appendChild(swHandle);
+    wrapper.appendChild(seHandle);
+
+    wrapper.addEventListener('mouseenter', () => {
+      nwHandle.style.display = 'block';
+      neHandle.style.display = 'block';
+      swHandle.style.display = 'block';
+      seHandle.style.display = 'block';
+    });
+
+    wrapper.addEventListener('mouseleave', () => {
+      nwHandle.style.display = 'none';
+      neHandle.style.display = 'none';
+      swHandle.style.display = 'none';
+      seHandle.style.display = 'none';
+    });
+
+    let isResizing = false;
+    let startX = 0;
+    let startY = 0;
+    let startWidth = 0;
+    let startHeight = 0;
+    let aspectRatio = 1;
+    let currentHandle: string = '';
+
+    const onMouseDown = (e: Event, handle: string): void => {
+      const mouseEvent = e as globalThis.MouseEvent;
+      mouseEvent.preventDefault();
+      mouseEvent.stopPropagation();
+      isResizing = true;
+      currentHandle = handle;
+      startX = mouseEvent.clientX;
+      startY = mouseEvent.clientY;
+      startWidth = img.offsetWidth;
+      startHeight = img.offsetHeight;
+      aspectRatio = startWidth / startHeight;
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    };
+
+    const onMouseMove = (e: Event): void => {
+      const mouseEvent = e as globalThis.MouseEvent;
+      if (!isResizing) return;
+
+      const deltaX = mouseEvent.clientX - startX;
+      const deltaY = mouseEvent.clientY - startY;
+      let newWidth = startWidth;
+      let newHeight = startHeight;
+
+      if (currentHandle === 'se') {
+        newWidth = startWidth + deltaX;
+        newHeight = startHeight + deltaY;
+      } else if (currentHandle === 'sw') {
+        newWidth = startWidth - deltaX;
+        newHeight = startHeight + deltaY;
+      } else if (currentHandle === 'ne') {
+        newWidth = startWidth + deltaX;
+        newHeight = startHeight - deltaY;
+      } else if (currentHandle === 'nw') {
+        newWidth = startWidth - deltaX;
+        newHeight = startHeight - deltaY;
+      }
+
+      const widthChange = Math.abs(newWidth - startWidth);
+      const heightChange = Math.abs(newHeight - startHeight);
+
+      if (widthChange > heightChange) {
+        newHeight = newWidth / aspectRatio;
+      } else {
+        newWidth = newHeight * aspectRatio;
+      }
+
+      const container = wrapper.parentElement;
+      const maxWidth = container?.offsetWidth || contentRef.current?.offsetWidth || 800;
+      const minWidth = 100;
+      const minHeight = 50;
+
+      newWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
+      newHeight = Math.max(minHeight, newWidth / aspectRatio);
+
+      img.style.width = `${newWidth}px`;
+      img.style.height = `${newHeight}px`;
+    };
+
+    const onMouseUp = (): void => {
+      isResizing = false;
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+
+      if (contentRef.current) {
+        const event = new Event("input", { bubbles: true });
+        contentRef.current.dispatchEvent(event);
+      }
+    };
+
+    nwHandle.addEventListener('mousedown', (e) => onMouseDown(e, 'nw'));
+    neHandle.addEventListener('mousedown', (e) => onMouseDown(e, 'ne'));
+    swHandle.addEventListener('mousedown', (e) => onMouseDown(e, 'sw'));
+    seHandle.addEventListener('mousedown', (e) => onMouseDown(e, 'se'));
+  };
+
+  const handleImageFileUpload = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
       setToast({
-        message: "Please enter a valid URL (e.g., https://example.com/image.jpg)",
+        message: "Please select a valid image file (JPG, PNG, GIF, etc.)",
         type: "error",
       });
       return;
     }
 
-    if (!contentRef.current) return;
-
-    const img = document.createElement("img");
-    img.src = cleanedUrl;
-    img.alt = altText || "Inserted image";
-    img.style.maxWidth = "100%";
-    img.style.height = "auto";
-    img.style.display = "block";
-    img.style.margin = "10px auto";
-    img.style.borderRadius = "8px";
-
-    const container = document.createElement("div");
-    container.style.width = "100%";
-    container.style.margin = "16px 0";
-    container.style.textAlign = "center";
-    container.appendChild(img);
-
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) {
-      const range = document.createRange();
-      range.selectNodeContents(contentRef.current);
-      range.collapse(false);
-      range.insertNode(container);
-    } else {
-      const range = selection.getRangeAt(0);
-      range.insertNode(container);
-      range.setStartAfter(container);
-      range.collapse(true);
-      selection.removeAllRanges();
-      selection.addRange(range);
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setToast({
+        message: "Image size must be less than 5MB",
+        type: "error",
+      });
+      return;
     }
 
-    const event = new Event("input", { bubbles: true });
-    contentRef.current.dispatchEvent(event);
+    const reader = new FileReader();
+    reader.onload = (e): void => {
+      const imageUrl = e.target?.result as string;
+
+      if (!contentRef.current) return;
+
+      restoreSelectionRange();
+
+      const img = document.createElement("img");
+      img.src = imageUrl;
+      img.alt = file.name || "Uploaded image";
+      img.style.height = "auto";
+      img.style.display = "block";
+      img.style.margin = "10px auto";
+      img.style.borderRadius = "8px";
+
+      const container = document.createElement("div");
+      container.style.width = "100%";
+      container.style.margin = "16px 0";
+      container.style.textAlign = "center";
+      container.appendChild(img);
+
+      img.onload = (): void => {
+        makeImageResizable(img);
+      };
+
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) {
+        const range = document.createRange();
+        range.selectNodeContents(contentRef.current);
+        range.collapse(false);
+        range.insertNode(container);
+      } else {
+        const range = selection.getRangeAt(0);
+        range.insertNode(container);
+        range.setStartAfter(container);
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+
+      const inputEvent = new Event("input", { bubbles: true });
+      contentRef.current.dispatchEvent(inputEvent);
+
+      setToast({
+        message: "Image uploaded successfully. Drag to resize.",
+        type: "success",
+      });
+    };
+
+    reader.onerror = (): void => {
+      setToast({
+        message: "Failed to read image file",
+        type: "error",
+      });
+    };
+
+    reader.readAsDataURL(file);
+
+    if (imageInputRef.current) {
+      imageInputRef.current.value = '';
+    }
   };
 
   const handleInsertImage = (): void => {
-    const selectedText = window.getSelection()?.toString().trim() ?? "Image";
-    openLinkModal({
-      title: "Insert Image",
-      initialText: selectedText,
-      initialUrl: "https://",
-      onConfirm: handleInsertImageConfirm,
-    });
+    imageInputRef.current?.click();
   };
 
   const handleInsertYouTube = (): void => {
@@ -396,6 +593,137 @@ export default function BlogBodyEditor({
       initialUrl: "",
       onConfirm: handleInsertYouTubeConfirm,
     });
+  };
+
+  const makeIframeResizable = (wrapper: HTMLElement, container: HTMLElement): void => {
+    if (wrapper.classList.contains('resizable-iframe')) return;
+
+    wrapper.classList.add('resizable-iframe');
+
+    if (!container.style.width) {
+      container.style.width = '800px';
+      container.style.maxWidth = '100%';
+    }
+
+    const createHandle = (position: string): HTMLDivElement => {
+      const handle = document.createElement('div');
+      handle.classList.add('iframe-resize-handle', `iframe-resize-handle-${position}`);
+      handle.style.position = 'absolute';
+      handle.style.width = '12px';
+      handle.style.height = '12px';
+      handle.style.backgroundColor = '#737eff';
+      handle.style.border = '2px solid white';
+      handle.style.borderRadius = '50%';
+      handle.style.zIndex = '100';
+      handle.style.display = 'none';
+
+      if (position === 'nw') {
+        handle.style.top = '-6px';
+        handle.style.left = '-6px';
+        handle.style.cursor = 'nwse-resize';
+      } else if (position === 'ne') {
+        handle.style.top = '-6px';
+        handle.style.right = '-6px';
+        handle.style.cursor = 'nesw-resize';
+      } else if (position === 'sw') {
+        handle.style.bottom = '-6px';
+        handle.style.left = '-6px';
+        handle.style.cursor = 'nesw-resize';
+      } else if (position === 'se') {
+        handle.style.bottom = '-6px';
+        handle.style.right = '-6px';
+        handle.style.cursor = 'nwse-resize';
+      }
+
+      return handle;
+    };
+
+    const nwHandle = createHandle('nw');
+    const neHandle = createHandle('ne');
+    const swHandle = createHandle('sw');
+    const seHandle = createHandle('se');
+
+    wrapper.appendChild(nwHandle);
+    wrapper.appendChild(neHandle);
+    wrapper.appendChild(swHandle);
+    wrapper.appendChild(seHandle);
+
+    wrapper.addEventListener('mouseenter', () => {
+      nwHandle.style.display = 'block';
+      neHandle.style.display = 'block';
+      swHandle.style.display = 'block';
+      seHandle.style.display = 'block';
+      wrapper.style.outline = '2px dashed #737eff';
+      wrapper.style.outlineOffset = '2px';
+    });
+
+    wrapper.addEventListener('mouseleave', () => {
+      nwHandle.style.display = 'none';
+      neHandle.style.display = 'none';
+      swHandle.style.display = 'none';
+      seHandle.style.display = 'none';
+      wrapper.style.outline = 'none';
+    });
+
+    let isResizing = false;
+    let startX = 0;
+    let startWidth = 0;
+    const aspectRatio = 16 / 9;
+    let currentHandle: string = '';
+
+    const onMouseDown = (e: Event, handle: string): void => {
+      const mouseEvent = e as globalThis.MouseEvent;
+      mouseEvent.preventDefault();
+      mouseEvent.stopPropagation();
+      isResizing = true;
+      currentHandle = handle;
+      startX = mouseEvent.clientX;
+      startWidth = container.offsetWidth;
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    };
+
+    const onMouseMove = (e: Event): void => {
+      const mouseEvent = e as globalThis.MouseEvent;
+      if (!isResizing) return;
+
+      const deltaX = mouseEvent.clientX - startX;
+      let newWidth = startWidth;
+
+      if (currentHandle === 'se' || currentHandle === 'ne') {
+        newWidth = startWidth + deltaX;
+      } else if (currentHandle === 'sw' || currentHandle === 'nw') {
+        newWidth = startWidth - deltaX;
+      }
+
+      const parentContainer = wrapper.parentElement;
+      const maxWidth = parentContainer?.offsetWidth || contentRef.current?.offsetWidth || 1200;
+      const minWidth = 300;
+
+      newWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
+      const newHeight = newWidth / aspectRatio;
+
+      container.style.width = `${newWidth}px`;
+      container.style.height = `${newHeight}px`;
+      container.style.paddingBottom = '0';
+    };
+
+    const onMouseUp = (): void => {
+      isResizing = false;
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+
+      if (contentRef.current) {
+        const event = new Event("input", { bubbles: true });
+        contentRef.current.dispatchEvent(event);
+      }
+    };
+
+    nwHandle.addEventListener('mousedown', (e) => onMouseDown(e, 'nw'));
+    neHandle.addEventListener('mousedown', (e) => onMouseDown(e, 'ne'));
+    swHandle.addEventListener('mousedown', (e) => onMouseDown(e, 'sw'));
+    seHandle.addEventListener('mousedown', (e) => onMouseDown(e, 'se'));
   };
 
   const handleInsertYouTubeConfirm = (linkText: string, url: string): void => {
@@ -411,43 +739,61 @@ export default function BlogBodyEditor({
 
     if (!contentRef.current) return;
 
+    restoreSelectionRange();
+
+    const wrapper = document.createElement("div");
+    wrapper.style.width = "100%";
+    wrapper.style.margin = "20px auto";
+    wrapper.style.padding = "0";
+    wrapper.style.position = "relative";
+    wrapper.contentEditable = "false";
+    wrapper.setAttribute("data-youtube-wrapper", "true");
+
     const container = document.createElement("div");
-    container.style.width = "100%";
-    container.style.maxWidth = "800px";
-    container.style.margin = "20px auto";
+    container.style.width = "800px";
+    container.style.maxWidth = "100%";
+    container.style.margin = "0 auto";
     container.style.position = "relative";
-    container.style.paddingBottom = "56.25%";
-    container.style.height = "0";
+    container.style.height = "450px";
     container.style.borderRadius = "8px";
     container.style.overflow = "hidden";
+    container.style.backgroundColor = "#000";
     container.setAttribute("data-youtube-embed", videoId);
     container.setAttribute("data-youtube-title", linkText);
 
     const iframe = document.createElement("iframe");
     iframe.src = `https://www.youtube.com/embed/${videoId}`;
-    iframe.frameBorder = "0";
-    iframe.allow =
-      "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-    iframe.allowFullscreen = true;
+    iframe.setAttribute("frameborder", "0");
+    iframe.setAttribute("allowfullscreen", "true");
+    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
     iframe.style.position = "absolute";
     iframe.style.top = "0";
     iframe.style.left = "0";
     iframe.style.width = "100%";
     iframe.style.height = "100%";
     iframe.style.border = "none";
+    iframe.style.pointerEvents = "auto";
 
     container.appendChild(iframe);
+    wrapper.appendChild(container);
+
+    makeIframeResizable(wrapper, container);
+
+    const spacer = document.createElement("div");
+    spacer.innerHTML = "<br>";
+    spacer.contentEditable = "true";
 
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) {
-      const range = document.createRange();
-      range.selectNodeContents(contentRef.current);
-      range.collapse(false);
-      range.insertNode(container);
+      contentRef.current.appendChild(wrapper);
+      contentRef.current.appendChild(spacer);
     } else {
       const range = selection.getRangeAt(0);
-      range.insertNode(container);
-      range.setStartAfter(container);
+      range.deleteContents();
+      range.insertNode(spacer);
+      range.insertNode(wrapper);
+
+      range.setStartAfter(spacer);
       range.collapse(true);
       selection.removeAllRanges();
       selection.addRange(range);
@@ -455,6 +801,11 @@ export default function BlogBodyEditor({
 
     const event = new Event("input", { bubbles: true });
     contentRef.current.dispatchEvent(event);
+
+    setToast({
+      message: "YouTube video added successfully. Drag corners to resize.",
+      type: "success",
+    });
   };
 
   const extractYouTubeVideoId = (urlString: string): string | null => {
@@ -521,12 +872,9 @@ export default function BlogBodyEditor({
     }
   }, [content]);
 
-  // Sync local state when initialBody prop changes externally
   useEffect(() => {
-    // If initialBody contains HTML, use it directly; otherwise use as plain text
     const bodyContent = initialBody || "";
     setContent(bodyContent);
-    // Also update the ref if it exists and we're not in user input mode
     if (contentRef.current && !isUserInputRef.current) {
       contentRef.current.innerHTML = bodyContent;
       const textContent = contentRef.current.textContent || "";
@@ -537,6 +885,23 @@ export default function BlogBodyEditor({
       }
     }
   }, [initialBody]);
+
+  useEffect(() => {
+    if (!contentRef.current) return;
+
+    const images = contentRef.current.querySelectorAll('img:not(.resizable-image)');
+    images.forEach((img) => {
+      makeImageResizable(img as HTMLImageElement);
+    });
+
+    const youtubeWrappers = contentRef.current.querySelectorAll('[data-youtube-wrapper]:not(.resizable-iframe)');
+    youtubeWrappers.forEach((wrapper) => {
+      const container = wrapper.querySelector('[data-youtube-embed]');
+      if (container) {
+        makeIframeResizable(wrapper as HTMLElement, container as HTMLElement);
+      }
+    });
+  }, [content]);
 
   return (
     <>
@@ -556,6 +921,14 @@ export default function BlogBodyEditor({
         initialText={linkModalInitialText}
         initialUrl={linkModalInitialUrl}
         title={linkModalTitle}
+      />
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageFileUpload}
+        style={{ display: 'none' }}
+        aria-hidden="true"
       />
       <style>{placeholderStyles}</style>
       <div className="w-full py-4 bg-zinc-800 rounded-3xl outline-1 -outline-offset-1 outline-zinc-700 flex flex-col justify-center items-start gap-4 overflow-hidden">
@@ -824,12 +1197,39 @@ export default function BlogBodyEditor({
             />
           </div>
           <style>{`
-            [contenteditable="true"] img {
+            [contenteditable="true"] .image-resize-wrapper {
+              position: relative;
+              display: inline-block;
               max-width: 100%;
-              height: auto;
+              margin: 16px auto;
+            }
+            [contenteditable="true"] .image-resize-wrapper img {
               display: block;
-              margin: 10px auto;
               border-radius: 8px;
+              transition: box-shadow 0.2s ease;
+              pointer-events: auto;
+            }
+            [contenteditable="true"] .image-resize-wrapper:hover img {
+              box-shadow: 0 0 0 2px #737eff;
+              outline: 2px dashed #737eff;
+              outline-offset: 2px;
+            }
+            [contenteditable="true"] .image-resize-wrapper .resize-handle {
+              position: absolute;
+              width: 12px;
+              height: 12px;
+              background-color: #737eff;
+              border: 2px solid white;
+              border-radius: 50%;
+              z-index: 10;
+              transition: transform 0.2s ease;
+            }
+            [contenteditable="true"] .image-resize-wrapper .resize-handle:hover {
+              transform: scale(1.3);
+              background-color: #5a4dd1;
+            }
+            [contenteditable="true"] img.resizable-image {
+              cursor: move;
             }
             [contenteditable="true"] a {
               color: #737eff;
@@ -839,18 +1239,27 @@ export default function BlogBodyEditor({
             [contenteditable="true"] a:hover {
               opacity: 0.8;
             }
-            [contenteditable="true"] iframe {
-              border: none;
+            [contenteditable="true"] [data-youtube-wrapper] {
+              width: 100%;
+              margin: 20px auto;
+              padding: 0;
+              pointer-events: auto;
+              position: relative;
+              display: flex;
+              justify-content: center;
+            }
+            [contenteditable="true"] [data-youtube-wrapper].resizable-iframe {
+              transition: outline 0.2s ease;
             }
             [contenteditable="true"] [data-youtube-embed] {
-              width: 100%;
-              max-width: 800px;
-              margin: 20px auto;
+              width: 800px;
+              max-width: 100%;
+              margin: 0 auto;
               position: relative;
-              padding-bottom: 56.25%;
-              height: 0;
+              height: 450px;
               border-radius: 8px;
               overflow: hidden;
+              background-color: #000;
             }
             [contenteditable="true"] [data-youtube-embed] iframe {
               position: absolute;
@@ -858,6 +1267,29 @@ export default function BlogBodyEditor({
               left: 0;
               width: 100%;
               height: 100%;
+              border: none;
+              pointer-events: auto;
+            }
+            [contenteditable="true"] .iframe-resize-handle {
+              position: absolute;
+              width: 12px;
+              height: 12px;
+              background-color: #737eff;
+              border: 2px solid white;
+              border-radius: 50%;
+              z-index: 100;
+              transition: transform 0.2s ease;
+            }
+            [contenteditable="true"] .iframe-resize-handle:hover {
+              transform: scale(1.3);
+              background-color: #5a4dd1;
+            }
+            [contenteditable="false"] {
+              user-select: none;
+              -webkit-user-select: none;
+            }
+            [contenteditable="false"] iframe {
+              pointer-events: auto !important;
             }
             [contenteditable="true"] h1 {
               font-size: 2em;
