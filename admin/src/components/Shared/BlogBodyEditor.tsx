@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import LinkInputModal from "./LinkInputModal";
 import Toast from "./Toast";
+import { uploadToCloudinary } from "../../config/cloudinary";
 
 const placeholderStyles = `
   [data-placeholder]:empty:before {
@@ -70,6 +71,7 @@ export default function BlogBodyEditor({
     message: string;
     type: "success" | "error" | "info" | "warning";
   } | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleToggle = (): void => {
@@ -496,7 +498,7 @@ export default function BlogBodyEditor({
     seHandle.addEventListener('mousedown', (e) => onMouseDown(e, 'se'));
   };
 
-  const handleImageFileUpload = (event: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleImageFileUpload = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -517,16 +519,18 @@ export default function BlogBodyEditor({
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e): void => {
-      const imageUrl = e.target?.result as string;
+    setUploadingImage(true);
+    saveSelectionRange();
+
+    try {
+      const cloudinaryUrl = await uploadToCloudinary(file);
 
       if (!contentRef.current) return;
 
       restoreSelectionRange();
 
       const img = document.createElement("img");
-      img.src = imageUrl;
+      img.src = cloudinaryUrl;
       img.alt = file.name || "Uploaded image";
       img.style.height = "auto";
       img.style.display = "block";
@@ -562,22 +566,23 @@ export default function BlogBodyEditor({
       contentRef.current.dispatchEvent(inputEvent);
 
       setToast({
-        message: "Image uploaded successfully. Drag to resize.",
+        message: "Image uploaded successfully to Cloudinary! Drag to resize.",
         type: "success",
       });
-    };
-
-    reader.onerror = (): void => {
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : "Failed to upload image. Please check your Cloudinary configuration.";
       setToast({
-        message: "Failed to read image file",
+        message: errorMessage,
         type: "error",
       });
-    };
-
-    reader.readAsDataURL(file);
-
-    if (imageInputRef.current) {
-      imageInputRef.current.value = '';
+    } finally {
+      setUploadingImage(false);
+      if (imageInputRef.current) {
+        imageInputRef.current.value = '';
+      }
     }
   };
 
@@ -1147,8 +1152,9 @@ export default function BlogBodyEditor({
                 <button
                   onMouseDown={handleToolbarMouseDown}
                   onClick={handleInsertImage}
-                  className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors"
-                  title="Insert Image"
+                  disabled={uploadingImage}
+                  className="w-8 h-8 p-1 flex justify-center items-center hover:bg-zinc-700 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={uploadingImage ? "Uploading..." : "Insert Image"}
                 >
                   <Image size={20} className="text-neutral-50" />
                 </button>
