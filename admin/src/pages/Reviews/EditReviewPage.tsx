@@ -238,7 +238,7 @@ export default function EditReviewPage(): ReactElement {
       return;
     }
 
-    if (!reviewData.rating || reviewData.rating === 0) {
+    if (!reviewData.aggregateRating || reviewData.aggregateRating === 0) {
       setToast({
         message: "Rating is required",
         type: "error",
@@ -248,12 +248,15 @@ export default function EditReviewPage(): ReactElement {
 
     try {
       setSaving(true);
+      const { rating, ...dataToSend } = reviewData;
+      const payload = rating && rating > 0 ? reviewData : dataToSend;
+
       const response = await fetch(`${REVIEWS_API}/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(reviewData),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -295,12 +298,15 @@ export default function EditReviewPage(): ReactElement {
 
     try {
       setSaving(true);
+      const { rating, ...dataToSend } = reviewData;
+      const payload = rating && rating > 0 ? reviewData : dataToSend;
+
       const response = await fetch(`${REVIEWS_API}/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(reviewData),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
