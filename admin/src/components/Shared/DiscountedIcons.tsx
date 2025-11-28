@@ -1,39 +1,37 @@
 import { ChevronDown } from "lucide-react";
-import {useEffect, useState, type ReactElement} from "react";
-import HeroImageUpload from "./HeroImageUpload";
+import { useEffect, useState, type ReactElement } from "react";
+import UploadIconGrid from "../HomeManagement/UploadIconGrid";
 
 type Props = {
   topTagline?: string;
   mainHeadline?: string;
   subHeadline?: string;
-  tags?: string[];
   ctaText?: string;
   ctaLink?: string;
-  onHeroImageChange?: (file: File | null) => void;
+  icons?: Array<{ url: string; alt?: string }>;
   onChange?: (fields: {
     topTagline: string;
     mainHeadline: string;
     subHeadline: string;
     ctaText?: string;
     ctaLink?: string;
-    tags: string[];
+    icons: Array<{ url: string; alt?: string }>;
   }) => void;
   open?: boolean;
   onToggleOpen?: (next: boolean) => void;
 };
 
-export default function HeroSectionManagement({
+export default function DiscountedIcons({
   topTagline,
   mainHeadline,
   subHeadline,
   ctaText,
   ctaLink,
-  tags,
+  icons,
   onChange,
   open: openProp,
   onToggleOpen,
-  onHeroImageChange,
-}: Props): ReactElement{
+}: Props): ReactElement {
   const [internalOpen, setInternalOpen] = useState(true);
 
   // fields internal state
@@ -41,14 +39,14 @@ export default function HeroSectionManagement({
     topTagline ?? "For Expert Insights"
   );
   const [internalMain, setInternalMain] = useState(
-    mainHeadline ?? "Software Homes"
+    mainHeadline ?? "Software Deals"
   );
   const [internalSub, setInternalSub] = useState(
     subHeadline ??
       "In-depth reviews, comparisons, and insights about the latest software tools and productivity solutions."
   );
-  const [internalTags, setInternalTags] = useState<string[]>(
-    tags ?? ["AI Tools", "No-code", "Marketing"]
+  const [internalIcons, setInternalIcons] = useState<Array<{ url: string; alt?: string }>>(
+    icons ?? []
   );
   const [internalCtaText, setInternalCtaText] = useState<string>(ctaText ?? "");
   const [internalCtaLink, setInternalCtaLink] = useState<string>(ctaLink ?? "");
@@ -64,11 +62,14 @@ export default function HeroSectionManagement({
     if (subHeadline !== undefined) setInternalSub(subHeadline);
   }, [subHeadline]);
   useEffect((): void => {
-    if (tags !== undefined) setInternalTags(tags);
-  }, [tags]);
+    if (icons !== undefined) setInternalIcons(icons);
+  }, [icons]);
+
+  // sync CTA props when they change
   useEffect((): void => {
     if (ctaText !== undefined) setInternalCtaText(ctaText);
   }, [ctaText]);
+
   useEffect((): void => {
     if (ctaLink !== undefined) setInternalCtaLink(ctaLink);
   }, [ctaLink]);
@@ -90,7 +91,7 @@ export default function HeroSectionManagement({
         subHeadline: internalSub,
         ctaText: internalCtaText,
         ctaLink: internalCtaLink,
-        tags: internalTags,
+        icons: internalIcons,
       });
   }, [
     internalTop,
@@ -98,7 +99,7 @@ export default function HeroSectionManagement({
     internalSub,
     internalCtaText,
     internalCtaLink,
-    internalTags,
+    internalIcons,
     onChange,
   ]);
 
@@ -106,7 +107,7 @@ export default function HeroSectionManagement({
     <div className="w-full p-4 bg-zinc-800 rounded-2xl flex flex-col justify-start items-start gap-6">
       <div className="self-stretch pb-4 border-b border-zinc-700 inline-flex justify-between items-center">
         <div className="text-neutral-50 text-xl font-medium leading-loose">
-          Hero Section Management
+          Discounted Icons Section
         </div>
 
         <button
@@ -138,7 +139,7 @@ export default function HeroSectionManagement({
           </div>
 
           <div className="self-stretch flex flex-col justify-center items-start gap-3">
-            <label className="text-neutral-50 text-sm font-medium">
+            <label className="text-neutral-50 text-sm font-medium placeholder:text-zinc-500">
               Main Headline
             </label>
             <input
@@ -149,7 +150,7 @@ export default function HeroSectionManagement({
           </div>
 
           <div className="self-stretch flex flex-col justify-center items-start gap-3">
-            <label className="text-neutral-50 text-sm font-medium">
+            <label className="text-neutral-50 text-sm font-medium placeholder:text-zinc-500">
               Sub-Headline ( Body )
             </label>
             <textarea
@@ -158,42 +159,38 @@ export default function HeroSectionManagement({
               onChange={(e) => setInternalSub(e.target.value)}
             />
           </div>
-
-          <div className="flex flex-col self-stretch gap-4">
-            <div className="flex flex-row w-full gap-6">
-              <div className="flex-1 flex flex-col justify-center items-start gap-3">
-                <label className="text-neutral-50 text-sm font-medium">
-                  Primary CTA Button Text
-                </label>
-                <input
-                  className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-200 placeholder:text-zinc-500"
-                  value={internalCtaText}
-                  onChange={(e) => setInternalCtaText(e.target.value)}
-                />
-              </div>
-              <div className="flex-1 flex flex-col justify-center items-start gap-3">
-                <label className="text-neutral-50 text-sm font-medium">
-                  Primary CTA Button Link
-                </label>
-                <input
-                  className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-200 placeholder:text-zinc-500"
-                  value={internalCtaLink}
-                  onChange={(e) => setInternalCtaLink(e.target.value)}
-                />
-              </div>
+          <div className="flex flex-row w-full justify-between gap-6">
+            <div className="self-stretch w-full flex flex-col gap-3">
+              <label className="text-neutral-50 text-sm font-medium ">
+                Primary CTA Button Text
+              </label>
+              <input
+                className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-200 placeholder:text-zinc-500"
+                value={internalCtaText}
+                onChange={(e) => setInternalCtaText(e.target.value)}
+              />
             </div>
-            <div className="text-[12px] text-neutral-400 font-medium">
-              The main button for users to proceed with the tool
-            </div>
-            <div className="flex flex-col self-stretch gap-2">
-            <div className="text-neutral-50 text-sm font-medium">Hero Image</div>
-            <HeroImageUpload
-              onImageChange={(file: File | null): void => {
-                if (onHeroImageChange) onHeroImageChange(file);
-              }}
-            />
+            <div className="self-stretch w-full flex flex-col justify-center items-start gap-3">
+              <label className="text-neutral-50 text-sm font-medium ">
+                Primary CTA Button Link
+              </label>
+              <input
+                className="self-stretch h-12 pl-4 pr-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 text-zinc-200 placeholder:text-zinc-500"
+                value={internalCtaLink}
+                onChange={(e) => setInternalCtaLink(e.target.value)}
+              />
             </div>
           </div>
+          <div
+            data-layer="The main button for users to proceed with the tool"
+            className="TheMainButtonForUsersToProceedWithTheTool justify-start pl-2 text-neutral-50 text-[12px] font-medium "
+          >
+            The main button for users to proceed with the tool
+          </div>
+          <UploadIconGrid />
+          <UploadIconGrid />
+          <UploadIconGrid />
+          <UploadIconGrid />
         </>
       )}
     </div>
