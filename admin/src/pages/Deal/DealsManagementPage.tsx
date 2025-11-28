@@ -3,7 +3,7 @@ import DealManagementHeader from "../../components/Deals/DealManagement/DealMana
 import DealPageSettings from "../../components/Deals/DealManagement/DealPageSettings";
 import HeroSectionManagement from "../../components/Deals/DealManagement/HeroSectionManagement";
 import ArticleGrid from "../../components/Deals/DealManagement/ArticleGrid";
-import FooterActions from "../../components/Deals/DealManagement/FooterActions";
+import FooterActions from "../../components/Shared/FooterActions";
 import { DEALPAGE_API, DEALS_API, STATS_API } from "../../config/backend";
 import type { DealApiResponse } from "../../types/api.types";
 import type { DealPageData, DealPageApiResponse, ApiErrorResponse } from "../../types/dealPage.types";

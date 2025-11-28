@@ -185,9 +185,17 @@ export default function DiscountedIcons({
             data-layer="The main button for users to proceed with the tool"
             className="TheMainButtonForUsersToProceedWithTheTool justify-start pl-2 text-neutral-50 text-[12px] font-medium "
           >
-            The main button for users to proceed with the tool
+            Upload Icon Grids
           </div>
-          <UploadIconGrid />
+          {[
+            { id: "grid-1", label: "Icon Grid 1" },
+            { id: "grid-2", label: "Icon Grid 2" },
+            { id: "grid-3", label: "Icon Grid 3" },
+            { id: "grid-4", label: "Icon Grid 4" },
+          ].map((grid) => (
+            <UploadIconGrid key={grid.id} />
+          ))}
+
         </>
       )}
     </div>
