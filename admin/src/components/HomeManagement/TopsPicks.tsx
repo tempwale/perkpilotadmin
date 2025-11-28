@@ -1,22 +1,16 @@
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Plus } from "lucide-react";
 import {useEffect, useState, type ReactElement} from "react";
+import DealsSelector from "./DealsSelector";
 import PicksGrid from "./PicksGrid";
 
 type Props = {
   topTagline?: string;
   mainHeadline?: string;
-  subHeadline?: string;
-  ctaText?: string;
-  ctaLink?: string;
-  onImageChange?: (file: File | null) => void;
-  tags?: string[];
+  selectedDeals?: string[];
   onChange?: (fields: {
     topTagline: string;
     mainHeadline: string;
-    subHeadline: string;
-    ctaText?: string;
-    ctaLink?: string;
-    tags: string[];
+    selectedDeals: string[];
   }) => void;
   open?: boolean;
   onToggleOpen?: (next: boolean) => void;
@@ -25,34 +19,24 @@ type Props = {
 export default function TopPicks({
   topTagline,
   mainHeadline,
-  subHeadline,
-  ctaText,
-  ctaLink,
-  tags,
+  selectedDeals,
   onChange,
   open: openProp,
   onToggleOpen,
 }: Props): ReactElement{
   const [internalOpen, setInternalOpen] = useState(true);
+  const [showSelector, setShowSelector] = useState(false);
 
   // fields internal state
   const [internalTop, setInternalTop] = useState(
-    topTagline ?? "For Expert Insights"
+    topTagline ?? "Top Picks"
   );
   const [internalMain, setInternalMain] = useState(
-    mainHeadline ?? "Software Deals"
+    mainHeadline ?? "Discover our top-rated software deals"
   );
-  const [internalSub, setInternalSub] = useState(
-    subHeadline ??
-      "In-depth reviews, comparisons, and insights about the latest software tools and productivity solutions."
+  const [internalDeals, setInternalDeals] = useState<string[]>(
+    selectedDeals ?? []
   );
-  const [internalTags, setInternalTags] = useState<string[]>(
-    tags ?? ["AI Tools", "No-code", "Marketing"]
-  );
-  const [internalCtaText, setInternalCtaText] = useState<string>(ctaText ?? "");
-  const [internalCtaLink, setInternalCtaLink] = useState<string>(ctaLink ?? "");
-
-  const [query, setQuery] = useState("");
 
   // sync prop -> internal when props change
   useEffect((): void => {
@@ -62,20 +46,8 @@ export default function TopPicks({
     if (mainHeadline !== undefined) setInternalMain(mainHeadline);
   }, [mainHeadline]);
   useEffect((): void => {
-    if (subHeadline !== undefined) setInternalSub(subHeadline);
-  }, [subHeadline]);
-  useEffect((): void => {
-    if (tags !== undefined) setInternalTags(tags);
-  }, [tags]);
-
-  // sync CTA props when they change
-  useEffect((): void => {
-    if (ctaText !== undefined) setInternalCtaText(ctaText);
-  }, [ctaText]);
-
-  useEffect((): void => {
-    if (ctaLink !== undefined) setInternalCtaLink(ctaLink);
-  }, [ctaLink]);
+    if (selectedDeals !== undefined) setInternalDeals(selectedDeals);
+  }, [selectedDeals]);
 
   const open = openProp ?? internalOpen;
 
@@ -91,18 +63,12 @@ export default function TopPicks({
       onChange({
         topTagline: internalTop,
         mainHeadline: internalMain,
-        subHeadline: internalSub,
-        ctaText: internalCtaText,
-        ctaLink: internalCtaLink,
-        tags: internalTags,
+        selectedDeals: internalDeals,
       });
   }, [
     internalTop,
     internalMain,
-    internalSub,
-    internalCtaText,
-    internalCtaLink,
-    internalTags,
+    internalDeals,
     onChange,
   ]);
 
@@ -118,7 +84,7 @@ export default function TopPicks({
           aria-expanded={open}
           onClick={toggleOpen}
           className="w-6 h-6 flex items-center justify-center rounded hover:bg-zinc-700/20 focus:outline-none focus:ring-2 focus:ring-[#7f57e2]"
-          aria-label={open ? "Collapse hero section" : "Expand hero section"}
+          aria-label={open ? "Collapse top picks section" : "Expand top picks section"}
         >
           <ChevronDown
             className={`text-zinc-400 transition-transform duration-150 ${
@@ -150,43 +116,35 @@ export default function TopPicks({
             />
           </div>
 
-          <div className="self-stretch relative bg-zinc-800 rounded-xl outline-1 -outline-offset-1 outline-zinc-700 px-3 py-2">
-            <div className="flex items-center gap-3">
-              <div className="w-5 h-5 rounded flex items-center justify-center">
-                {/* simple search circle visual (keeps original look) */}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="22"
-                  height="22"
-                  viewBox="0 0 22 22"
-                  fill="none"
-                >
-                  <path
-                    d="M10.5404 19.2499C15.3498 19.2499 19.2487 15.3511 19.2487 10.5416C19.2487 5.73211 15.3498 1.83325 10.5404 1.83325C5.73088 1.83325 1.83203 5.73211 1.83203 10.5416C1.83203 15.3511 5.73088 19.2499 10.5404 19.2499Z"
-                    stroke="#727A8F"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                  <path
-                    d="M20.1654 20.1666L18.332 18.3333"
-                    stroke="#727A8F"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>{" "}
-              </div>
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search Deals"
-                className="bg-transparent outline-none text-neutral-50 placeholder:text-zinc-500 w-full"
-                aria-label="Search Deals"
-              />
-            </div>
+          {/* Add Items Button */}
+          <div className="w-full flex justify-between items-center">
+            <label className="text-neutral-50 text-sm font-medium">
+              Selected Deals ({internalDeals.length})
+            </label>
+            <button
+              type="button"
+              onClick={() => setShowSelector(true)}
+              className="h-9 px-4 py-2 bg-linear-to-b from-[#501bd6] to-[#7f57e2] rounded-lg flex items-center gap-2 transition-transform duration-150 hover:scale-[1.02]"
+            >
+              <Plus className="w-4 h-4 text-white" />
+              <span className="text-white text-sm">Manage Deals</span>
+            </button>
           </div>
-          <PicksGrid />
+
+          {/* Original Card Grid UI */}
+          <PicksGrid selectedDeals={internalDeals} />
+
+          {/* Selection Modal (only shown when button clicked) */}
+          {showSelector && (
+            <DealsSelector
+              selectedDeals={internalDeals}
+              onSelectionChange={(deals) => {
+                setInternalDeals(deals);
+                setShowSelector(false);
+              }}
+              onClose={() => setShowSelector(false)}
+            />
+          )}
         </>
       )}
     </div>

@@ -9,6 +9,7 @@ interface PickProps {
   savingsAmount: string;
   rating: string;
   verified?: boolean;
+  logoUri?: string;
 }
 
 const Pick: React.FC<PickProps> = ({
@@ -19,6 +20,7 @@ const Pick: React.FC<PickProps> = ({
   savingsAmount,
   rating,
   verified = false,
+  logoUri,
 }) => {
   const SlackIcon = (): ReactElement=> (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
@@ -90,7 +92,7 @@ const Pick: React.FC<PickProps> = ({
           <div className="flex items-center gap-3 flex-1">
             {/* App Icon */}
             <div
-              className="flex items-center justify-center p-2.5 rounded-full border-2"
+              className="flex items-center justify-center p-2.5 rounded-full border-2 overflow-hidden"
               style={{
                 backgroundColor: "#FAFAFA",
                 borderColor: "rgba(255, 255, 255, 0.08)",
@@ -98,7 +100,15 @@ const Pick: React.FC<PickProps> = ({
                 height: "56px",
               }}
             >
-              <SlackIcon />
+              {logoUri ? (
+                <img
+                  src={logoUri}
+                  alt={`${appName} logo`}
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <SlackIcon />
+              )}
             </div>
 
             {/* App Name and Category */}
