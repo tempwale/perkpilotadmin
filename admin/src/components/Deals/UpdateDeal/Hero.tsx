@@ -5,6 +5,7 @@ import { Plus, Star } from "lucide-react";
 import { DEALS_API } from "../../../config/backend";
 import { fetchLogoByDomain } from "../../../utils/LogoFetch";
 import type { DealApiResponse, ApiError } from "../../../types/api.types";
+import CategorySelector from "../../Shared/CategorySelector";
 export default function ToolComparisonForm({
   reviewId,
   create,
@@ -192,8 +193,6 @@ export default function ToolComparisonForm({
   const [logoFetchUrl, setLogoFetchUrl] = useState<string>("");
   const [logoFetching, setLogoFetching] = useState<boolean>(false);
   const [logoFetchError, setLogoFetchError] = useState<string | null>(null);
-  const [showCustomCategory, setShowCustomCategory] = useState<boolean>(false);
-  const [customCategory, setCustomCategory] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -448,57 +447,17 @@ export default function ToolComparisonForm({
               >
                 Tool Category
               </div>
-              <div
-                data-layer="Input"
-                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
-              >
-                <select
-                  name="toolCategory"
-                  value={showCustomCategory ? "custom" : formData.toolCategory}
-                  onChange={(e) => {
-                    if (e.target.value === "custom") {
-                      setShowCustomCategory(true);
-                      setCustomCategory("");
-                    } else {
-                      setShowCustomCategory(false);
-                      setFormData((prev) => ({
-                        ...prev,
-                        toolCategory: e.target.value,
-                      }));
-                    }
-                  }}
-                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
-                >
-                  <option value="">Select Category</option>
-                  <option value="productivity">Productivity</option>
-                  <option value="design">Design</option>
-                  <option value="development">Development</option>
-                  <option value="marketing">Marketing</option>
-                  <option value="analytics">Analytics</option>
-                  <option value="custom">+ Add Custom Category</option>
-                </select>
-              </div>
-              {showCustomCategory && (
-                <div
-                  data-layer="Input"
-                  className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
-                >
-                  <input
-                    type="text"
-                    value={customCategory}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setCustomCategory(value);
-                      setFormData((prev) => ({
-                        ...prev,
-                        toolCategory: value,
-                      }));
-                    }}
-                    placeholder="Enter custom category"
-                    className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6"
-                  />
-                </div>
-              )}
+              <CategorySelector
+                value={formData.toolCategory}
+                onChange={(value) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    toolCategory: value,
+                  }));
+                }}
+                placeholder="Select or type custom category"
+                name="toolCategory"
+              />
             </div>
           </div>
         </div>

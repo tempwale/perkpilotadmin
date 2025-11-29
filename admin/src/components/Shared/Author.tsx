@@ -3,6 +3,7 @@ import { ChevronDown, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AUTHORS_API } from "../../config/backend";
 import type { AuthorsApiResponse } from "../../types/api.types";
+import CategorySelector from "./CategorySelector";
 
 type Props = {
   onAuthorChange?: (author: string | undefined) => void;
@@ -23,23 +24,19 @@ export default function Author({
 }: Props): ReactElement {
   const navigate = useNavigate();
   const [selectedAuthor, setSelectedAuthor] = useState<string>("Select Author");
-  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory || "Select Category");
   const [readingTime, setReadingTime] = useState(initialReadingTime || "5 Minutes");
   
   const authorDropdownRef = useRef<HTMLDivElement>(null);
   const authorMenuRef = useRef<HTMLDivElement>(null);
-  const categoryDropdownRef = useRef<HTMLDivElement>(null);
   const onAuthorChangeRef = useRef(onAuthorChange);
   const [focusedAuthorIndex, setFocusedAuthorIndex] = useState<number>(-1);
 
   const [showAuthors, setShowAuthors] = useState(false);
-  const [showCategories, setShowCategories] = useState(false);
 
   const [authors, setAuthors] = useState<Array<{ id: string; name: string }>>(
     []
   );
   const [loadingAuthors, setLoadingAuthors] = useState(false);
-  const categories = ["AI Tools", "Productivity", "Marketing", "Development", "Design", "Tech", "Finance"];
 
   // Fetch authors from backend (only once on mount)
   useEffect((): void => {
@@ -152,27 +149,6 @@ export default function Author({
     };
   }, [showAuthors]);
 
-  // Click outside detection for category dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent | TouchEvent): void => {
-      if (
-        categoryDropdownRef.current &&
-        !categoryDropdownRef.current.contains(event.target as Node)
-      ) {
-        setShowCategories(false);
-      }
-    };
-
-    if (showCategories) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("touchstart", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
-    };
-  }, [showCategories]);
 
   const handleAuthorSelect = (author: { id: string; name: string }): void => {
     setSelectedAuthor(author.name);
@@ -231,12 +207,6 @@ export default function Author({
       }
     }
   }, [showAuthors, focusedAuthorIndex]);
-
-  const handleCategorySelect = (category: string): void => {
-    setSelectedCategory(category);
-    setShowCategories(false);
-    onCategoryChange?.(category);
-  };
 
   const handleReadingTimeChange = (time: string): void => {
     setReadingTime(time);
@@ -334,38 +304,21 @@ export default function Author({
 
       {/* Category Dropdown */}
       <div
-        ref={categoryDropdownRef}
         data-layer="Frame 2147205563"
-        className="Frame2147205563 flex-1 inline-flex flex-col justify-center items-start gap-3 relative"
+        className="Frame2147205563 flex-1 inline-flex flex-col justify-center items-start gap-3"
       >
         <div className="BlogCategory text-neutral-50 text-sm font-medium font-['Poppins']">
           Blog Category
         </div>
-        <div
-          className="Input self-stretch h-14 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 outline-zinc-700 inline-flex justify-between items-center cursor-pointer"
-          onClick={(): void => setShowCategories(!showCategories)}
-        >
-          <span className="text-neutral-50 text-base font-normal font-['Poppins']">
-            {selectedCategory}
-          </span>
-          <ChevronDown className="text-zinc-200 w-5 h-5" />
-          {showCategories && (
-            <div className="absolute top-16 left-0 w-full bg-zinc-800 rounded-xl shadow-lg border border-zinc-700 z-10">
-              {categories.map((c) => (
-                <div
-                  key={c}
-                  className="px-4 py-2 hover:bg-zinc-700 cursor-pointer text-neutral-50 text-sm font-['Poppins']"
-                  onClick={(e): void => {
-                    e.stopPropagation();
-                    handleCategorySelect(c);
-                  }}
-                >
-                  {c}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <CategorySelector
+          value={initialCategory || ""}
+          onChange={(value) => {
+            onCategoryChange?.(value);
+          }}
+          placeholder="Select or type custom category"
+          categories={["AI Tools", "Productivity", "Marketing", "Development", "Design", "Tech", "Finance"]}
+          name="blogCategory"
+        />
       </div>
 
       {/* Reading Time Input */}

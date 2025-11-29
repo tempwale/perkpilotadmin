@@ -1,5 +1,5 @@
 import {useState, type ReactElement} from "react";
-import { GripVertical, Plus, Trash2 } from "lucide-react";
+import { GripVertical, Plus, Trash2, Star } from "lucide-react";
 
 type UseCase = {
   id: number;
@@ -16,7 +16,7 @@ type Props = {
 export default function BestUseCase({ initialUseCases, onUseCasesChange }: Props = {}): ReactElement {
   const [useCases, setUseCases] = useState<UseCase[]>(
     initialUseCases || [
-      { id: 1, title: "", description: "" },
+      { id: 1, title: "", description: "", rating: 3 },
     ]
   );
 
@@ -30,6 +30,7 @@ export default function BestUseCase({ initialUseCases, onUseCasesChange }: Props
       id: Date.now(),
       title: "",
       description: "",
+      rating: 3,
     };
     updateUseCasesState([...useCases, newUseCase]);
   };
@@ -41,7 +42,7 @@ export default function BestUseCase({ initialUseCases, onUseCasesChange }: Props
   const updateUseCase = (
     id: number,
     field: keyof Omit<UseCase, "id">,
-    value: string
+    value: string | number
   ): void => {
     updateUseCasesState(
       useCases.map((useCase) =>
@@ -180,6 +181,49 @@ export default function BestUseCase({ initialUseCases, onUseCasesChange }: Props
                     placeholder="Description"
                     className="w-full bg-transparent text-neutral-50 text-base font-normal font-['Poppins'] leading-6 outline-none placeholder:text-zinc-400"
                   />
+                </div>
+              </div>
+              <div
+                data-layer="Frame 2147205561"
+                className="Frame2147205561 self-stretch flex flex-col justify-center items-start gap-2"
+              >
+                <div
+                  data-layer="Rating"
+                  className="Rating justify-start text-neutral-50 text-sm font-medium font-['Poppins']"
+                >
+                  Rating (1-5)
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`w-6 h-6 cursor-pointer transition-colors ${
+                          star <= Math.round(useCase.rating || 3)
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-zinc-600"
+                        }`}
+                        onClick={() => updateUseCase(useCase.id, "rating", star)}
+                      />
+                    ))}
+                  </div>
+                  <div
+                    data-layer="Input"
+                    className="Input flex-1 h-12 pl-6 pr-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center flex-wrap content-center overflow-hidden"
+                  >
+                    <input
+                      type="number"
+                      min="1"
+                      max="5"
+                      step="0.1"
+                      value={useCase.rating || 3}
+                      onChange={(e) =>
+                        updateUseCase(useCase.id, "rating", parseFloat(e.target.value) || 3)
+                      }
+                      placeholder="Rating"
+                      className="w-full bg-transparent text-neutral-50 text-base font-normal font-['Poppins'] leading-6 outline-none placeholder:text-zinc-400"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
