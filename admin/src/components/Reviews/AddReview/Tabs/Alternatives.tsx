@@ -1,6 +1,7 @@
 
-import {useState, type ReactElement} from "react";
-import { GripVertical, Trash2, Search, Star } from "lucide-react";
+import {useState, useEffect, useRef, type ReactElement} from "react";
+import { GripVertical, Trash2, Search, Star, Plus } from "lucide-react";
+import { REVIEWS_API } from "../../../../config/backend";
 
 interface Alternative {
   id: number;
@@ -12,6 +13,7 @@ interface Alternative {
   reviewCount: number;
   pricing: string;
   compareLink: string;
+  reviewId?: string; // MongoDB _id of the review
 }
 
 interface AlternativesProps {
@@ -19,84 +21,97 @@ interface AlternativesProps {
   onAlternativesChange?: (alternatives: Alternative[]) => void;
 }
 
+interface SearchResult {
+  _id: string;
+  productName: string;
+  productType: string;
+  avatarUrl?: string;
+  aggregateRating: number;
+  ratingCount: number;
+  pricing?: Array<{ plan: string; amount: string }>;
+}
+
 export default function Alternatives({
   initialAlternatives,
+  onAlternativesChange,
 }: AlternativesProps): ReactElement{
   const [isEnabled, setIsEnabled] = useState<boolean>(true);
   const [sectionTitle, setSectionTitle] = useState<string>(
     "Product Alternatives Section"
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [alternatives] = useState<Alternative[]>(
-    initialAlternatives || [
-      {
-        id: 1,
-        logo: null,
-        name: "Sketch",
-        isVerified: true,
-        category: "Design Tool",
-        rating: 5,
-        reviewCount: 200,
-        pricing: "Free - $20/Month",
-        compareLink: "Compare With Figma",
-      },
-      {
-        id: 2,
-        logo: null,
-        name: "Sketch",
-        isVerified: true,
-        category: "Design Tool",
-        rating: 5,
-        reviewCount: 200,
-        pricing: "Free - $20/Month",
-        compareLink: "Compare With Figma",
-      },
-      {
-        id: 3,
-        logo: null,
-        name: "Sketch",
-        isVerified: true,
-        category: "Design Tool",
-        rating: 5,
-        reviewCount: 200,
-        pricing: "Free - $20/Month",
-        compareLink: "Compare With Figma",
-      },
-      {
-        id: 4,
-        logo: null,
-        name: "Sketch",
-        isVerified: true,
-        category: "Design Tool",
-        rating: 5,
-        reviewCount: 200,
-        pricing: "Free - $20/Month",
-        compareLink: "Compare With Figma",
-      },
-      {
-        id: 5,
-        logo: null,
-        name: "Sketch",
-        isVerified: true,
-        category: "Design Tool",
-        rating: 5,
-        reviewCount: 200,
-        pricing: "Free - $20/Month",
-        compareLink: "Compare With Figma",
-      },
-      {
-        id: 6,
-        logo: null,
-        name: "Sketch",
-        isVerified: true,
-        category: "Design Tool",
-        rating: 5,
-        reviewCount: 200,
-        pricing: "Free - $20/Month",
-        compareLink: "Compare With Figma",
-      },
-    ]
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searching, setSearching] = useState<boolean>(false);
+  const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
+  const [alternatives, setAlternatives] = useState<Alternative[]>(
+    initialAlternatives && initialAlternatives.length > 0 ? initialAlternatives : []
   );
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  // Update alternatives when initialAlternatives prop changes (for edit mode)
+  useEffect(() => {
+    if (initialAlternatives && initialAlternatives.length > 0) {
+      // Only update if the alternatives are actually different
+      const isDifferent = alternatives.length !== initialAlternatives.length ||
+        alternatives.some((alt, idx) => alt.id !== initialAlternatives[idx]?.id);
+
+      if (isDifferent) {
+        setAlternatives(initialAlternatives);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialAlternatives?.length]);
+
+  // Click outside to close search results
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSearchResults(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Notify parent when alternatives change
+  useEffect(() => {
+    if (onAlternativesChange) {
+      onAlternativesChange(alternatives);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [alternatives]);
+
+  // Search reviews from backend
+  useEffect(() => {
+    if (!searchQuery || searchQuery.trim().length < 2) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    const searchReviews = async () => {
+      setSearching(true);
+      try {
+        const response = await fetch(
+          `${REVIEWS_API}?productName=${encodeURIComponent(searchQuery)}&limit=10`
+        );
+        if (!response.ok) throw new Error("Failed to search reviews");
+
+        const data = await response.json() as { data: SearchResult[] };
+        setSearchResults(data.data || []);
+        setShowSearchResults(true);
+      } catch (error) {
+        console.error("Error searching reviews:", error);
+        setSearchResults([]);
+      } finally {
+        setSearching(false);
+      }
+    };
+
+    const debounceTimer = setTimeout(searchReviews, 300);
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery]);
 
   const handleToggle = (): void => {
     setIsEnabled(!isEnabled);
@@ -107,9 +122,51 @@ export default function Alternatives({
     console.log("Delete section");
   };
 
-  const filteredAlternatives = alternatives.filter((alt): boolean =>
-    alt.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleAddAlternative = (result: SearchResult): void => {
+    // Check if already added
+    if (alternatives.some(alt => alt.name === result.productName)) {
+      return;
+    }
+
+    // Check if limit reached (max 6)
+    if (alternatives.length >= 6) {
+      alert("Maximum 6 alternatives allowed");
+      return;
+    }
+
+    // Ensure rating is between 1-5, default to 3 if invalid
+    let rating = result.aggregateRating || 0;
+    if (rating < 1 || rating > 5) {
+      rating = Math.min(Math.max(Math.round(rating), 1), 5);
+    }
+    // If still 0 or invalid, default to 3
+    if (rating === 0) {
+      rating = 3;
+    }
+
+    const newAlternative: Alternative = {
+      id: Date.now(),
+      logo: result.avatarUrl || null,
+      name: result.productName,
+      isVerified: true,
+      category: result.productType || "Tool",
+      rating: rating,
+      reviewCount: result.ratingCount || 0,
+      pricing: result.pricing?.[0]
+        ? `${result.pricing[0].amount}/${result.pricing[0].plan}`
+        : "Free",
+      compareLink: `/review/${result._id}`, // Store the review link
+      reviewId: result._id,
+    };
+
+    setAlternatives(prev => [...prev, newAlternative]);
+    setSearchQuery("");
+    setShowSearchResults(false);
+  };
+
+  const handleRemoveAlternative = (id: number): void => {
+    setAlternatives(prev => prev.filter(alt => alt.id !== id));
+  };
 
   return (
     <div
@@ -199,8 +256,9 @@ export default function Alternatives({
 
         {/* Search Bar */}
         <div
+          ref={searchRef}
           data-layer="Frame 2147205556"
-          className="Frame2147205556 self-stretch inline-flex justify-start items-center gap-6"
+          className="Frame2147205556 self-stretch inline-flex justify-start items-center gap-6 relative"
         >
           <div className="flex-1 h-12 px-4 py-3 bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 flex justify-start items-center gap-3">
             <Search className="w-[22px] h-[22px] text-zinc-400" />
@@ -210,35 +268,103 @@ export default function Alternatives({
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setSearchQuery(e.target.value)
               }
-              placeholder="Search Deals"
+              onFocus={() => searchQuery.length >= 2 && setShowSearchResults(true)}
+              placeholder="Search products from reviews to add as alternatives"
               className="flex-1 bg-transparent text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-400 outline-none"
             />
+            {searching && (
+              <div className="text-zinc-400 text-sm">Searching...</div>
+            )}
           </div>
+
+          {/* Search Results Dropdown */}
+          {showSearchResults && searchQuery.length >= 2 && (
+            <div className="absolute top-14 left-0 right-0 bg-zinc-800 border border-zinc-700 rounded-xl shadow-lg max-h-80 overflow-y-auto z-50 scrollbar-thin scrollbar-thumb-zinc-600 scrollbar-track-zinc-800">
+              {searchResults.length > 0 ? (
+                searchResults.map((result) => (
+                  <div
+                    key={result._id}
+                    onClick={() => handleAddAlternative(result)}
+                    className="px-4 py-3 hover:bg-zinc-700 cursor-pointer flex items-center gap-3 border-b border-zinc-700 last:border-b-0"
+                  >
+                    {result.avatarUrl ? (
+                      <img
+                        src={result.avatarUrl}
+                        alt={result.productName}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 bg-neutral-50 rounded-full" />
+                    )}
+                    <div className="flex-1">
+                      <div className="text-neutral-50 text-sm font-medium">
+                        {result.productName}
+                      </div>
+                      <div className="text-zinc-400 text-xs">
+                        {result.productType} • {result.aggregateRating}★ ({result.ratingCount} reviews)
+                      </div>
+                    </div>
+                    <Plus className="w-5 h-5 text-[#7f57e2]" />
+                  </div>
+                ))
+              ) : (
+                <div className="px-4 py-3 text-zinc-400 text-sm text-center">
+                  No products found. Try a different search term.
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Alternatives Grid */}
-        <div className="self-stretch flex flex-col gap-6">
-          {/* Row 1 */}
-          <div className="self-stretch inline-flex justify-start items-start gap-6">
-            {filteredAlternatives.slice(0, 2).map((alternative) => (
-              <AlternativeCard key={alternative.id} alternative={alternative} />
-            ))}
-          </div>
+        {alternatives.length > 0 ? (
+          <div className="self-stretch flex flex-col gap-6">
+            {/* Row 1 */}
+            {alternatives.slice(0, 2).length > 0 && (
+              <div className="self-stretch inline-flex justify-start items-start gap-6">
+                {alternatives.slice(0, 2).map((alternative) => (
+                  <AlternativeCard
+                    key={alternative.id}
+                    alternative={alternative}
+                    onRemove={handleRemoveAlternative}
+                  />
+                ))}
+              </div>
+            )}
 
-          {/* Row 2 */}
-          <div className="self-stretch inline-flex justify-start items-start gap-6">
-            {filteredAlternatives.slice(2, 4).map((alternative) => (
-              <AlternativeCard key={alternative.id} alternative={alternative} />
-            ))}
-          </div>
+            {/* Row 2 */}
+            {alternatives.slice(2, 4).length > 0 && (
+              <div className="self-stretch inline-flex justify-start items-start gap-6">
+                {alternatives.slice(2, 4).map((alternative) => (
+                  <AlternativeCard
+                    key={alternative.id}
+                    alternative={alternative}
+                    onRemove={handleRemoveAlternative}
+                  />
+                ))}
+              </div>
+            )}
 
-          {/* Row 3 */}
-          <div className="self-stretch inline-flex justify-start items-start gap-6">
-            {filteredAlternatives.slice(4, 6).map((alternative) => (
-              <AlternativeCard key={alternative.id} alternative={alternative} />
-            ))}
+            {/* Row 3 */}
+            {alternatives.slice(4, 6).length > 0 && (
+              <div className="self-stretch inline-flex justify-start items-start gap-6">
+                {alternatives.slice(4, 6).map((alternative) => (
+                  <AlternativeCard
+                    key={alternative.id}
+                    alternative={alternative}
+                    onRemove={handleRemoveAlternative}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        </div>
+        ) : (
+          <div className="self-stretch py-12 text-center">
+            <div className="text-zinc-400 text-base">
+              No alternatives added yet. Use the search bar above to find and add products from your reviews.
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -247,13 +373,16 @@ export default function Alternatives({
 // Alternative Card Component
 interface AlternativeCardProps {
   alternative: Alternative;
+  onRemove: (id: number) => void;
 }
 
-const AlternativeCard: React.FC<AlternativeCardProps> = ({ alternative }): ReactElement=> {
+const AlternativeCard: React.FC<AlternativeCardProps> = ({ alternative, onRemove }): ReactElement=> {
   return (
-    <div className="flex-1 p-6 bg-white/5 rounded-3xl outline-1 -outline-offset-1 outline-white/10 inline-flex flex-col justify-start items-start gap-[35px]">
-      {/* Header */}
-      <div className="self-stretch relative inline-flex justify-between items-center">
+    <div className="flex-1 p-6 bg-white/5 rounded-3xl outline-1 -outline-offset-1 outline-white/10 flex gap-4">
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col justify-start items-start gap-[35px]">
+        {/* Header */}
+        <div className="self-stretch relative inline-flex justify-between items-center">
         {/* Logo and Name */}
         <div className="flex justify-start items-center gap-4">
           <div className="w-14 h-14 bg-neutral-50 rounded-full flex items-center justify-center">
@@ -302,30 +431,53 @@ const AlternativeCard: React.FC<AlternativeCardProps> = ({ alternative }): React
               <Star
                 key={star}
                 className={`w-6 h-6 ${
-                  star <= alternative.rating
+                  star <= Math.round(alternative.rating)
                     ? "fill-[#ffba1e] text-[#ffba1e]"
-                    : "text-zinc-400"
+                    : "fill-none text-zinc-400"
                 }`}
               />
             ))}
           </div>
           <div className="text-neutral-50 text-base font-normal font-['Plus_Jakarta_Sans'] leading-6">
-            Reviews ({alternative.reviewCount})
+            {alternative.rating.toFixed(1)} ({alternative.reviewCount} reviews)
           </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="self-stretch inline-flex justify-between items-center">
-        <div className="text-neutral-50 text-xl font-medium font-['Plus_Jakarta_Sans'] leading-8">
-          {alternative.pricing}
-        </div>
-        <button className="px-6 py-3 bg-white/10 rounded-[100px] flex justify-center items-center hover:bg-white/20 transition-colors">
-          <div className="text-neutral-50 text-base font-normal font-['Poppins'] leading-6">
-            {alternative.compareLink}
+        {/* Footer */}
+        <div className="self-stretch inline-flex justify-between items-center">
+          <div className="text-neutral-50 text-xl font-medium font-['Plus_Jakarta_Sans'] leading-8">
+            {alternative.pricing}
           </div>
-        </button>
+          {alternative.reviewId ? (
+            <a
+              href={`http://localhost:5173/review/${alternative.reviewId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-3 bg-white/10 rounded-[100px] flex justify-center items-center hover:bg-white/20 transition-colors"
+            >
+              <div className="text-neutral-50 text-base font-normal font-['Poppins'] leading-6">
+                View Review
+              </div>
+            </a>
+          ) : (
+            <button className="px-6 py-3 bg-white/10 rounded-[100px] flex justify-center items-center hover:bg-white/20 transition-colors">
+              <div className="text-neutral-50 text-base font-normal font-['Poppins'] leading-6">
+                Compare with {alternative.name}
+              </div>
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Delete Button */}
+      <button
+        onClick={() => onRemove(alternative.id)}
+        className="self-start hover:opacity-70 transition-opacity"
+        aria-label={`Remove alternative ${alternative.name}`}
+      >
+        <Trash2 className="w-6 h-6 text-neutral-50" />
+      </button>
     </div>
   );
 };

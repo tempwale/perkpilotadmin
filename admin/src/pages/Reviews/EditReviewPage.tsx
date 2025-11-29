@@ -200,17 +200,52 @@ export default function EditReviewPage(): ReactElement {
       default:
         return (
           <AlternativesTab
-            initialAlternatives={reviewData.alternatives?.map((alternative, idx) => ({
-              id: idx + 1,
-              logo: alternative.avatarUrl ?? null,
-              name: alternative.name ?? "",
-              isVerified: true,
-              category: alternative.type ?? "",
-              rating: alternative.rating ?? 0,
-              reviewCount: alternative.reviewCount ?? 0,
-              pricing: alternative.price ?? "",
-              compareLink: alternative.compareNote ?? "",
-            }))}
+            initialAlternatives={reviewData.alternatives?.map((alternative, idx) => {
+              let validRating = alternative.rating ?? 0;
+              if (validRating < 1 || validRating > 5) {
+                validRating = Math.min(Math.max(Math.round(validRating), 1), 5);
+              }
+              if (validRating === 0) {
+                validRating = 3;
+              }
+
+              return {
+                id: idx + 1,
+                logo: alternative.avatarUrl ?? null,
+                name: alternative.name ?? "",
+                isVerified: true,
+                category: alternative.type ?? "",
+                rating: validRating,
+                reviewCount: alternative.reviewCount ?? 0,
+                pricing: alternative.price ?? "",
+                compareLink: alternative.compareNote ?? "",
+                reviewId: alternative.reviewId ?? undefined,
+              };
+            })}
+            onAlternativesChange={(alternatives) => {
+              updateReviewData({
+                alternatives: alternatives.map((alt) => {
+                  let validRating = alt.rating;
+                  if (validRating < 1 || validRating > 5) {
+                    validRating = Math.min(Math.max(Math.round(validRating), 1), 5);
+                  }
+                  if (validRating === 0 || !validRating) {
+                    validRating = 3;
+                  }
+
+                  return {
+                    name: alt.name,
+                    type: alt.category,
+                    avatarUrl: alt.logo ?? undefined,
+                    price: alt.pricing,
+                    rating: validRating,
+                    reviewCount: alt.reviewCount,
+                    compareNote: alt.compareLink,
+                    reviewId: alt.reviewId,
+                  };
+                }),
+              });
+            }}
           />
         );
     }
@@ -229,7 +264,6 @@ export default function EditReviewPage(): ReactElement {
     console.log("=== UPDATING REVIEW ===");
     console.log("Review Data:", JSON.stringify(reviewData, null, 2));
 
-    // Validate required fields
     if (!reviewData.productName || !reviewData.productName.trim()) {
       setToast({
         message: "Product Name is required",
@@ -414,19 +448,39 @@ export default function EditReviewPage(): ReactElement {
         }}
       />
       <BestUseCase
-        initialUseCases={reviewData.useCases ? reviewData.useCases.map((uc: UseCaseApiResponse, idx: number) => ({
-          id: idx + 1,
-          title: uc.title,
-          description: uc.description ?? "",
-          rating: uc.rating,
-        })) : undefined}
+        initialUseCases={reviewData.useCases ? reviewData.useCases.map((uc: UseCaseApiResponse, idx: number) => {
+          let validRating = uc.rating ?? 0;
+          if (validRating < 1 || validRating > 5) {
+            validRating = Math.min(Math.max(Math.round(validRating), 1), 5);
+          }
+          if (validRating === 0) {
+            validRating = 3;
+          }
+
+          return {
+            id: idx + 1,
+            title: uc.title,
+            description: uc.description ?? "",
+            rating: validRating,
+          };
+        }) : undefined}
         onUseCasesChange={(useCases) => {
           updateReviewData({
-            useCases: useCases.map((uc) => ({
-              title: uc.title,
-              description: uc.description,
-              rating: uc.rating || 0,
-            })),
+            useCases: useCases.map((uc) => {
+              let validRating = uc.rating ?? 0;
+              if (validRating < 1 || validRating > 5) {
+                validRating = Math.min(Math.max(Math.round(validRating), 1), 5);
+              }
+              if (validRating === 0 || !validRating) {
+                validRating = 3;
+              }
+
+              return {
+                title: uc.title,
+                description: uc.description,
+                rating: validRating,
+              };
+            }),
           });
         }}
       />

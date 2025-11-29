@@ -177,10 +177,14 @@ export default function ToolReviewForm({
   // Handle star rating click
   const handleRatingClick = (rating: number): void => {
     console.log("Rating clicked:", rating); // Debug log
-    setFormData((prev) => ({
-      ...prev,
-      averageRating: prev.averageRating === rating ? 0 : rating, // Toggle if same rating
-    }));
+    setFormData((prev) => {
+      const newRating = prev.averageRating === rating ? 0 : rating;
+      return {
+        ...prev,
+        averageRating: newRating,
+        averageRatingText: newRating > 0 ? `${newRating} / 5` : "",
+      };
+    });
   };
 
 

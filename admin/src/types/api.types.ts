@@ -221,6 +221,7 @@ export interface AlternativeReviewApiResponse {
   rating?: number;
   reviewCount?: number;
   compareNote?: string;
+  reviewId?: string;
 }
 
 export interface RatingCategoryApiResponse {
