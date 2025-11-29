@@ -8,6 +8,7 @@ import {
 } from "react";
 import { fetchLogoByDomain } from "../../../utils/LogoFetch";
 import type { ReviewApiResponse } from "../../../types/api.types";
+import CategorySelector from "../../Shared/CategorySelector";
 
 type Props = {
   reviewData?: ReviewApiResponse;
@@ -174,7 +175,6 @@ export default function ToolReviewForm({
   };
 
   // Handle star rating click
-  // Handle star rating click
   const handleRatingClick = (rating: number): void => {
     console.log("Rating clicked:", rating); // Debug log
     setFormData((prev) => ({
@@ -183,7 +183,7 @@ export default function ToolReviewForm({
     }));
   };
 
-  // Accessible star button component
+
   const StarButton = ({ star }: { star: number }): ReactElement=> {
     const filled = star <= (hoverRating || formData.averageRating);
 
@@ -266,12 +266,10 @@ export default function ToolReviewForm({
     </button>
   );
 
-  // Handle logo selection
   const handleLogoSelect = (index: number): void => {
     setSelectedLogo(index);
   };
 
-  // Handle logo file upload
   const handleLogoUpload = (
     index: number,
     e: ChangeEvent<HTMLInputElement>
@@ -285,7 +283,6 @@ export default function ToolReviewForm({
     }
   };
 
-  // Handle logo fetch from domain
   const handleFetchLogo = async (): Promise<void> => {
     if (!logoFetchUrl.trim()) {
       setLogoFetchError("Please enter a domain or company name");
@@ -318,13 +315,11 @@ export default function ToolReviewForm({
     }
   };
 
-  // Handle form submission
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     console.log("Form Data:", formData);
     console.log("Selected Logo Index:", selectedLogo);
     console.log("Logo Files:", logoFiles);
-    // Add your API call or submission logic here
   };
 
   return (
@@ -333,7 +328,6 @@ export default function ToolReviewForm({
         data-layer="Frame 2147223610"
         className="Frame2147223610 w-[1068px] rounded-2xl inline-flex flex-col justify-start items-center gap-6"
       >
-        {/* Tool Name and Category */}
         <div
           data-layer="Frame 2147206050"
           className="Frame2147206050 self-stretch inline-flex justify-start items-center gap-6"
@@ -377,24 +371,17 @@ export default function ToolReviewForm({
               >
                 Tool Category
               </div>
-              <div
-                data-layer="Input"
-                className="Input self-stretch h-14 px-4 py-3 relative bg-zinc-800 rounded-xl outline-1 -outline-offset-0.5 outline-zinc-700 inline-flex justify-start items-center"
-              >
-                <select
-                  name="toolCategory"
-                  value={formData.toolCategory}
-                  onChange={handleInputChange}
-                  className="w-full bg-transparent outline-none text-neutral-50 text-base font-normal font-['Poppins'] leading-6 placeholder:text-zinc-500"
-                >
-                  <option value="">Select Category</option>
-                  <option value="productivity">Productivity</option>
-                  <option value="design">Design</option>
-                  <option value="development">Development</option>
-                  <option value="marketing">Marketing</option>
-                  <option value="analytics">Analytics</option>
-                </select>
-              </div>
+              <CategorySelector
+                value={formData.toolCategory}
+                onChange={(value) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    toolCategory: value,
+                  }));
+                }}
+                placeholder="Select or type custom category"
+                name="toolCategory"
+              />
             </div>
           </div>
         </div>

@@ -217,8 +217,8 @@ export default function Sidebar({
             <Home className={iconClass} />
             <div
               data-layer="Home"
-              className={`SiteManagement justify-center text-sm font-normal font-['Poppins'] leading-normal ${
-                active === "site-management" ? "text-white" : "text-[#ebeef4]"
+              className={`Home justify-center text-sm font-normal font-['Poppins'] leading-normal ${
+                active === "home" ? "text-white" : "text-[#ebeef4]"
               }`}
             >
               Home
@@ -356,8 +356,8 @@ export default function Sidebar({
             <UserPlus className={iconClass} />
             <div
               data-layer="Add Author"
-              className={`Users justify-center text-sm font-normal font-['Poppins'] ${
-                active === "users" ? "text-white" : "text-[#ebeef4]"
+              className={`AddAuthor justify-center text-sm font-normal font-['Poppins'] ${
+                active === "addAuthor" ? "text-white" : "text-[#ebeef4]"
               }`}
             >
               Add Author
